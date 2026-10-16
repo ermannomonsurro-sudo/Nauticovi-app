@@ -6,130 +6,96 @@
     <title>NAUTICOVI - Noleggio Barche & SUP Praia a Mare</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .hero-bg {
+            background: linear-gradient(to bottom, rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.95)), url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans pb-16">
 
-    <!-- HERO SECTION VIVIDA E D'IMPATTO -->
-    <header class="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white pt-10 pb-12 px-4 text-center shadow-2xl border-b-4 border-cyan-500 relative overflow-hidden">
+    <!-- HERO SECTION SCENOGRAFICA CON LOGO & COVER MARE -->
+    <header class="hero-bg text-white pt-12 pb-16 px-4 text-center shadow-2xl border-b-4 border-cyan-500 relative overflow-hidden">
         <div class="max-w-md mx-auto space-y-4 relative z-10">
-            <!-- Icona e Logo Maiuscolo -->
-            <div class="flex items-center justify-center gap-2">
+            
+            <!-- Logo & Brand Header -->
+            <div class="flex items-center justify-center gap-2.5">
                 <i class="fa-solid fa-water text-cyan-400 text-3xl"></i>
                 <h1 class="text-3xl font-black tracking-widest text-white">NAUTICOVI</h1>
             </div>
-            <p class="text-[10px] tracking-widest text-cyan-400 font-extrabold uppercase bg-cyan-950/60 inline-block px-3 py-1 rounded-full border border-cyan-500/30">
+            
+            <p class="text-[10px] tracking-widest text-cyan-300 font-extrabold uppercase bg-cyan-950/80 inline-block px-3.5 py-1 rounded-full border border-cyan-400/30 shadow-md">
                 NOLEGGIO BARCHE & SUP • PRAIA A MARE
             </p>
-            <h2 class="text-xl font-black text-white leading-tight">
-                Vivi il Mare della Riviera dei Cedri in Totale Libertà
+
+            <!-- Headline Emozionale Persuasiva -->
+            <h2 class="text-2xl font-black text-white leading-tight pt-2">
+                Il Tuo Mare, la Tua Barca, Zero Pensieri.
             </h2>
-            <p class="text-xs text-slate-300 max-w-xs mx-auto leading-relaxed">
-                Gommoni e scafi nuovi, **100% guida senza patente**. Scopri l'Isola di Dino, la Grotta Azzurra e l'Arco Magno a modo tuo.
+            
+            <p class="text-xs text-slate-200 max-w-xs mx-auto leading-relaxed">
+                Noleggia gommoni e scafi nuovi <b>100% senza patente</b>. Vivi l'Isola di Dino, la Grotta Azzurra e l'Arco Magno in totale autonomia.
             </p>
+
+            <!-- PULSANTE PRIMARIO PRINCIPALE AD ALTA CONVERSIONE -->
+            <div class="pt-4">
+                <a href="catalogo.html" class="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600 text-white text-base font-black px-8 py-4 rounded-2xl shadow-2xl transform active:scale-95 transition border border-white/20 w-full max-w-xs">
+                    <i class="fa-solid fa-ship text-xl"></i>
+                    <span>SCOPRI FLOTTA & PREZZI</span>
+                    <i class="fa-solid fa-arrow-right text-sm"></i>
+                </a>
+            </div>
+
         </div>
     </header>
 
-    <main class="max-w-md mx-auto p-4 space-y-6 -mt-6 relative z-20">
+    <main class="max-w-md mx-auto p-4 space-y-6 -mt-8 relative z-20">
 
-        <!-- 2 PULSANTI PRINCIPALI PRE-BOOKING & GUEST -->
-        <div class="space-y-3">
-            
-            <!-- Pulsante 1: Pre-Vendita & Prezzi -->
-            <a href="catalogo.html" class="block bg-white hover:bg-slate-50 p-4 rounded-2xl shadow-xl border-2 border-cyan-500/40 transition transform active:scale-95">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-cyan-600 text-white p-3.5 rounded-xl shadow">
-                            <i class="fa-solid fa-ship text-2xl"></i>
-                        </div>
-                        <div>
-                            <span class="bg-emerald-100 text-emerald-800 text-[9px] font-extrabold px-2 py-0.5 rounded uppercase">Vuoi Noleggiare?</span>
-                            <h3 class="font-extrabold text-slate-800 text-base mt-0.5">Scopri Flotta, Prezzi & SUP</h3>
-                            <p class="text-[11px] text-slate-500">Listino chiaro, calcolatore carburante e disponibilità</p>
-                        </div>
-                    </div>
-                    <i class="fa-solid fa-chevron-right text-slate-400 text-sm"></i>
-                </div>
-            </a>
-
-            <!-- Pulsante 2: Guest Portal Post-Noleggio -->
-            <a href="guest.html" class="block bg-slate-900 hover:bg-slate-800 text-white p-4 rounded-2xl shadow-xl border border-slate-700 transition transform active:scale-95">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-emerald-500 text-white p-3.5 rounded-xl shadow">
-                            <i class="fa-solid fa-compass text-2xl"></i>
-                        </div>
-                        <div>
-                            <span class="bg-cyan-900 text-cyan-200 text-[9px] font-extrabold px-2 py-0.5 rounded uppercase">Sei già a Bordo?</span>
-                            <h3 class="font-extrabold text-white text-base mt-0.5">Guest Portal & Itinerari</h3>
-                            <p class="text-[11px] text-slate-300">Rotte consigliate, consigli sulla barca e divieti</p>
-                        </div>
-                    </div>
-                    <i class="fa-solid fa-chevron-right text-cyan-400 text-sm"></i>
-                </div>
-            </a>
-
-        </div>
-
-        <!-- PERCHÉ SCEGLIERE NAUTICOVI (HIGHLIGHTS VETRINA) -->
-        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
-            <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider border-b pb-2 flex items-center gap-2">
-                <i class="fa-solid fa-anchor text-cyan-600"></i> Perché Noleggiare con Nauticovi
-            </h3>
-
-            <div class="grid grid-cols-1 gap-3 text-xs">
-                <div class="flex items-start gap-3 p-2 bg-slate-50 rounded-xl border border-slate-100">
-                    <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-bold">
-                        <i class="fa-solid fa-id-card text-sm"></i>
-                    </div>
-                    <div>
-                        <b class="text-slate-800 block text-sm">Nessuna Patente Richiesta</b>
-                        <span class="text-slate-500">Motori 30 e 40 CV facilissimi da guidare. Ti spieghiamo tutto prima di partire in 5 minuti.</span>
-                    </div>
-                </div>
-
-                <div class="flex items-start gap-3 p-2 bg-slate-50 rounded-xl border border-slate-100">
-                    <div class="bg-emerald-100 text-emerald-800 p-2 rounded-lg font-bold">
-                        <i class="fa-solid fa-shield-heart text-sm"></i>
-                    </div>
-                    <div>
-                        <b class="text-slate-800 block text-sm">Caparra e Garanzia Meteo</b>
-                        <span class="text-slate-500">Caparra 50% trasparente. Se il mare è mosso o piove, rimborso 100% o cambio data gratuito.</span>
-                    </div>
-                </div>
-
-                <div class="flex items-start gap-3 p-2 bg-slate-50 rounded-xl border border-slate-100">
-                    <div class="bg-amber-100 text-amber-800 p-2 rounded-lg font-bold">
-                        <i class="fa-solid fa-snowflake text-sm"></i>
-                    </div>
-                    <div>
-                        <b class="text-slate-800 block text-sm">Comfort & Extra a Bordo</b>
-                        <span class="text-slate-500">Su richiesta forniamo frigo rigido con ghiaccio pronto per le tue bevande al fresco.</span>
-                    </div>
-                </div>
+        <!-- STATS / HIGHLIGHTS AD IMPATTO VISIVO -->
+        <div class="grid grid-cols-3 gap-2 text-center text-xs">
+            <div class="bg-white p-3 rounded-2xl shadow-md border border-slate-200/80">
+                <i class="fa-solid fa-id-card text-cyan-600 text-lg mb-1 block"></i>
+                <b class="text-slate-800 text-[11px] block">Senza Patente</b>
+                <span class="text-[9px] text-slate-400">Guida facile 30/40 CV</span>
+            </div>
+            <div class="bg-white p-3 rounded-2xl shadow-md border border-slate-200/80">
+                <i class="fa-solid fa-shield-heart text-emerald-600 text-lg mb-1 block"></i>
+                <b class="text-slate-800 text-[11px] block">Garanzia Meteo</b>
+                <span class="text-[9px] text-slate-400">100% Rimborsabile</span>
+            </div>
+            <div class="bg-white p-3 rounded-2xl shadow-md border border-slate-200/80">
+                <i class="fa-solid fa-snowflake text-amber-500 text-lg mb-1 block"></i>
+                <b class="text-slate-800 text-[11px] block">Frigo + Ghiaccio</b>
+                <span class="text-[9px] text-slate-400">Su richiesta (15€)</span>
             </div>
         </div>
 
-        <!-- ANTEPRIMA DESTINAZIONI RAGGIUNGIBILI -->
+        <!-- ANTEPRIMA DESTINAZIONI CON IMMAGINI MOZZAFIATO -->
         <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
-            <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider border-b pb-2 flex items-center gap-2">
-                <i class="fa-solid fa-map-marked-alt text-cyan-600"></i> Cosa Vedrai in Mare
-            </h3>
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-map-marked-alt text-cyan-600"></i> Le Meraviglie da Esplorare
+                </h3>
+                <span class="text-[10px] text-cyan-600 font-bold">Praia a Mare</span>
+            </div>
 
-            <div class="grid grid-cols-3 gap-2 text-center text-[10px]">
-                <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
-                    <i class="fa-solid fa-mountain-sun text-cyan-600 text-lg mb-1 block"></i>
-                    <b class="text-slate-800 block">Isola di Dino</b>
-                    <span class="text-slate-400">Grotta Azzurra</span>
+            <!-- Card Foto Destinazione 1: Isola di Dino -->
+            <div class="relative rounded-xl overflow-hidden shadow-sm h-28 group">
+                <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" alt="Isola di Dino" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent p-3 flex flex-col justify-end text-white">
+                    <b class="text-sm font-bold">Isola di Dino & Grotta Azzurra</b>
+                    <span class="text-[10px] text-cyan-300">A soli 5 minuti di navigazione dalla costa</span>
                 </div>
-                <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
-                    <i class="fa-solid fa-archway text-cyan-600 text-lg mb-1 block"></i>
-                    <b class="text-slate-800 block">Arco Magno</b>
-                    <span class="text-slate-400">San Nicola</span>
-                </div>
-                <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
-                    <i class="fa-solid fa-fish text-cyan-600 text-lg mb-1 block"></i>
-                    <b class="text-slate-800 block">Maratea</b>
-                    <span class="text-slate-400">Calette & Secche</span>
+            </div>
+
+            <!-- Card Foto Destinazione 2: Arco Magno -->
+            <div class="relative rounded-xl overflow-hidden shadow-sm h-28 group">
+                <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" alt="Arco Magno" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent p-3 flex flex-col justify-end text-white">
+                    <b class="text-sm font-bold">Arco Magno (San Nicola Arcella)</b>
+                    <span class="text-[10px] text-cyan-300">Un parco naturale unico incastonato nella roccia</span>
                 </div>
             </div>
         </div>
@@ -144,30 +110,26 @@
                 <i class="fa-solid fa-star"></i>
                 <span class="text-slate-800 font-bold text-xs ml-1">5.0 / 5 su Google</span>
             </div>
-            <p class="text-xs text-slate-600 italic">"Gommoni nuovi e pulitissimi, facilità unica di guida. Un tour fantastico tra Grotta Azzurra e Arco Magno!"</p>
+            <p class="text-xs text-slate-600 italic">"Gommoni nuovi, puliti e facilissimi da guidare. Un'escursione indimenticabile all'Isola di Dino!"</p>
             <a href="https://maps.google.com" target="_blank" class="inline-block text-[11px] font-bold text-cyan-600 hover:underline">
-                <i class="fa-brands fa-google"></i> Leggi tutte le recensioni su Google
+                <i class="fa-brands fa-google"></i> Leggi le recensioni ufficiali dei nostri clienti
             </a>
         </div>
 
-        <!-- FASCIA FAQ RAPIDE -->
+        <!-- FASCIA FAQ RAPIDE PER SUPERARE LE FRIZIONI -->
         <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
             <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider border-b pb-2 flex items-center gap-2">
-                <i class="fa-solid fa-circle-question text-cyan-600"></i> Domande Frequenti (FAQ)
+                <i class="fa-solid fa-circle-question text-cyan-600"></i> Hai Domande prima di Noleggiare?
             </h3>
 
             <div class="space-y-2.5 text-xs text-slate-600">
                 <div>
-                    <b class="text-slate-800 block">Serve la patente nautica?</b>
-                    <span>No! Tutte le nostre imbarcazioni sono da 30 e 40 CV e si guidano in autonomia senza patente.</span>
+                    <b class="text-slate-800 block">E se non ho mai guidato una barca?</b>
+                    <span>Nessun problema! Prima di salpare faremo un briefing di 5 minuti dove ti spiegheremo comandi, ancora e sicurezza.</span>
                 </div>
                 <div class="border-t pt-2">
-                    <b class="text-slate-800 block">Come funziona la caparra?</b>
-                    <span>Chiediamo il 50% di caparra alla conferma via bonifico istantaneo, PayPal o contanti in sede.</span>
-                </div>
-                <div class="border-t pt-2">
-                    <b class="text-slate-800 block">E se c'è brutto tempo?</b>
-                    <span>In caso di mare mosso o allerta meteo, la caparra viene rimborsata al 100% o la data spostata gratuitamente.</span>
+                    <b class="text-slate-800 block">Come funziona in caso di brutto tempo?</b>
+                    <span>In caso di mare mosso o allerta meteo, la caparra del 50% viene rimborsata al 100% o la data spostata gratuitamente.</span>
                 </div>
             </div>
         </div>
