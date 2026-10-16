@@ -3,20 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NAUTICOVI - Guest Portal</title>
+    <title>NAUTICOVI - Guest Portal & Navigatore</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- CSS & JS Leaflet Mappa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        #nav-map {
+            height: 380px !important;
+            width: 100% !important;
+            border-radius: 1rem;
+            z-index: 10;
+        }
+    </style>
 </head>
-<body class="bg-slate-100 text-slate-800 pb-16 font-sans">
+<body class="bg-slate-100 text-slate-800 pb-20 font-sans">
 
-    <!-- Header Brand -->
-    <header class="bg-slate-900 text-white py-5 px-4 text-center shadow-xl border-b-4 border-cyan-500 sticky top-0 z-50">
-        <div class="flex items-center justify-between max-w-md mx-auto w-full px-2"><a href="index.html" class="text-xs text-cyan-400 hover:text-white font-bold flex items-center gap-1 bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700"><i class="fa-solid fa-house"></i> Home</a><div class="flex flex-col items-center justify-center"><div class="flex items-center gap-2"><i class="fa-solid fa-water text-cyan-400 text-xl"></i><h1 class="text-xl font-black tracking-widest text-white">NAUTICOVI</h1></div><p class="text-[8px] tracking-widest text-cyan-400 font-bold uppercase">NOLEGGIO BARCHE</p></div><div class="w-12"></div></div>
-            <div class="flex items-center gap-2 mb-1">
-                <i class="fa-solid fa-water text-cyan-400 text-2xl"></i>
-                <h1 class="text-2xl font-black tracking-widest text-white">NAUTICOVI</h1>
+    <!-- Header Brand con Pulsante Home -->
+    <header class="bg-slate-900 text-white py-4 px-4 shadow-xl border-b-4 border-cyan-500 sticky top-0 z-50">
+        <div class="flex items-center justify-between max-w-md mx-auto w-full">
+            <a href="index.html" class="text-xs text-cyan-400 hover:text-white font-bold flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
+                <i class="fa-solid fa-house"></i> Home
+            </a>
+            <div class="text-center">
+                <div class="flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-water text-cyan-400 text-lg"></i>
+                    <h1 class="text-xl font-black tracking-widest text-white">NAUTICOVI</h1>
+                </div>
+                <p class="text-[8px] tracking-widest text-cyan-400 font-bold uppercase">GUEST PORTAL • PRAIA A MARE</p>
             </div>
-            <p class="text-[9px] tracking-widest text-cyan-400 font-bold uppercase">NOLEGGIO BARCHE • PRAIA A MARE</p>
+            <a href="tel:+393000000000" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1 shadow">
+                <i class="fa-solid fa-phone"></i> SOS
+            </a>
         </div>
     </header>
 
@@ -30,46 +51,98 @@
                     <h2 class="text-xl font-extrabold mt-2" id="welcome-nome">Benvenuto a Bordo!</h2>
                     <p class="text-xs text-slate-300 mt-0.5">Barca: <span class="font-bold text-cyan-300" id="welcome-barca">Marlin 1</span></p>
                 </div>
-                <!-- Chiamata Assistenza al Gestore -->
-                <a href="tel:+393000000000" class="bg-red-500 hover:bg-red-600 text-white p-3 rounded-xl shadow-lg transition flex items-center justify-center">
-                    <i class="fa-solid fa-phone-volume text-lg"></i>
-                </a>
-            </div>
-            <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs text-slate-300">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-sun text-amber-400 text-base"></i>
-                    <span>28°C • Mare Calmo</span>
-                </div>
-                <div class="flex items-center gap-1.5 text-cyan-300 font-medium">
-                    <i class="fa-solid fa-wind"></i> Vento NO 6 nodi
+                <div class="text-right">
+                    <span class="text-xs text-amber-400 block font-bold"><i class="fa-solid fa-sun"></i> 28°C</span>
+                    <span class="text-[10px] text-cyan-300">Mare Calmo</span>
                 </div>
             </div>
         </div>
 
-        <!-- Navigazione a Schede -->
+        <!-- TAB NAVIGAZIONE INTERNA -->
         <div class="flex bg-slate-200 p-1 rounded-xl text-xs font-bold text-slate-600 gap-1 shadow-inner">
-            <button onclick="switchTab('rotta')" id="tab-rotta" class="tab-btn flex-1 py-2.5 rounded-lg bg-white text-slate-900 shadow">Scegli Rotta</button>
-            <button onclick="switchTab('tips')" id="tab-tips" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Tips Barca</button>
-            <button onclick="switchTab('regole')" id="tab-regole" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Divieti</button>
+            <button onclick="switchTab('navigatore')" id="tab-navigatore" class="tab-btn flex-1 py-2.5 rounded-lg bg-white text-slate-900 shadow flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-location-arrow text-cyan-600"></i> Navigatore GPS
+            </button>
+            <button onclick="switchTab('tips')" id="tab-tips" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-compass"></i> Tips Barca
+            </button>
+            <button onclick="switchTab('regole')" id="tab-regole" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-ban text-red-500"></i> Divieti
+            </button>
         </div>
 
-        <!-- SEZIONE 1: SELEZIONATORE ROTTA DEL GIORNO -->
-        <div id="sec-rotta" class="tab-content space-y-4">
-            <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200 space-y-3">
-                <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
-                    <i class="fa-solid fa-compass text-cyan-600"></i> Seleziona la Tua Meta di Oggi
-                </h3>
-                <select id="select-itinerario" onchange="cambiaItinerario()" class="w-full p-2.5 border rounded-xl bg-slate-50 font-bold text-slate-800 text-xs outline-none focus:ring-2 focus:ring-cyan-500">
-                    <option value="generico">Tutti i Punti d'Interesse in Zona (Isola, Arco Magno, Grotte)</option>
-                    <option value="arcomagno">Vuoi Visitare l'Arco Magno? (Rotta e punti dedicati)</option>
-                    <option value="maratea">Vuoi Visitare Maratea? (Rotta verso Nord e insenature)</option>
+        <!-- SEZIONE 1: NAVIGATORE NAUTICO INTEGRATO -->
+        <div id="sec-navigatore" class="tab-content space-y-4">
+            
+            <!-- Telemetria GPS Live Bar -->
+            <div class="bg-slate-900 text-white p-3 rounded-2xl shadow-md border border-cyan-500/30 flex justify-between items-center text-center font-mono text-xs">
+                <div>
+                    <span class="text-[9px] text-slate-400 block uppercase">Velocità</span>
+                    <b class="text-cyan-400 text-sm" id="live-speed">0.0 Nodi</b>
+                </div>
+                <div class="border-x border-slate-700 px-3">
+                    <span class="text-[9px] text-slate-400 block uppercase">Prua / Rotta</span>
+                    <b class="text-emerald-400 text-sm" id="live-heading">---°</b>
+                </div>
+                <div>
+                    <span class="text-[9px] text-slate-400 block uppercase">Stato GPS</span>
+                    <span class="inline-flex items-center gap-1 text-emerald-400 font-bold text-[10px]" id="gps-status">
+                        <i class="fa-solid fa-circle text-[8px] animate-pulse"></i> Attivo
+                    </span>
+                </div>
+            </div>
+
+            <!-- Selezionatore Itinerario / Filtro Rotta sulla Mappa -->
+            <div class="bg-white p-3.5 rounded-2xl shadow-md border border-slate-200 space-y-2">
+                <label class="block font-bold text-slate-700 text-xs flex items-center gap-1.5">
+                    <i class="fa-solid fa-route text-cyan-600"></i> Seleziona Rotta da Seguire:
+                </label>
+                <select id="select-rotta" onchange="filtraRotta()" class="w-full p-2 border rounded-xl bg-slate-50 font-bold text-slate-800 text-xs outline-none focus:ring-2 focus:ring-cyan-500">
+                    <option value="tutti">Tutti i Punti d'Interesse in Zona</option>
+                    <option value="arcomagno">Rotta Sud: Isola di Dino ➔ Arco Magno</option>
+                    <option value="maratea">Rotta Nord: Isola di Dino ➔ Costa di Maratea</option>
                 </select>
             </div>
 
-            <!-- Contenitore Punti d'Interesse Dinamico -->
-            <div id="punti-container" class="space-y-3">
-                <!-- Popolato da JS in base alla scelta -->
+            <!-- Mappa GPS Live -->
+            <div class="bg-white p-3 rounded-2xl shadow-md border border-slate-200 relative">
+                <div id="nav-map"></div>
+                
+                <!-- Bottone Ricentra Posizione -->
+                <button onclick="ricentraGPS()" class="absolute bottom-6 right-6 z-20 bg-slate-900 text-cyan-400 p-3 rounded-full shadow-2xl border border-cyan-500/40 text-sm">
+                    <i class="fa-solid fa-crosshairs"></i>
+                </button>
             </div>
+
+            <!-- Card Dettaglio POI Selezionato sulla Mappa -->
+            <div id="poi-detail-card" class="bg-white p-4 rounded-2xl shadow-md border border-cyan-500/40 hidden space-y-1 text-xs">
+                <div class="flex justify-between items-start">
+                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" id="poi-cat">Grotta</span>
+                    <button onclick="chiudiPoiCard()" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <h4 class="font-extrabold text-slate-800 text-sm mt-1" id="poi-title">Isola di Dino</h4>
+                <p class="text-slate-600 text-[11px] leading-relaxed" id="poi-desc">Descrizione del punto di interesse.</p>
+            </div>
+
+            <!-- Integrazione Carte Nautiche Esterne Professionali -->
+            <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md space-y-2.5">
+                <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
+                    <i class="fa-solid fa-compass-drafting text-cyan-400 text-sm"></i>
+                    <h3 class="font-bold text-xs">Apri Carte Nautiche Professionali</h3>
+                </div>
+                <p class="text-[11px] text-slate-300">
+                    Vuoi consultare la batimetria ufficiale dei fondali di Praia a Mare?
+                </p>
+                <div class="grid grid-cols-2 gap-2 pt-1 text-xs font-bold">
+                    <a href="https://web.navionics.com/?bbox=15.70,39.82,15.85,39.90" target="_blank" class="p-2.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded-xl text-center border border-slate-700 flex justify-center items-center gap-1.5">
+                        <i class="fa-solid fa-map"></i> Navionics Web
+                    </a>
+                    <a href="https://getorca.com" target="_blank" class="p-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl text-center flex justify-center items-center gap-1.5">
+                        <i class="fa-solid fa-location-crosshairs"></i> Orca Marine
+                    </a>
+                </div>
+            </div>
+
         </div>
 
         <!-- SEZIONE 2: TIPS GUIDA BARCA -->
@@ -134,6 +207,16 @@
     </main>
 
     <script>
+        let map, userMarker, markersGroup;
+
+        const poiList = [
+            { id: "dino", nome: "Isola di Dino & Grotta Azzurra", cat: "Grotta Marina", desc: "Entrare a motore al minimo o a remi. Fondali azzurri spettacolari.", lat: 39.8731, lng: 15.7735, rotta: "tutti" },
+            { id: "leone", nome: "Grotta del Leone", cat: "Snorkeling", desc: "Roccia caratteristica a leone sdraiato. Ottimo punto per snorkeling.", lat: 39.8695, lng: 15.7720, rotta: "tutti" },
+            { id: "arcomagno", nome: "Baia dell'Arco Magno", cat: "San Nicola Arcella", desc: "Arco naturale di roccia. Mantenere 200m dalla spiaggia.", lat: 39.8456, lng: 15.7889, rotta: "arcomagno" },
+            { id: "prete", nome: "Scoglio del Prete", cat: "Ancoraggio", desc: "Fondale sabbioso chiaro sicuro per l'ancoraggio.", lat: 39.8420, lng: 15.7870, rotta: "arcomagno" },
+            { id: "maratea", nome: "Castrocucco & Secca della Giada", cat: "Costa Maratea", desc: "Insenature selvagge verso nord con acque cristalline.", lat: 39.9000, lng: 15.7500, rotta: "maratea" }
+        ];
+
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(el => {
@@ -142,56 +225,88 @@
             });
             document.getElementById('sec-' + tab).classList.remove('hidden');
             document.getElementById('tab-' + tab).classList.add('bg-white', 'text-slate-900', 'shadow');
-        }
 
-        function cambiaItinerario() {
-            const val = document.getElementById('select-itinerario').value;
-            const container = document.getElementById('punti-container');
-            container.innerHTML = '';
-
-            if(val === 'generico') {
-                container.innerHTML = `
-                    <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 space-y-2">
-                        <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Isola di Dino</span>
-                        <h4 class="font-bold text-slate-800">Isola di Dino & Grotta Azzurra</h4>
-                        <p class="text-xs text-slate-600">Partenza dall'isola per esplorare la Grotta Azzurra e la Grotta del Leone con fondali adatti allo snorkeling.</p>
-                    </div>
-                    <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 space-y-2">
-                        <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">San Nicola Arcella</span>
-                        <h4 class="font-bold text-slate-800">Arco Magno</h4>
-                        <p class="text-xs text-slate-600">Arco naturale suggestivo situato a pochi minuti a sud dell'Isola di Dino.</p>
-                    </div>
-                `;
-            } else if(val === 'arcomagno') {
-                container.innerHTML = `
-                    <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 space-y-2 border-l-4 border-l-cyan-600">
-                        <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Rotta Arco Magno</span>
-                        <h4 class="font-bold text-slate-800">1. Baia dell'Arco Magno</h4>
-                        <p class="text-xs text-slate-600">Naviga verso sud mantenendo la distanza di sicurezza dalla costa. Fermati all'esterno del passaggio di roccia per scattare foto al tramonto o fare il bagno.</p>
-                    </div>
-                    <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 space-y-2">
-                        <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Sosta 2</span>
-                        <h4 class="font-bold text-slate-800">2. Scoglio del Prete</h4>
-                        <p class="text-xs text-slate-600">Formazione rocciosa ideale per gettare l'ancora su sabbia e godersi le acque limpide.</p>
-                    </div>
-                `;
-            } else if(val === 'maratea') {
-                container.innerHTML = `
-                    <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 space-y-2 border-l-4 border-l-cyan-600">
-                        <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Rotta Maratea</span>
-                        <h4 class="font-bold text-slate-800">1. Secca della Giada & Castrocucco</h4>
-                        <p class="text-xs text-slate-600">Prosegui verso Nord. La costa di Maratea offre insenature rocciose e calette isolate ideali per la mezza giornata o giornata intera.</p>
-                    </div>
-                    <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 space-y-2">
-                        <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Sosta 2</span>
-                        <h4 class="font-bold text-slate-800">2. Calafuria & Spiaggia della Secca</h4>
-                        <p class="text-xs text-slate-600">Acque trasparenti circondate dalla vegetazione mediterranea.</p>
-                    </div>
-                `;
+            if(tab === 'navigatore' && map) {
+                setTimeout(() => map.invalidateSize(), 200);
             }
         }
 
-        window.addEventListener('DOMContentLoaded', cambiaItinerario);
+        function initMapNav() {
+            map = L.map('nav-map', { zoomControl: false }).setView([39.8700, 15.7750], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            markersGroup = L.layerGroup().addTo(map);
+            caricaPOIMappa("tutti");
+
+            // Geolocation Live
+            if ("geolocation" in navigator) {
+                navigator.geolocation.watchPosition(
+                    pos => {
+                        const lat = pos.coords.latitude;
+                        const lng = pos.coords.longitude;
+                        const speed = pos.coords.speed ? (pos.coords.speed * 1.94384).toFixed(1) : "0.0";
+                        const heading = pos.coords.heading ? Math.round(pos.coords.heading) + "°" : "---°";
+
+                        document.getElementById('live-speed').innerText = `${speed} Nodi`;
+                        document.getElementById('live-heading').innerText = heading;
+
+                        if (!userMarker) {
+                            userMarker = L.circleMarker([lat, lng], {
+                                radius: 8,
+                                fillColor: "#06b6d4",
+                                color: "#ffffff",
+                                weight: 2,
+                                fillOpacity: 0.9
+                            }).addTo(map);
+                        } else {
+                            userMarker.setLatLng([lat, lng]);
+                        }
+                    },
+                    err => {
+                        document.getElementById('gps-status').innerHTML = `<span class="text-amber-400 font-bold">GPS Base</span>`;
+                    },
+                    { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
+                );
+            }
+        }
+
+        function caricaPOIMappa(rottaSelezionata) {
+            markersGroup.clearLayers();
+
+            poiList.forEach(poi => {
+                if(rottaSelezionata === "tutti" || poi.rotta === rottaSelezionata || poi.rotta === "tutti") {
+                    const m = L.marker([poi.lat, poi.lng]).addTo(markersGroup);
+                    m.on('click', () => {
+                        document.getElementById('poi-title').innerText = poi.nome;
+                        document.getElementById('poi-cat').innerText = poi.cat;
+                        document.getElementById('poi-desc').innerText = poi.desc;
+                        document.getElementById('poi-detail-card').classList.remove('hidden');
+                    });
+                }
+            });
+        }
+
+        function filtraRotta() {
+            const val = document.getElementById('select-rotta').value;
+            caricaPOIMappa(val);
+        }
+
+        function ricentraGPS() {
+            if (userMarker) {
+                map.setView(userMarker.getLatLng(), 15);
+            } else {
+                map.setView([39.8700, 15.7750], 13);
+            }
+        }
+
+        function chiudiPoiCard() {
+            document.getElementById('poi-detail-card').classList.add('hidden');
+        }
+
+        window.addEventListener('DOMContentLoaded', initMapNav);
     </script>
 </body>
 </html>
