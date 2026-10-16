@@ -7,75 +7,83 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-slate-100 text-slate-800 pb-10">
 
-    <!-- Guest Header -->
-    <header class="bg-slate-900 text-white text-center p-6 shadow-md">
-        <h1 class="text-2xl font-black tracking-widest text-cyan-400">NAUTICOVI</h1>
-        <p class="text-xs text-slate-300 mt-1">NOLEGGIO BARCHE • PRAIA A MARE</p>
+    <!-- Header Brand -->
+    <header class="bg-slate-900 text-white p-6 text-center shadow-xl border-b-4 border-cyan-500">
+        <h1 class="text-3xl font-black tracking-widest text-white">NAUTICOVI</h1>
+        <p class="text-xs tracking-wider text-cyan-400 font-semibold mt-1">NOLEGGIO BARCHE • PRAIA A MARE</p>
     </header>
 
-    <main class="max-w-md mx-auto p-4 space-y-6">
+    <div class="max-w-md mx-auto p-4 space-y-5">
 
-        <!-- SOS / Emergenza -->
-        <div class="bg-red-500 text-white p-4 rounded-2xl shadow-lg flex justify-between items-center">
+        <!-- Banner Benvenuto / Assistenza -->
+        <div class="bg-gradient-to-r from-cyan-600 to-blue-700 rounded-2xl p-4 text-white shadow-lg flex justify-between items-center">
             <div>
-                <h3 class="font-bold text-sm">Assistenza in Mare</h3>
-                <p class="text-xs opacity-90">Hai bisogno di aiuto con la barca?</p>
+                <p class="text-xs text-cyan-100 font-medium">Assistenza in Mare</p>
+                <h3 class="font-bold text-lg">Serve Aiuto a Bordo?</h3>
             </div>
-            <a href="tel:+390000000000" class="bg-white text-red-600 px-4 py-2 rounded-xl font-bold text-sm shadow">
-                <i class="fa-solid fa-phone"></i> Chiama
+            <a href="tel:+393000000000" class="bg-white text-cyan-800 px-4 py-2 rounded-xl font-bold text-sm shadow hover:bg-slate-100 transition flex items-center gap-2">
+                <i class="fa-solid fa-phone text-red-500"></i> Chiama
             </a>
         </div>
 
         <!-- Mappa Interattiva -->
-        <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-100">
-            <h2 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
-                <i class="fa-solid fa-map-location-dot text-cyan-600"></i> Punti di Interesse & Calette
-            </h2>
-            <div id="map" class="h-64 rounded-xl border border-slate-200"></div>
+        <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-map-location-dot text-cyan-600"></i> Calette e Punti di Interesse
+                </h2>
+                <span class="text-xs bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded-full font-semibold">Praia a Mare</span>
+            </div>
+            <div id="map" class="h-72 rounded-xl border border-slate-200 shadow-inner z-0"></div>
         </div>
 
-        <!-- Regole di Navigazione Praia a Mare -->
-        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100 space-y-3">
+        <!-- Regole di Navigazione -->
+        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
             <h2 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
-                <i class="fa-solid fa-anchor text-cyan-600"></i> Regole di Navigazione
+                <i class="fa-solid fa-shield-halved text-cyan-600"></i> Regole di Navigazione & Sicurezza
             </h2>
-            <ul class="text-xs space-y-2 text-slate-600">
-                <li class="flex items-start gap-2">
-                    <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                    <span><b>Distanza dalla Costa:</b> Mantenere almeno 200m di distanza dalle spiagge con bagnanti.</span>
+            <ul class="text-xs space-y-3 text-slate-600">
+                <li class="flex items-start gap-2.5">
+                    <i class="fa-solid fa-circle-check text-emerald-500 text-sm mt-0.5"></i>
+                    <span><b>Distanza dalla Costa:</b> Mantenere almeno 200 metri di distanza dalle spiagge con bagnanti.</span>
                 </li>
-                <li class="flex items-start gap-2">
-                    <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                    <span><b>Isola di Dino:</b> Entrare nelle grotte solo a remi o a motore al minimo dove consentito.</span>
+                <li class="flex items-start gap-2.5">
+                    <i class="fa-solid fa-circle-check text-emerald-500 text-sm mt-0.5"></i>
+                    <span><b>Isola di Dino:</b> L'ingresso nelle grotte marine è consentito unicamente a motore al minimo o a remi.</span>
                 </li>
-                <li class="flex items-start gap-2">
-                    <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5"></i>
-                    <span><b>Ancoraggio:</b> Non gettare l'ancora sulle praterie di Posidonia.</span>
+                <li class="flex items-start gap-2.5">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm mt-0.5"></i>
+                    <span><b>Ancoraggio:</b> Vietato gettare l'ancora sulle praterie protette di Posidonia oceanica.</span>
                 </li>
             </ul>
         </div>
 
-    </main>
+    </div>
 
     <script>
-        // Mappa centrata sull'Isola di Dino (Praia a Mare)
-        const map = L.map('map').setView([39.8731, 15.7735], 14);
+        // Inizializzazione Mappa centrata su Isola di Dino / Praia a Mare
+        const map = L.map('map').setView([39.8700, 15.7750], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        // Marker Isola di Dino
-        L.marker([39.8731, 15.7735]).addTo(map)
-            .bindPopup('<b>Isola di Dino</b><br>Grotta Azzurra e Grotta del Leone.');
+        // Punti d'interesse predefiniti
+        const poiList = JSON.parse(localStorage.getItem('nauticovi_poi')) || [
+            { nome: 'Isola di Dino & Grotta Azzurra', desc: 'Acque cristalline e grotta famosa per i riflessi blu.', lat: 39.8731, lng: 15.7735 },
+            { nome: 'Grotta del Leone', desc: 'Roccia a forma di leone sdraiato e fondale ideale per snorkeling.', lat: 39.8695, lng: 15.7720 },
+            { nome: 'Arco Magno (San Nicola Arcella)', desc: 'Spettacolare arco naturale su baia incantata.', lat: 39.8456, lng: 15.7889 }
+        ];
 
-        // Marker Arco Magno
-        L.marker([39.8456, 15.7889]).addTo(map)
-            .bindPopup('<b>Arco Magno</b><br>Spettacolare baia naturale.');
+        poiList.forEach(poi => {
+            L.marker([poi.lat, poi.lng]).addTo(map)
+                .bindPopup(`<b>${poi.nome}</b><br><span style="font-size:12px">${poi.desc}</span>`);
+        });
     </script>
 </body>
 </html>
+
