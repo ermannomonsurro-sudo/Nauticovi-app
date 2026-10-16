@@ -6,23 +6,42 @@
     <title>NAUTICOVI - Flotta & Prezzi Noleggio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .flag-btn {
+            cursor: pointer;
+            filter: grayscale(40%);
+            transition: all 0.2s ease;
+        }
+        .flag-btn.active {
+            filter: grayscale(0%);
+            transform: scale(1.15);
+            border-color: #06b6d4;
+        }
+    </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans pb-16">
 
-    <!-- Header Brand con Pulsante Home -->
-    <header class="bg-slate-900 text-white py-5 px-4 text-center shadow-xl border-b-4 border-cyan-500 sticky top-0 z-50">
-        <div class="flex items-center justify-between max-w-md mx-auto w-full px-2">
+    <!-- Header Brand con Pulsante Home e Selettore Bandiere -->
+    <header class="bg-slate-900 text-white py-4 px-4 shadow-xl border-b-4 border-cyan-500 sticky top-0 z-50">
+        <div class="flex items-center justify-between max-w-md mx-auto w-full">
             <a href="index.html" class="text-xs text-cyan-400 hover:text-white font-bold flex items-center gap-1 bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700">
                 <i class="fa-solid fa-house"></i> Home
             </a>
+            
             <div class="flex flex-col items-center justify-center">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-water text-cyan-400 text-xl"></i>
                     <h1 class="text-xl font-black tracking-widest text-white">NAUTICOVI</h1>
                 </div>
-                <p class="text-[8px] tracking-widest text-cyan-400 font-bold uppercase">NOLEGGIO BARCHE & SUP</p>
+                <p class="text-[8px] tracking-widest text-cyan-400 font-bold uppercase" data-i18n="nav_sub">NOLEGGIO BARCHE & SUP</p>
             </div>
-            <div class="w-12"></div>
+
+            <!-- Bandiere Lingua -->
+            <div class="flex gap-1.5">
+                <button onclick="setLanguage('it')" id="flag-it" class="flag-btn active bg-slate-800 p-1 rounded-full border border-slate-600 text-xs">🇮🇹</button>
+                <button onclick="setLanguage('en')" id="flag-en" class="flag-btn bg-slate-800 p-1 rounded-full border border-slate-600 text-xs">🇬🇧</button>
+                <button onclick="setLanguage('es')" id="flag-es" class="flag-btn bg-slate-800 p-1 rounded-full border border-slate-600 text-xs">🇪🇸</button>
+            </div>
         </div>
     </header>
 
@@ -30,15 +49,15 @@
 
         <!-- Banner Benvenuto -->
         <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-900 rounded-2xl p-5 text-white shadow-lg border border-cyan-500/30 text-center">
-            <span class="bg-emerald-500/20 text-emerald-300 text-xs px-3 py-1 rounded-full font-bold border border-emerald-400/30 uppercase">100% Guida Senza Patente</span>
-            <h2 class="text-xl font-black mt-2">Noleggio Barche a Praia a Mare</h2>
-            <p class="text-xs text-slate-300 mt-1">Scopri l'Isola di Dino, l'Arco Magno e la costa di Maratea in totale autonomia.</p>
+            <span class="bg-emerald-500/20 text-emerald-300 text-xs px-3 py-1 rounded-full font-bold border border-emerald-400/30 uppercase" data-i18n="banner_tag">100% Guida Senza Patente</span>
+            <h2 class="text-xl font-black mt-2" data-i18n="banner_title">Noleggio Barche a Praia a Mare</h2>
+            <p class="text-xs text-slate-300 mt-1" data-i18n="banner_desc">Scopri l'Isola di Dino, l'Arco Magno e la costa di Maratea in totale autonomia.</p>
         </div>
 
         <!-- 1. LE NOSTRE IMBARCAZIONI -->
         <div class="space-y-4">
             <h3 class="font-black text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
-                <i class="fa-solid fa-ship text-cyan-600"></i> Le Nostre Imbarcazioni
+                <i class="fa-solid fa-ship text-cyan-600"></i> <span data-i18n="fleet_title">Le Nostre Imbarcazioni</span>
             </h3>
 
             <!-- Card Gommoni 40 CV -->
@@ -52,22 +71,22 @@
                 </div>
 
                 <div class="p-4 space-y-2">
-                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Gommone • Max 6 Persone</span>
-                    <h4 class="font-extrabold text-slate-800 text-base">Gommoni Marlin 40 CV (Senza Patente)</h4>
+                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase" data-i18n="rib_tag">Gommone • Max 6 Persone</span>
+                    <h4 class="font-extrabold text-slate-800 text-base" data-i18n="rib_title">Gommoni Marlin 40 CV (Senza Patente)</h4>
                     
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
                         <div class="flex justify-between">
-                            <span class="text-slate-500">Bassa Stagione (Giu/Set):</span>
+                            <span class="text-slate-500" data-i18n="low_season">Bassa Stagione (Giu/Set):</span>
                             <span class="font-bold">Mezza €120 | Intera €200</span>
                         </div>
                         <div class="flex justify-between border-t pt-1">
-                            <span class="text-slate-500">Alta Stagione (Lug/Ago):</span>
+                            <span class="text-slate-500" data-i18n="high_season">Alta Stagione (Lug/Ago):</span>
                             <span class="font-bold text-emerald-600">Mezza €150 | Intera €220</span>
                         </div>
                     </div>
 
                     <a href="https://wa.me/393000000000?text=Ciao!%20Vorrei%20informazioni%20per%20un%20Gommone%2040%20CV" target="_blank" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
-                        <i class="fa-brands fa-whatsapp text-base text-emerald-400"></i> Chiedi Informazioni su WhatsApp
+                        <i class="fa-brands fa-whatsapp text-base text-emerald-400"></i> <span data-i18n="btn_wa">Chiedi Informazioni su WhatsApp</span>
                     </a>
                 </div>
             </div>
@@ -76,22 +95,22 @@
             <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
                 <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" alt="Scafo Open 40 CV" class="w-full h-44 object-cover">
                 <div class="p-4 space-y-2">
-                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Scafo Rigido • Max 5 Persone</span>
-                    <h4 class="font-extrabold text-slate-800 text-base">Scafi Open Poseidon 40 CV (Senza Patente)</h4>
+                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase" data-i18n="open_tag">Scafo Rigido • Max 5 Persone</span>
+                    <h4 class="font-extrabold text-slate-800 text-base" data-i18n="open_title">Scafi Open Poseidon 40 CV (Senza Patente)</h4>
                     
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
                         <div class="flex justify-between">
-                            <span class="text-slate-500">Bassa Stagione (Giu/Set):</span>
+                            <span class="text-slate-500" data-i18n="low_season">Bassa Stagione (Giu/Set):</span>
                             <span class="font-bold">Mezza €120 | Intera €200</span>
                         </div>
                         <div class="flex justify-between border-t pt-1">
-                            <span class="text-slate-500">Alta Stagione (Lug/Ago):</span>
+                            <span class="text-slate-500" data-i18n="high_season">Alta Stagione (Lug/Ago):</span>
                             <span class="font-bold text-emerald-600">Mezza €150 | Intera €220</span>
                         </div>
                     </div>
 
                     <a href="https://wa.me/393000000000?text=Ciao!%20Vorrei%20informazioni%20per%20uno%20Scafo%20Open%2040%20CV" target="_blank" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
-                        <i class="fa-brands fa-whatsapp text-base text-emerald-400"></i> Chiedi Informazioni su WhatsApp
+                        <i class="fa-brands fa-whatsapp text-base text-emerald-400"></i> <span data-i18n="btn_wa">Chiedi Informazioni su WhatsApp</span>
                     </a>
                 </div>
             </div>
@@ -100,22 +119,22 @@
             <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
                 <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" alt="Lancia Tradizionale" class="w-full h-44 object-cover">
                 <div class="p-4 space-y-2">
-                    <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Lancia Tradizionale • Max 4 Persone</span>
-                    <h4 class="font-extrabold text-slate-800 text-base">Lancia Tradizionale 30 CV (Senza Patente)</h4>
+                    <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase" data-i18n="lancia_tag">Lancia Tradizionale • Max 4 Persone</span>
+                    <h4 class="font-extrabold text-slate-800 text-base" data-i18n="lancia_title">Lancia Tradizionale 30 CV (Senza Patente)</h4>
                     
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
                         <div class="flex justify-between">
-                            <span class="text-slate-500">Bassa Stagione (Giu/Set):</span>
+                            <span class="text-slate-500" data-i18n="low_season">Bassa Stagione (Giu/Set):</span>
                             <span class="font-bold">Mezza €80 | Intera €150</span>
                         </div>
                         <div class="flex justify-between border-t pt-1">
-                            <span class="text-slate-500">Alta Stagione (Lug/Ago):</span>
+                            <span class="text-slate-500" data-i18n="high_season">Alta Stagione (Lug/Ago):</span>
                             <span class="font-bold text-emerald-600">Mezza €100 | Intera €180</span>
                         </div>
                     </div>
 
                     <a href="https://wa.me/393000000000?text=Ciao!%20Vorrei%20informazioni%20per%20la%20Lancia%20Tradizionale" target="_blank" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
-                        <i class="fa-brands fa-whatsapp text-base text-emerald-400"></i> Chiedi Informazioni su WhatsApp
+                        <i class="fa-brands fa-whatsapp text-base text-emerald-400"></i> <span data-i18n="btn_wa">Chiedi Informazioni su WhatsApp</span>
                     </a>
                 </div>
             </div>
@@ -124,24 +143,24 @@
         <!-- 2. WIDGET CALCOLATORE STIMA CARBURANTE -->
         <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200 space-y-3">
             <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
-                <i class="fa-solid fa-calculator text-cyan-600"></i> Calcolatore Indicativo Carburante (Motore 40CV)
+                <i class="fa-solid fa-calculator text-cyan-600"></i> <span data-i18n="calc_title">Calcolatore Indicativo Carburante (Motore 40CV)</span>
             </h3>
-            <p class="text-[11px] text-slate-500">Stima basata su un costo medio indicativo di 2,50 €/L con partenza dall'Isola di Dino.</p>
+            <p class="text-[11px] text-slate-500" data-i18n="calc_sub">Stima basata su un costo medio indicativo di 2,50 €/L con partenza dall'Isola di Dino.</p>
             
             <div class="space-y-2 text-xs">
-                <label class="block font-bold text-slate-700">Seleziona Itinerario:</label>
-                                <select id="calc-rotta" onchange="calcolaCarburante()" class="w-full p-2 border rounded-lg bg-slate-50 font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-cyan-500">
-                    <option value="dino">Giro Isola di Dino</option>
-                    <option value="arcomagno">Isola di Dino + Arco Magno</option>
-                    <option value="maratea">Costa di Maratea</option>
-                    <option value="completo">Tour Completo (Isola + Arco Magno + Maratea)</option>
+                <label class="block font-bold text-slate-700" data-i18n="calc_label">Seleziona Itinerario:</label>
+                <select id="calc-rotta" onchange="calcolaCarburante()" class="w-full p-2 border rounded-lg bg-slate-50 font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-cyan-500">
+                    <option value="dino" id="opt-dino">Giro Isola di Dino</option>
+                    <option value="arcomagno" id="opt-arcomagno">Isola di Dino + Arco Magno</option>
+                    <option value="maratea" id="opt-maratea">Costa di Maratea</option>
+                    <option value="completo" id="opt-completo">Tour Completo (Isola + Arco Magno + Maratea)</option>
                 </select>
 
                 <div id="calc-risultato" class="p-2.5 bg-slate-100 rounded-xl font-bold text-slate-800 text-center text-xs border border-slate-200">
                     Stima spesa carburante: <b>4 - 7 Litri (~10,00 € - 17,50 €)</b>
                 </div>
 
-                <p class="text-[10px] text-slate-400 italic text-center pt-1">
+                <p class="text-[10px] text-slate-400 italic text-center pt-1" data-i18n="calc_note">
                     * I consumi effettivi sono sempre strettamente legati al peso del carico a bordo, alla velocità di crociera e alle correnti marine della giornata.
                 </p>
             </div>
@@ -151,64 +170,204 @@
         <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200 p-5 space-y-3">
             <div class="flex justify-between items-start">
                 <div>
-                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Attività oraria</span>
-                    <h3 class="text-lg font-bold text-slate-800 mt-1">Noleggio Stand Up Paddle (SUP)</h3>
+                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" data-i18n="sup_tag">Attività oraria</span>
+                    <h3 class="text-lg font-bold text-slate-800 mt-1" data-i18n="sup_title">Noleggio Stand Up Paddle (SUP)</h3>
                 </div>
                 <div class="text-right">
                     <span class="text-xl font-black text-emerald-600">€10</span>
-                    <span class="text-xs text-slate-400 block">/ ora</span>
+                    <span class="text-xs text-slate-400 block" data-i18n="per_hour">/ ora</span>
                 </div>
             </div>
-            <p class="text-xs text-slate-600 leading-relaxed">
+            <p class="text-xs text-slate-600 leading-relaxed" data-i18n="sup_desc">
                 Noleggio indipendente ad ore per esplorare la costa in totale relax.
             </p>
             <a href="https://wa.me/393000000000?text=Ciao!%20Vorrei%20informazioni%20sul%20noleggio%20SUP" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
-                <i class="fa-brands fa-whatsapp text-base"></i> Prenota SUP su WhatsApp
+                <i class="fa-brands fa-whatsapp text-base"></i> <span data-i18n="btn_sup_wa">Prenota SUP su WhatsApp</span>
             </a>
         </div>
 
-        <!-- 4. CONDOTTE DI PRENOTAZIONE E CAPARRA (IN FONDO) -->
+        <!-- 4. CONDOTTE DI PRENOTAZIONE E CAPARRA -->
         <div class="bg-amber-50 p-4 rounded-2xl border border-amber-200 text-xs space-y-2 shadow-sm">
             <div class="font-bold text-amber-900 flex items-center gap-1.5 text-sm">
-                <i class="fa-solid fa-circle-info text-amber-600"></i> Informazioni & Caparra
+                <i class="fa-solid fa-circle-info text-amber-600"></i> <span data-i18n="info_deposit_title">Informazioni & Caparra</span>
             </div>
-            <p class="text-amber-800 leading-relaxed text-[11px]">
+            <p class="text-amber-800 leading-relaxed text-[11px]" data-i18n="info_deposit_body">
                 • <b>Caparra richiesta:</b> 50% del totale entro il giorno prima (Bonifico Istantaneo, PayPal o Contanti in sede).<br>
                 • <b>Frigo con Ghiaccio:</b> Disponibile su richiesta come supplemento a <b>15€</b>.<br>
                 • <b>Carburante:</b> Escluso dal prezzo di listino (si salda al rientro in base al consumo effettivo).
             </p>
         </div>
 
-        <!-- 5. POLITICA DI TRASPARENZA METEO (IN FONDO) -->
+        <!-- 5. POLITICA DI TRASPARENZA METEO -->
         <div class="bg-cyan-50 p-4 rounded-2xl border border-cyan-200 text-xs space-y-1.5 shadow-sm">
             <div class="font-bold text-cyan-900 flex items-center gap-1.5 text-sm">
-                <i class="fa-solid fa-cloud-sun-rain text-cyan-600"></i> Trasparenza Meteo
+                <i class="fa-solid fa-cloud-sun-rain text-cyan-600"></i> <span data-i18n="weather_title">Trasparenza Meteo</span>
             </div>
-            <p class="text-cyan-800 leading-relaxed text-[11px]">
+            <p class="text-cyan-800 leading-relaxed text-[11px]" data-i18n="weather_body">
                 In caso di mare mosso o condizioni meteo avverse che impediscono la navigazione in sicurezza, la caparra verrà <b>interamente rimborsata</b> oppure recuperata in un'altra data a tua scelta.
             </p>
         </div>
 
     </main>
 
+    <!-- TRADUZIONI MULTILINGUA CATALOGO -->
     <script>
+        const translations = {
+            it: {
+                nav_sub: "NOLEGGIO BARCHE & SUP",
+                banner_tag: "100% Guida Senza Patente",
+                banner_title: "Noleggio Barche a Praia a Mare",
+                banner_desc: "Scopri l'Isola di Dino, l'Arco Magno e la costa di Maratea in totale autonomia.",
+                fleet_title: "Le Nostre Imbarcazioni",
+                rib_tag: "Gommone • Max 6 Persone",
+                rib_title: "Gommoni Marlin 40 CV (Senza Patente)",
+                open_tag: "Scafo Rigido • Max 5 Persone",
+                open_title: "Scafi Open Poseidon 40 CV (Senza Patente)",
+                lancia_tag: "Lancia Tradizionale • Max 4 Persone",
+                lancia_title: "Lancia Tradizionale 30 CV (Senza Patente)",
+                low_season: "Bassa Stagione (Giu/Set):",
+                high_season: "Alta Stagione (Lug/Ago):",
+                btn_wa: "Chiedi Informazioni su WhatsApp",
+                calc_title: "Calcolatore Indicativo Carburante (Motore 40CV)",
+                calc_sub: "Stima basata su un costo medio indicativo di 2,50 €/L con partenza dall'Isola di Dino.",
+                calc_label: "Seleziona Itinerario:",
+                opt_dino: "Giro Isola di Dino",
+                opt_arcomagno: "Isola di Dino + Arco Magno",
+                opt_maratea: "Costa di Maratea",
+                opt_completo: "Tour Completo (Isola + Arco Magno + Maratea)",
+                calc_note: "* I consumi effettivi sono sempre strettamente legati al peso del carico a bordo, alla velocità di crociera e alle correnti marine della giornata.",
+                sup_tag: "Attività oraria",
+                sup_title: "Noleggio Stand Up Paddle (SUP)",
+                per_hour: "/ ora",
+                sup_desc: "Noleggio indipendente ad ore per esplorare la costa in totale relax.",
+                btn_sup_wa: "Prenota SUP su WhatsApp",
+                info_deposit_title: "Informazioni & Caparra",
+                info_deposit_body: "• <b>Caparra richiesta:</b> 50% del totale entro il giorno prima (Bonifico Istantaneo, PayPal o Contanti in sede).<br>• <b>Frigo con Ghiaccio:</b> Disponibile su richiesta come supplemento a <b>15€</b>.<br>• <b>Carburante:</b> Escluso dal prezzo di listino (si salda al rientro in base al consumo effettivo).",
+                weather_title: "Trasparenza Meteo",
+                weather_body: "In caso di mare mosso o condizioni meteo avverse che impediscono la navigazione in sicurezza, la caparra verrà <b>interamente rimborsata</b> oppure recuperata in un'altra data a tua scelta."
+            },
+            en: {
+                nav_sub: "BOAT & SUP RENTAL",
+                banner_tag: "100% No License Required",
+                banner_title: "Boat Rental in Praia a Mare",
+                banner_desc: "Explore Dino Island, Arco Magno and the Maratea coast completely independently.",
+                fleet_title: "Our Fleet",
+                rib_tag: "RIB • Max 6 People",
+                rib_title: "Marlin RIB 40 HP (No License)",
+                open_tag: "Motorboat • Max 5 People",
+                open_title: "Poseidon Open Boat 40 HP (No License)",
+                lancia_tag: "Traditional Lancia • Max 4 People",
+                lancia_title: "Traditional Lancia 30 HP (No License)",
+                low_season: "Low Season (Jun/Sep):",
+                high_season: "High Season (Jul/Aug):",
+                btn_wa: "Ask Info on WhatsApp",
+                calc_title: "Fuel Cost Estimator (40HP Engine)",
+                calc_sub: "Estimated cost calculated at ~€2.50/L starting from Dino Island.",
+                calc_label: "Select Route:",
+                opt_dino: "Dino Island Tour",
+                opt_arcomagno: "Dino Island + Arco Magno",
+                opt_maratea: "Maratea Coast",
+                opt_completo: "Full Tour (Dino Island + Arco Magno + Maratea)",
+                calc_note: "* Actual fuel consumption always depends on total load, cruising speed and sea currents.",
+                sup_tag: "Hourly activity",
+                sup_title: "Stand Up Paddle (SUP) Rental",
+                per_hour: "/ hour",
+                sup_desc: "Hourly paddle board rental to explore the coastline at your own pace.",
+                btn_sup_wa: "Book SUP on WhatsApp",
+                info_deposit_title: "Booking & Deposit Info",
+                info_deposit_body: "• <b>Deposit:</b> 50% required by the day before (Instant Bank Transfer, PayPal or Cash).<br>• <b>Ice Cooler Box:</b> Available on request for <b>€15</b>.<br>• <b>Fuel:</b> Excluded from list price (paid upon return based on actual consumption).",
+                weather_title: "Weather Guarantee Policy",
+                weather_body: "In case of rough sea or severe weather preventing safe navigation, your deposit will be <b>100% refunded</b> or rescheduled for free."
+            },
+            es: {
+                nav_sub: "ALQUILER DE BARCOS & SUP",
+                banner_tag: "100% Sin Titulación",
+                banner_title: "Alquiler de Barcos en Praia a Mare",
+                banner_desc: "Descubre la Isla de Dino, el Arco Magno y la costa de Maratea a tu ritmo.",
+                fleet_title: "Nuestra Flota",
+                rib_tag: "Neumática • Máx 6 Personas",
+                rib_title: "Neumática Marlin 40 CV (Sin Licencia)",
+                open_tag: "Lancha Rígida • Máx 5 Personas",
+                open_title: "Lancha Poseidon Open 40 CV (Sin Licencia)",
+                lancia_tag: "Lancha Tradicional • Máx 4 Personas",
+                lancia_title: "Lancha Tradicional 30 CV (Sin Licencia)",
+                low_season: "Temporada Baja (Jun/Sep):",
+                high_season: "Temporada Alta (Jul/Ago):",
+                btn_wa: "Consultar por WhatsApp",
+                calc_title: "Calculadora de Combustible (Motor 40CV)",
+                calc_sub: "Estimación calculada a ~2,50 €/L saliendo desde la Isla de Dino.",
+                calc_label: "Selecciona Itinerario:",
+                opt_dino: "Vuelta a la Isla de Dino",
+                opt_arcomagno: "Isla de Dino + Arco Magno",
+                opt_maratea: "Costa de Maratea",
+                opt_completo: "Tour Completo (Isla + Arco Magno + Maratea)",
+                calc_note: "* El consumo real depende del peso a bordo, la velocidad de crucero y las corrientes marinas.",
+                sup_tag: "Alquiler por horas",
+                sup_title: "Alquiler de Stand Up Paddle (SUP)",
+                per_hour: "/ hora",
+                sup_desc: "Alquiler independiente por horas para explorar la costa en total relax.",
+                btn_sup_wa: "Reservar SUP por WhatsApp",
+                info_deposit_title: "Información y Señal",
+                info_deposit_body: "• <b>Señal solicitada:</b> 50% del total hasta el día anterior (Transferencia, PayPal o Efectivo).<br>• <b>Nevera con Hielo:</b> Disponible bajo petición por <b>15€</b>.<br>• <b>Combustible:</b> Excluido del precio (se liquida al regresar según consumo real).",
+                weather_title: "Garantía de Mal Tiempo",
+                weather_body: "En caso de mar picado o mal tiempo que impida navegar con seguridad, la señal será <b>100% reembolsada</b> o cambiada de fecha gratis."
+            }
+        };
+
+        let currentLang = 'it';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('nauticovi_lang', lang);
+
+            document.querySelectorAll('.flag-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('flag-' + lang).classList.add('active');
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+
+            document.getElementById('opt-dino').innerText = translations[lang].opt_dino;
+            document.getElementById('opt-arcomagno').innerText = translations[lang].opt_arcomagno;
+            document.getElementById('opt-maratea').innerText = translations[lang].opt_maratea;
+            document.getElementById('opt-completo').innerText = translations[lang].opt_completo;
+
+            calcolaCarburante();
+        }
+
         function calcolaCarburante() {
             const rotta = document.getElementById('calc-rotta').value;
             const res = document.getElementById('calc-risultato');
-            if(rotta === 'dino') {
-                res.innerHTML = "Stima spesa carburante: <b>4 - 7 Litri (~10,00 € - 17,50 €)</b>";
-            } else if(rotta === 'arcomagno') {
-                res.innerHTML = "Stima spesa carburante: <b>10 - 15 Litri (~25,00 € - 37,50 €)</b>";
-            } else if(rotta === 'maratea') {
-                res.innerHTML = "Stima spesa carburante: <b>15 - 20 Litri (~37,50 € - 50,00 €)</b>";
-            } else if(rotta === 'completo') {
-                res.innerHTML = "Stima spesa carburante: <b>22 - 30 Litri (~55,00 € - 75,00 €)</b>";
+            
+            if(currentLang === 'en') {
+                if(rotta === 'dino') res.innerHTML = "Estimated fuel cost: <b>4 - 7 Liters (~€10.00 - €17.50)</b>";
+                else if(rotta === 'arcomagno') res.innerHTML = "Estimated fuel cost: <b>10 - 15 Liters (~€25.00 - €37.50)</b>";
+                else if(rotta === 'maratea') res.innerHTML = "Estimated fuel cost: <b>15 - 20 Liters (~€37.50 - €50.00)</b>";
+                else if(rotta === 'completo') res.innerHTML = "Estimated fuel cost: <b>22 - 30 Liters (~€55.00 - €75.00)</b>";
+            } else if(currentLang === 'es') {
+                if(rotta === 'dino') res.innerHTML = "Consumo estimado: <b>4 - 7 Litros (~10,00 € - 17,50 €)</b>";
+                else if(rotta === 'arcomagno') res.innerHTML = "Consumo estimado: <b>10 - 15 Litros (~25,00 € - 37,50 €)</b>";
+                else if(rotta === 'maratea') res.innerHTML = "Consumo estimado: <b>15 - 20 Litros (~37,50 € - 50,00 €)</b>";
+                else if(rotta === 'completo') res.innerHTML = "Consumo estimado: <b>22 - 30 Litros (~55,00 € - 75,00 €)</b>";
+            } else {
+                if(rotta === 'dino') res.innerHTML = "Stima spesa carburante: <b>4 - 7 Litri (~10,00 € - 17,50 €)</b>";
+                else if(rotta === 'arcomagno') res.innerHTML = "Stima spesa carburante: <b>10 - 15 Litri (~25,00 € - 37,50 €)</b>";
+                else if(rotta === 'maratea') res.innerHTML = "Stima spesa carburante: <b>15 - 20 Litri (~37,50 € - 50,00 €)</b>";
+                else if(rotta === 'completo') res.innerHTML = "Stima spesa carburante: <b>22 - 30 Litri (~55,00 € - 75,00 €)</b>";
             }
         }
 
         function cambiaFoto(idImg, url) {
             document.getElementById(idImg).src = url;
         }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('nauticovi_lang') || 'it';
+            setLanguage(savedLang);
+        });
     </script>
 </body>
 </html>
