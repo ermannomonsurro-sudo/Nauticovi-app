@@ -66,9 +66,9 @@
                 Noleggia gommoni e scafi nuovi <b>100% senza patente</b>. Vivi l'Isola di Dino, la Grotta Azzurra e l'Arco Magno in totale autonomia.
             </p>
 
-            <!-- PULSANTE PRIMARIO PRINCIPALE AD ALTA CONVERSIONE -->
-            <div class="pt-4">
-                <a href="catalogo.html" class="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600 text-white text-base font-black px-8 py-4 rounded-2xl shadow-2xl transform active:scale-95 transition border border-white/20 w-full max-w-xs">
+            <!-- PULSANTE PRIMARIO AD ALTA CONVERSIONE (FIX TOUCH ANDROID) -->
+            <div class="pt-4 relative z-30">
+                <a href="catalogo.html" onclick="window.location.href='catalogo.html'" class="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600 text-white text-base font-black px-8 py-4 rounded-2xl shadow-2xl transform active:scale-95 transition border border-white/20 w-full max-w-xs cursor-pointer touch-manipulation">
                     <i class="fa-solid fa-ship text-xl"></i>
                     <span data-i18n="btn_catalog">SCOPRI FLOTTA & PREZZI</span>
                     <i class="fa-solid fa-arrow-right text-sm"></i>
@@ -78,7 +78,7 @@
         </div>
     </header>
 
-    <main class="max-w-md mx-auto p-4 space-y-6 -mt-8 relative z-20">
+    <main class="max-w-md mx-auto p-4 space-y-6 relative z-10">
 
         <!-- STATS / HIGHLIGHTS AD IMPATTO VISIVO -->
         <div class="grid grid-cols-3 gap-2 text-center text-xs">
@@ -158,7 +158,7 @@
             </div>
         </div>
 
-        <!-- FASCIA FAQ RAPIDE PER SUPERARE LE FRIZIONI -->
+        <!-- FASCIA FAQ RAPIDE -->
         <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
             <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider border-b pb-2 flex items-center gap-2">
                 <i class="fa-solid fa-circle-question text-cyan-600"></i> <span data-i18n="faq_title">Hai Domande prima di Noleggiare?</span>
@@ -274,7 +274,7 @@
         const googleReviewsMultilang = {
             it: [
                 { testo: '"Gommoni nuovi e pulitissimi, facilità unica di guida. Un tour fantastico tra Grotta Azzurra e Arco Magno!"', autore: 'Marco V.' },
-                { testo: '"Accoglienza super professionale! Ci hanno spiegato tutto prima di partire. L'Isola di Dino vista in gommone è uno spettacolo!"', autore: 'Giulia R.' },
+                { testo: '"Accoglienza super professionale! Ci hanno spiegato tutto prima di partire. L\'Isola di Dino vista in gommone è uno spettacolo!"', autore: 'Giulia R.' },
                 { testo: '"Barche perfette, scafi in ottimo stato e frigo con ghiaccio comodissimo per le bevande al fresco. Consigliatissimo!"', autore: 'Antonio M.' }
             ],
             en: [
@@ -296,11 +296,9 @@
             currentLang = lang;
             localStorage.setItem('nauticovi_lang', lang);
 
-            // Cambia stato visivo bandiere
             document.querySelectorAll('.flag-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('flag-' + lang).classList.add('active');
 
-            // Traduce tutti gli elementi con attributo data-i18n
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (translations[lang][key]) {
@@ -308,7 +306,6 @@
                 }
             });
 
-            // Aggiorna carousel recensioni nella lingua selezionata
             reviewIndex = 0;
             updateReviewCarousel();
         }
