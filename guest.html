@@ -18,33 +18,47 @@
             border-radius: 1rem;
             z-index: 10;
         }
-        /* Rotazione fluida dell'icona della barca in base alla prua GPS */
         .boat-marker-icon {
             transition: transform 0.3s ease-out;
             display: flex;
             align-items: center;
             justify-center: center;
         }
+        .flag-btn {
+            cursor: pointer;
+            filter: grayscale(40%);
+            transition: all 0.2s ease;
+        }
+        .flag-btn.active {
+            filter: grayscale(0%);
+            transform: scale(1.15);
+            border-color: #06b6d4;
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 pb-20 font-sans">
 
-    <!-- Header Brand con Pulsante Home -->
+    <!-- Header Brand con Pulsante Home e Bandiere -->
     <header class="bg-slate-900 text-white py-4 px-4 shadow-xl border-b-4 border-cyan-500 sticky top-0 z-50">
         <div class="flex items-center justify-between max-w-md mx-auto w-full">
             <a href="index.html" class="text-xs text-cyan-400 hover:text-white font-bold flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
                 <i class="fa-solid fa-house"></i> Home
             </a>
+            
             <div class="text-center">
                 <div class="flex items-center justify-center gap-2">
                     <i class="fa-solid fa-water text-cyan-400 text-lg"></i>
                     <h1 class="text-xl font-black tracking-widest text-white">NAUTICOVI</h1>
                 </div>
-                <p class="text-[8px] tracking-widest text-cyan-400 font-bold uppercase">GUEST PORTAL • NAVIGATORE GPS</p>
+                <p class="text-[8px] tracking-widest text-cyan-400 font-bold uppercase" data-i18n="header_sub">GUEST PORTAL • NAVIGATORE GPS</p>
             </div>
-            <a href="tel:+393000000000" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1 shadow">
-                <i class="fa-solid fa-phone"></i> SOS
-            </a>
+
+            <!-- Bandiere Lingua -->
+            <div class="flex gap-1">
+                <button onclick="setLanguage('it')" id="flag-it" class="flag-btn active bg-slate-800 p-1 rounded-full border border-slate-600 text-xs">🇮🇹</button>
+                <button onclick="setLanguage('en')" id="flag-en" class="flag-btn bg-slate-800 p-1 rounded-full border border-slate-600 text-xs">🇬🇧</button>
+                <button onclick="setLanguage('es')" id="flag-es" class="flag-btn bg-slate-800 p-1 rounded-full border border-slate-600 text-xs">🇪🇸</button>
+            </div>
         </div>
     </header>
 
@@ -54,13 +68,14 @@
         <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-900 rounded-2xl p-5 text-white shadow-lg border border-cyan-500/30">
             <div class="flex justify-between items-start">
                 <div>
-                    <span class="bg-cyan-500/20 text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-400/30">Noleggio Attivo</span>
-                    <h2 class="text-xl font-extrabold mt-2" id="welcome-nome">Benvenuto a Bordo!</h2>
-                    <p class="text-xs text-slate-300 mt-0.5">Barca: <span class="font-bold text-cyan-300" id="welcome-barca">Marlin 1</span></p>
+                    <span class="bg-cyan-500/20 text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-400/30" data-i18n="active_rental">Noleggio Attivo</span>
+                    <h2 class="text-xl font-extrabold mt-2" id="welcome-nome" data-i18n="welcome_title">Benvenuto a Bordo!</h2>
+                    <p class="text-xs text-slate-300 mt-0.5"><span data-i18n="boat_label">Barca:</span> <span class="font-bold text-cyan-300" id="welcome-barca">Marlin 1</span></p>
                 </div>
                 <div class="text-right">
-                    <span class="text-xs text-amber-400 block font-bold"><i class="fa-solid fa-sun"></i> 28°C</span>
-                    <span class="text-[10px] text-cyan-300">Mare Calmo</span>
+                    <a href="tel:+393000000000" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs inline-flex items-center gap-1 shadow">
+                        <i class="fa-solid fa-phone"></i> SOS
+                    </a>
                 </div>
             </div>
         </div>
@@ -68,75 +83,67 @@
         <!-- TAB NAVIGAZIONE INTERNA -->
         <div class="flex bg-slate-200 p-1 rounded-xl text-xs font-bold text-slate-600 gap-1 shadow-inner">
             <button onclick="switchTab('destinazioni')" id="tab-destinazioni" class="tab-btn flex-1 py-2.5 rounded-lg bg-white text-slate-900 shadow flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-location-dot text-cyan-600"></i> Destinazioni
+                <i class="fa-solid fa-location-dot text-cyan-600"></i> <span data-i18n="tab_dest">Destinazioni</span>
             </button>
             <button onclick="switchTab('navigatore')" id="tab-navigatore" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900 flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-compass text-cyan-600"></i> Mappa GPS
+                <i class="fa-solid fa-compass text-cyan-600"></i> <span data-i18n="tab_map">Mappa GPS</span>
             </button>
             <button onclick="switchTab('tips')" id="tab-tips" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900 flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-lightbulb"></i> Tips
             </button>
             <button onclick="switchTab('regole')" id="tab-regole" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900 flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-ban text-red-500"></i> Divieti
+                <i class="fa-solid fa-ban text-red-500"></i> <span data-i18n="tab_rules">Divieti</span>
             </button>
         </div>
 
         <!-- SEZIONE 1: LISTA PUNTI ESATTI DI NAVIGAZIONE -->
         <div id="sec-destinazioni" class="tab-content space-y-3">
             <h3 class="font-black text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5 px-1">
-                <i class="fa-solid fa-map-pin text-cyan-600"></i> Seleziona la Destinazione di Oggi
+                <i class="fa-solid fa-map-pin text-cyan-600"></i> <span data-i18n="dest_section_title">Seleziona la Destinazione di Oggi</span>
             </h3>
-            <p class="text-xs text-slate-500 px-1">Clicca su uno dei punti esatti per avviare il navigatore GPS in tempo reale verso la meta.</p>
+            <p class="text-xs text-slate-500 px-1" data-i18n="dest_section_desc">Clicca su uno dei punti esatti per avviare il navigatore GPS in tempo reale verso la meta.</p>
 
-            <div id="punti-esatti-lista" class="space-y-3 pt-1">
-                <!-- Popolato da JS -->
-            </div>
+            <div id="punti-esatti-lista" class="space-y-3 pt-1"></div>
         </div>
 
         <!-- SEZIONE 2: NAVIGATORE GPS LIVE IN STILE AUTO -->
         <div id="sec-navigatore" class="tab-content hidden space-y-4">
             
-            <!-- Dashboard Telemetria Navigazione -->
             <div class="bg-slate-900 text-white p-3.5 rounded-2xl shadow-md border border-cyan-500/30 flex justify-between items-center text-center font-mono text-xs">
                 <div>
-                    <span class="text-[9px] text-slate-400 block uppercase">Velocità</span>
+                    <span class="text-[9px] text-slate-400 block uppercase" data-i18n="telemetry_speed">Velocità</span>
                     <b class="text-cyan-400 text-base" id="live-speed">0.0 Nodi</b>
                 </div>
                 <div class="border-x border-slate-700 px-3">
-                    <span class="text-[9px] text-slate-400 block uppercase">Prua (Bussola)</span>
+                    <span class="text-[9px] text-slate-400 block uppercase" data-i18n="telemetry_heading">Prua (Bussola)</span>
                     <b class="text-emerald-400 text-base" id="live-heading">0°</b>
                 </div>
                 <div>
-                    <span class="text-[9px] text-slate-400 block uppercase">Destinazione</span>
-                    <b class="text-amber-400 text-xs truncate max-w-[100px] block" id="target-poi-name">Nessuna</b>
+                    <span class="text-[9px] text-slate-400 block uppercase" data-i18n="telemetry_target">Destinazione</span>
+                    <b class="text-amber-400 text-xs truncate max-w-[100px] block" id="target-poi-name" data-i18n="target_none">Nessuna</b>
                 </div>
             </div>
 
-            <!-- Banner Navigazione Attiva (se avviata) -->
             <div id="active-nav-banner" class="hidden bg-cyan-600 text-white p-3 rounded-xl shadow text-xs flex justify-between items-center">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-location-arrow text-base animate-bounce"></i>
                     <div>
-                        <span class="text-[10px] opacity-80 block uppercase font-bold">Navigazione Attiva verso:</span>
+                        <span class="text-[10px] opacity-80 block uppercase font-bold" data-i18n="active_nav_label">Navigazione Attiva verso:</span>
                         <b class="text-sm font-black" id="active-target-title">Arco Magno</b>
                     </div>
                 </div>
-                <button onclick="annullaNavigazione()" class="bg-slate-900/80 hover:bg-slate-900 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold">
+                <button onclick="annullaNavigazione()" class="bg-slate-900/80 hover:bg-slate-900 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold" data-i18n="btn_stop_nav">
                     Interrompi
                 </button>
             </div>
 
-            <!-- Mappa GPS Live -->
             <div class="bg-white p-2.5 rounded-2xl shadow-md border border-slate-200 relative">
                 <div id="nav-map"></div>
-                
-                <!-- Bottone Ricentra Posizione sulla Barca -->
                 <button onclick="ricentraGPS()" class="absolute bottom-6 right-6 z-20 bg-slate-900 text-cyan-400 p-3 rounded-full shadow-2xl border border-cyan-500/40 text-sm" title="Ricentra Posizione Barca">
                     <i class="fa-solid fa-crosshairs"></i>
                 </button>
             </div>
 
-            <!-- Card Dettaglio POI Selezionato -->
             <div id="poi-detail-card" class="bg-white p-4 rounded-2xl shadow-md border border-cyan-500/40 hidden space-y-2 text-xs">
                 <div class="flex justify-between items-start">
                     <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" id="poi-cat">Attrazione</span>
@@ -146,7 +153,7 @@
                 <p class="text-slate-600 text-[11px] leading-relaxed" id="poi-desc">Descrizione del punto.</p>
                 
                 <button id="btn-avvia-card" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl shadow text-xs flex justify-center items-center gap-1.5">
-                    <i class="fa-solid fa-play"></i> Avvia Navigatore verso questo Punto
+                    <i class="fa-solid fa-play"></i> <span data-i18n="btn_start_card">Avvia Navigatore verso questo Punto</span>
                 </button>
             </div>
 
@@ -156,31 +163,31 @@
         <div id="sec-tips" class="tab-content hidden space-y-3">
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2 text-sm">
-                    <i class="fa-solid fa-lightbulb text-cyan-600"></i> Consigli per la Navigazione
+                    <i class="fa-solid fa-lightbulb text-cyan-600"></i> <span data-i18n="tips_title">Consigli per la Navigazione</span>
                 </h3>
 
                 <div class="space-y-3 text-xs">
                     <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
                         <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">1</div>
                         <div>
-                            <h4 class="font-bold text-slate-800 text-sm">Accensione Motore</h4>
-                            <p class="text-slate-600 mt-0.5">Mettere la leva in folle (N) e agganciare lo stacco di sicurezza prima di girare la chiave.</p>
+                            <h4 class="font-bold text-slate-800 text-sm" data-i18n="tip1_h">Accensione Motore</h4>
+                            <p class="text-slate-600 mt-0.5" data-i18n="tip1_p">Mettere la leva in folle (N) e agganciare lo stacco di sicurezza prima di girare la chiave.</p>
                         </div>
                     </div>
 
                     <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
                         <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">2</div>
                         <div>
-                            <h4 class="font-bold text-slate-800 text-sm">Ancoraggio Corretto</h4>
-                            <p class="text-slate-600 mt-0.5">Calare l'ancora sempre su fondale sabbioso di colore chiaro, mai sulla roccia o sulla posidonia.</p>
+                            <h4 class="font-bold text-slate-800 text-sm" data-i18n="tip2_h">Ancoraggio Corretto</h4>
+                            <p class="text-slate-600 mt-0.5" data-i18n="tip2_p">Calare l'ancora sempre su fondale sabbioso di colore chiaro, mai sulla roccia o sulla posidonia.</p>
                         </div>
                     </div>
 
                     <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
                         <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">3</div>
                         <div>
-                            <h4 class="font-bold text-slate-800 text-sm">Tendalino Parasole</h4>
-                            <p class="text-slate-600 mt-0.5">Fissare il tendalino solo a barca ferma o a velocità bassissima per evitare danni alla struttura.</p>
+                            <h4 class="font-bold text-slate-800 text-sm" data-i18n="tip3_h">Tendalino Parasole</h4>
+                            <p class="text-slate-600 mt-0.5" data-i18n="tip3_p">Fissare il tendalino solo a barca ferma o a velocità bassissima per evitare danni alla struttura.</p>
                         </div>
                     </div>
                 </div>
@@ -191,21 +198,21 @@
         <div id="sec-regole" class="tab-content hidden space-y-3">
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <h3 class="font-bold text-red-600 flex items-center gap-2 border-b pb-2 text-sm">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Regole Tassative di Bordo
+                    <i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="rules_title">Regole Tassative di Bordo</span>
                 </h3>
 
                 <ul class="text-xs space-y-3 text-slate-700">
                     <li class="flex items-start gap-2.5 p-2 bg-red-50 rounded-lg border border-red-100">
                         <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
-                        <span><b>Distanza Bagnanti:</b> VIETATO avvicinarsi a meno di 200 metri dalle spiagge con bagnanti.</span>
+                        <span data-i18n="rule1"><b>Distanza Bagnanti:</b> VIETATO avvicinarsi a meno di 200 metri dalle spiagge con bagnanti.</span>
                     </li>
                     <li class="flex items-start gap-2.5 p-2 bg-red-50 rounded-lg border border-red-100">
                         <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
-                        <span><b>Velocità nelle Grotte:</b> VIETATO entrare veloci nelle grotte. Procedere solo a motore al minimo o a remi.</span>
+                        <span data-i18n="rule2"><b>Velocità nelle Grotte:</b> VIETATO entrare veloci nelle grotte. Procedere solo a motore al minimo o a remi.</span>
                     </li>
                     <li class="flex items-start gap-2.5 p-2 bg-red-50 rounded-lg border border-red-100">
                         <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
-                        <span><b>Protezione Fondali:</b> VIETATO gettare l'ancora sulle praterie protette di Posidonia oceanica.</span>
+                        <span data-i18n="rule3"><b>Protezione Fondali:</b> VIETATO gettare l'ancora sulle praterie protette di Posidonia oceanica.</span>
                     </li>
                 </ul>
             </div>
@@ -220,81 +227,182 @@
                 <i class="fa-solid fa-location-arrow"></i>
             </div>
             <div>
-                <h3 class="font-extrabold text-slate-900 text-base">Avviare Navigatore GPS?</h3>
-                <p class="text-xs text-slate-500 mt-1">Confermi di voler avviare la navigazione in tempo reale verso:</p>
+                <h3 class="font-extrabold text-slate-900 text-base" data-i18n="modal_title">Avviare Navigatore GPS?</h3>
+                <p class="text-xs text-slate-500 mt-1" data-i18n="modal_sub">Confermi di voler avviare la navigazione in tempo reale verso:</p>
                 <b class="text-cyan-700 text-sm block mt-1" id="modal-target-name">Arco Magno</b>
             </div>
             <div class="grid grid-cols-2 gap-2 pt-2 text-xs font-bold">
-                <button onclick="chiudiModale()" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition">
+                <button onclick="chiudiModale()" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition" data-i18n="btn_cancel">
                     Annulla
                 </button>
-                <button onclick="confermaAvvioNavigazione()" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow transition">
+                <button onclick="confermaAvvioNavigazione()" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow transition" data-i18n="btn_start_confirm">
                     Sì, Avvia!
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- DIZIONARIO MULTILINGUA GUEST -->
     <script>
+        const translations = {
+            it: {
+                header_sub: "GUEST PORTAL • NAVIGATORE GPS",
+                active_rental: "Noleggio Attivo",
+                welcome_title: "Benvenuto a Bordo!",
+                boat_label: "Barca:",
+                tab_dest: "Destinazioni",
+                tab_map: "Mappa GPS",
+                tab_rules: "Divieti",
+                dest_section_title: "Seleziona la Destinazione di Oggi",
+                dest_section_desc: "Clicca su uno dei punti esatti per avviare il navigatore GPS in tempo reale verso la meta.",
+                btn_start_gps: "Avvia Navigatore GPS",
+                telemetry_speed: "Velocità",
+                telemetry_heading: "Prua (Bussola)",
+                telemetry_target: "Destinazione",
+                target_none: "Nessuna",
+                active_nav_label: "Navigazione Attiva verso:",
+                btn_stop_nav: "Interrompi",
+                btn_start_card: "Avvia Navigatore verso questo Punto",
+                tips_title: "Consigli per la Navigazione",
+                tip1_h: "Accensione Motore",
+                tip1_p: "Mettere la leva in folle (N) e agganciare lo stacco di sicurezza prima di girare la chiave.",
+                tip2_h: "Ancoraggio Corretto",
+                tip2_p: "Calare l'ancora sempre su fondale sabbioso di colore chiaro, mai sulla roccia o sulla posidonia.",
+                tip3_h: "Tendalino Parasole",
+                tip3_p: "Fissare il tendalino solo a barca ferma o a velocità bassissima per evitare danni alla struttura.",
+                rules_title: "Regole Tassative di Bordo",
+                rule1: "<b>Distanza Bagnanti:</b> VIETATO avvicinarsi a meno di 200 metri dalle spiagge con bagnanti.",
+                rule2: "<b>Velocità nelle Grotte:</b> VIETATO entrare veloci nelle grotte. Procedere solo a motore al minimo o a remi.",
+                rule3: "<b>Protezione Fondali:</b> VIETATO gettare l'ancora sulle praterie protette di Posidonia oceanica.",
+                modal_title: "Avviare Navigatore GPS?",
+                modal_sub: "Confermi di voler avviare la navigazione in tempo reale verso:",
+                btn_cancel: "Annulla",
+                btn_start_confirm: "Sì, Avvia!"
+            },
+            en: {
+                header_sub: "GUEST PORTAL • GPS NAVIGATION",
+                active_rental: "Active Rental",
+                welcome_title: "Welcome Aboard!",
+                boat_label: "Boat:",
+                tab_dest: "Destinations",
+                tab_map: "GPS Map",
+                tab_rules: "Rules",
+                dest_section_title: "Select Today's Destination",
+                dest_section_desc: "Click on one of the exact spots to start real-time GPS navigation.",
+                btn_start_gps: "Start GPS Navigation",
+                telemetry_speed: "Speed",
+                telemetry_heading: "Heading (Compass)",
+                telemetry_target: "Destination",
+                target_none: "None",
+                active_nav_label: "Active Navigation to:",
+                btn_stop_nav: "Stop",
+                btn_start_card: "Start Navigator to this Spot",
+                tips_title: "Boating Tips",
+                tip1_h: "Engine Starting",
+                tip1_p: "Put the lever in neutral (N) and attach the kill-switch lanyard before turning the key.",
+                tip2_h: "Proper Anchoring",
+                tip2_p: "Always drop anchor on light-colored sand bottoms, never on rocks or posidonia seagrass.",
+                tip3_h: "Sun Awning Bimini",
+                tip3_p: "Secure the bimini top only when stopped or at low speed to avoid frame damage.",
+                rules_title: "Mandatory Board Rules",
+                rule1: "<b>Swimmers Distance:</b> PROHIBITED to approach within 200 meters of beaches with swimmers.",
+                rule2: "<b>Caves Speed:</b> PROHIBITED to enter caves at speed. Idle engine or row only.",
+                rule3: "<b>Seabed Protection:</b> PROHIBITED to anchor on protected Posidonia seagrass meadows.",
+                modal_title: "Start GPS Navigation?",
+                modal_sub: "Confirm starting real-time navigation to:",
+                btn_cancel: "Cancel",
+                btn_start_confirm: "Yes, Start!"
+            },
+            es: {
+                header_sub: "GUEST PORTAL • NAVEGADOR GPS",
+                active_rental: "Alquiler Activo",
+                welcome_title: "¡Bienvenido a Bordo!",
+                boat_label: "Barco:",
+                tab_dest: "Destinos",
+                tab_map: "Mapa GPS",
+                tab_rules: "Reglas",
+                dest_section_title: "Selecciona el Destino de Hoy",
+                dest_section_desc: "Haz clic en uno de los puntos exactos para iniciar la navegación GPS en tiempo real.",
+                btn_start_gps: "Iniciar Navegador GPS",
+                telemetry_speed: "Velocidad",
+                telemetry_heading: "Rumbo (Brújula)",
+                telemetry_target: "Destino",
+                target_none: "Ninguno",
+                active_nav_label: "Navegación Activa hacia:",
+                btn_stop_nav: "Detener",
+                btn_start_card: "Iniciar Navegador a este Punto",
+                tips_title: "Consejos de Navegación",
+                tip1_h: "Arranque del Motor",
+                tip1_p: "Poner la palanca en punto muerto (N) y enganchar el paro de seguridad antes de girar la llave.",
+                tip2_h: "Fondeo Correcto",
+                tip2_p: "Echar el ancla siempre en fondo de arena clara, nunca sobre rocas o posidonia.",
+                tip3_h: "Toldo Parasol",
+                tip3_p: "Fijar el toldo solo con el barco parado o a muy baja velocidad para evitar daños.",
+                rules_title: "Reglas Obligatorias a Bordo",
+                rule1: "<b>Distancia a Bañistas:</b> PROHIBIDO acercarse a menos de 200 metros de playas con bañistas.",
+                rule2: "<b>Velocidad en Cuevas:</b> PROHIBIDO entrar rápido en las cuevas. Solo motor al mínimo o remos.",
+                rule3: "<b>Protección del Fondo:</b> PROHIBIDO fondear sobre praderas protegidas de Posidonia.",
+                modal_title: "¿Iniciar Navegador GPS?",
+                modal_sub: "Confirma iniciar navegación en tiempo real hacia:",
+                btn_cancel: "Cancelar",
+                btn_start_confirm: "¡Sí, Iniciar!"
+            }
+        };
+
+        const puntiEsattiMultilang = {
+            it: [
+                { id: "arcomagno", nome: "Arco Magno (San Nicola Arcella)", cat: "Baia Naturale", desc: "Famoso arco di roccia su baia incantata. Mantenere la distanza di sicurezza dalle spiagge.", lat: 39.8456, lng: 15.7889, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" },
+                { id: "grotta_leone", nome: "Grotta del Leone", cat: "Grotta & Snorkeling", desc: "Roccia immersa con sagoma a leone. Fondale sabbioso eccezionale per l'ancoraggio.", lat: 39.8695, lng: 15.7720, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
+                { id: "grotta_azzurra", nome: "Grotta Azzurra (Isola di Dino)", cat: "Grotta Marina", desc: "Grotta principale dell'Isola di Dino. Entrare esclusivamente a motore al minimo o a remi.", lat: 39.8731, lng: 15.7735, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" },
+                { id: "secca_castrocucco", nome: "Secca di Castrocucco (Maratea)", cat: "Secca & Fondali", desc: "Prima insenature della costa di Maratea verso nord. Acque trasparenti ricche di pesci.", lat: 39.9000, lng: 15.7500, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
+                { id: "secca_giumenta", nome: "Secca della Giumenta (Maratea)", cat: "Punto Immersione", desc: "Spettacolare secca rocciosa sommersa lungo la costa di Maratea. Attenzione ai segnali d'onda.", lat: 39.9150, lng: 15.7380, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" }
+            ],
+            en: [
+                { id: "arcomagno", nome: "Arco Magno (San Nicola Arcella)", cat: "Natural Bay", desc: "Famous rock arch over an enchanted bay. Keep safe distance from beaches.", lat: 39.8456, lng: 15.7889, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" },
+                { id: "grotta_leone", nome: "Lion's Cave", cat: "Cave & Snorkeling", desc: "Submerged rock with a lion silhouette. Exceptional sandy bottom for anchoring.", lat: 39.8695, lng: 15.7720, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
+                { id: "grotta_azzurra", nome: "Blue Grotto (Dino Island)", cat: "Sea Cave", desc: "Main sea cave on Dino Island. Enter strictly with engine at idle or rowing.", lat: 39.8731, lng: 15.7735, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" },
+                { id: "secca_castrocucco", nome: "Castrocucco Reef (Maratea)", cat: "Reef & Seabed", desc: "First cove of the Maratea coast facing north. Crystal clear waters full of fish.", lat: 39.9000, lng: 15.7500, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
+                { id: "secca_giumenta", nome: "Giumenta Reef (Maratea)", cat: "Diving Spot", desc: "Spectacular submerged rocky reef along the Maratea coast.", lat: 39.9150, lng: 15.7380, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" }
+            ],
+            es: [
+                { id: "arcomagno", nome: "Arco Magno (San Nicola Arcella)", cat: "Bahía Natural", desc: "Famoso arco de roca sobre una bahía encantada. Mantener distancia de seguridad.", lat: 39.8456, lng: 15.7889, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" },
+                { id: "grotta_leone", nome: "Cueva del León", cat: "Cueva y Snorkel", desc: "Roca sumergida con silueta de león. Fondo de arena excelente para fondear.", lat: 39.8695, lng: 15.7720, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
+                { id: "grotta_azzurra", nome: "Cueva Azul (Isla de Dino)", cat: "Cueva Marina", desc: "Cueva principal de la Isla de Dino. Entrar únicamente con motor al mínimo o a remos.", lat: 39.8731, lng: 15.7735, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" },
+                { id: "secca_castrocucco", nome: "Bajo de Castrocucco (Maratea)", cat: "Bajo y Fondos", desc: "Primera cala de la costa de Maratea hacia el norte. Aguas cristalinas.", lat: 39.9000, lng: 15.7500, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
+                { id: "secca_giumenta", nome: "Bajo de la Giumenta (Maratea)", cat: "Punto de Buceo", desc: "Espectacular bajo rocoso sumergido a lo largo de la costa de Maratea.", lat: 39.9150, lng: 15.7380, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" }
+            ]
+        };
+
+        let currentLang = 'it';
         let map, userMarker, markersGroup, routePolyline;
         let destinazioneSelezionata = null;
         let destinazioneAttiva = null;
         let currentHeading = 0;
 
-        // I 5 PUNTI ESATTI DI NAVIGAZIONE
-        const puntiEsatti = [
-            {
-                id: "arcomagno",
-                nome: "Arco Magno (San Nicola Arcella)",
-                cat: "Baia Naturale",
-                desc: "Famoso arco di roccia su baia incantata. Mantenere la distanza di sicurezza dalle spiagge.",
-                lat: 39.8456,
-                lng: 15.7889,
-                img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80"
-            },
-            {
-                id: "grotta_leone",
-                nome: "Grotta del Leone",
-                cat: "Grotta & Snorkeling",
-                desc: "Roccia immersa con sagoma a leone. Fondale sabbioso eccezionale per l'ancoraggio.",
-                lat: 39.8695,
-                lng: 15.7720,
-                img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80"
-            },
-            {
-                id: "grotta_azzurra",
-                nome: "Grotta Azzurra (Isola di Dino)",
-                cat: "Grotta Marina",
-                desc: "Grotta principale dell'Isola di Dino. Entrare esclusivamente a motore al minimo o a remi.",
-                lat: 39.8731,
-                lng: 15.7735,
-                img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80"
-            },
-            {
-                id: "secca_castrocucco",
-                nome: "Secca di Castrocucco (Maratea)",
-                cat: "Secca & Fondali",
-                desc: "Prima insenatura della costa di Maratea verso nord. Acque trasparenti ricche di pesci.",
-                lat: 39.9000,
-                lng: 15.7500,
-                img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80"
-            },
-            {
-                id: "secca_giumenta",
-                nome: "Secca della Giumenta (Maratea)",
-                cat: "Punto Immersione",
-                desc: "Spettacolare secca rocciosa sommersa lungo la costa di Maratea. Attenzione ai segnali d'onda.",
-                lat: 39.9150,
-                lng: 15.7380,
-                img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80"
-            }
-        ];
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('nauticovi_lang', lang);
+
+            document.querySelectorAll('.flag-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('flag-' + lang).classList.add('active');
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+
+            generaListaPunti();
+        }
 
         function generaListaPunti() {
             const container = document.getElementById('punti-esatti-lista');
             container.innerHTML = '';
+            const list = puntiEsattiMultilang[currentLang] || puntiEsattiMultilang['it'];
+            const btnText = translations[currentLang].btn_start_gps;
 
-            puntiEsatti.forEach(poi => {
+            list.forEach(poi => {
                 container.innerHTML += `
                     <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
                         <img src="${poi.img}" alt="${poi.nome}" class="w-full h-36 object-cover">
@@ -306,7 +414,7 @@
                             <p class="text-xs text-slate-600 leading-relaxed">${poi.desc}</p>
                             
                             <button onclick="chiediConfermaNavigazione('${poi.id}')" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
-                                <i class="fa-solid fa-location-arrow"></i> Avvia Navigatore GPS
+                                <i class="fa-solid fa-location-arrow"></i> ${btnText}
                             </button>
                         </div>
                     </div>
@@ -329,7 +437,8 @@
         }
 
         function chiediConfermaNavigazione(idPoi) {
-            destinazioneSelezionata = puntiEsatti.find(p => p.id === idPoi);
+            const list = puntiEsattiMultilang[currentLang] || puntiEsattiMultilang['it'];
+            destinazioneSelezionata = list.find(p => p.id === idPoi);
             if(destinazioneSelezionata) {
                 document.getElementById('modal-target-name').innerText = destinazioneSelezionata.nome;
                 document.getElementById('confirm-modal').classList.remove('hidden');
@@ -343,22 +452,18 @@
         function confermaAvvioNavigazione() {
             chiudiModale();
             destinazioneAttiva = destinazioneSelezionata;
-            
-            // Passa alla tab del navigatore
             switchTab('navigatore');
 
-            // Aggiorna interfaccia navigazione
             document.getElementById('target-poi-name').innerText = destinazioneAttiva.nome;
             document.getElementById('active-target-title').innerText = destinazioneAttiva.nome;
             document.getElementById('active-nav-banner').classList.remove('hidden');
 
-            // Disegna rotta visiva sulla mappa se la posizione user esiste
             tracciaRottaSullaMappa();
         }
 
         function annullaNavigazione() {
             destinazioneAttiva = null;
-            document.getElementById('target-poi-name').innerText = "Nessuna";
+            document.getElementById('target-poi-name').innerText = translations[currentLang].target_none;
             document.getElementById('active-nav-banner').classList.add('hidden');
             if(routePolyline) map.removeLayer(routePolyline);
         }
@@ -366,25 +471,25 @@
         function initMapNav() {
             map = L.map('nav-map', { zoomControl: false }).setView([39.8700, 15.7750], 12);
 
-            // Mappa Base OpenStreetMap + Layer Nautico OpenSeaMap
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
             L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', { attribution: '© OpenSeaMap' }).addTo(map);
 
             markersGroup = L.layerGroup().addTo(map);
 
-            // Aggiungi tutti i 5 Punti esatti sulla mappa
-            puntiEsatti.forEach(poi => {
+            const list = puntiEsattiMultilang['it'];
+            list.forEach(poi => {
                 const m = L.marker([poi.lat, poi.lng]).addTo(markersGroup);
                 m.on('click', () => {
-                    document.getElementById('poi-title').innerText = poi.nome;
-                    document.getElementById('poi-cat').innerText = poi.cat;
-                    document.getElementById('poi-desc').innerText = poi.desc;
+                    const currentList = puntiEsattiMultilang[currentLang] || puntiEsattiMultilang['it'];
+                    const localizedPoi = currentList.find(p => p.id === poi.id) || poi;
+                    document.getElementById('poi-title').innerText = localizedPoi.nome;
+                    document.getElementById('poi-cat').innerText = localizedPoi.cat;
+                    document.getElementById('poi-desc').innerText = localizedPoi.desc;
                     document.getElementById('btn-avvia-card').onclick = () => chiediConfermaNavigazione(poi.id);
                     document.getElementById('poi-detail-card').classList.remove('hidden');
                 });
             });
 
-            // CREAZIONE ICONA BARCA PERSONALIZZATA (LOGO CON FRECCIA DI PRUA)
             const boatIcon = L.divIcon({
                 className: 'boat-marker-container',
                 html: `<div id="boat-icon-inner" class="boat-marker-icon" style="transform: rotate(0deg);">
@@ -396,7 +501,6 @@
                 iconAnchor: [16, 16]
             });
 
-            // Geolocation Live con rotazione prua
             if ("geolocation" in navigator) {
                 navigator.geolocation.watchPosition(
                     pos => {
@@ -405,30 +509,26 @@
                         const speed = pos.coords.speed ? (pos.coords.speed * 1.94384).toFixed(1) : "0.0";
                         currentHeading = pos.coords.heading ? Math.round(pos.coords.heading) : currentHeading;
 
-                        document.getElementById('live-speed').innerText = `${speed} Nodi`;
+                        const speedUnit = currentLang === 'en' ? 'Knots' : (currentLang === 'es' ? 'Nudos' : 'Nodi');
+                        document.getElementById('live-speed').innerText = `${speed} ${speedUnit}`;
                         document.getElementById('live-heading').innerText = `${currentHeading}°`;
 
-                        // Aggiorna posizione Marker Barca
                         if (!userMarker) {
                             userMarker = L.marker([lat, lng], { icon: boatIcon }).addTo(map);
                         } else {
                             userMarker.setLatLng([lat, lng]);
                         }
 
-                        // Ruota l'icona della barca secondo la prua GPS
                         const boatEl = document.getElementById('boat-icon-inner');
                         if(boatEl) {
                             boatEl.style.transform = `rotate(${currentHeading}deg)`;
                         }
 
-                        // Aggiorna linea di rotta se c'è una destinazione attiva
                         if(destinazioneAttiva) {
                             tracciaRottaSullaMappa();
                         }
                     },
-                    err => {
-                        document.getElementById('gps-status').innerHTML = `<span class="text-amber-400 font-bold">GPS Base</span>`;
-                    },
+                    err => {},
                     { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
                 );
             }
@@ -462,8 +562,9 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            generaListaPunti();
+            const savedLang = localStorage.getItem('nauticovi_lang') || 'it';
             initMapNav();
+            setLanguage(savedLang);
         });
     </script>
 </body>
