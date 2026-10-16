@@ -3,28 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NAUTICOVI - Guest Portal</title>
+    <title>NAUTICOVI - Noleggio Barche & SUP Praia a Mare</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- CSS Leaflet Mappa -->
+    <!-- CSS & JS Leaflet Mappa -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <!-- JS Leaflet Mappa -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    
-    <!-- FontAwesome Icone -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* Forza l'altezza e la visibilità della mappa */
         #map {
-            height: 280px !important;
+            height: 260px !important;
             width: 100% !important;
             border-radius: 0.75rem;
             z-index: 10;
         }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 pb-16">
+<body class="bg-slate-100 text-slate-800 pb-20 font-sans">
 
     <!-- Header Brand con Logo Ufficiale -->
     <header class="bg-slate-900 text-white py-5 px-4 text-center shadow-xl border-b-4 border-cyan-500 sticky top-0 z-50">
@@ -33,27 +29,26 @@
                 <i class="fa-solid fa-water text-cyan-400 text-2xl"></i>
                 <h1 class="text-2xl font-black tracking-widest text-white">NAUTICOVI</h1>
             </div>
-            <p class="text-[9px] tracking-widest text-cyan-400 font-bold uppercase">NOLEGGIO BARCHE • PRAIA A MARE</p>
+            <p class="text-[9px] tracking-widest text-cyan-400 font-bold uppercase">NOLEGGIO BARCHE & SUP • PRAIA A MARE</p>
         </div>
     </header>
 
     <main class="max-w-md mx-auto p-4 space-y-5">
 
-        <!-- Banner Benvenuto Personalizzato -->
-        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-900 rounded-2xl p-5 text-white shadow-lg border border-cyan-500/30">
-            <div class="flex justify-between items-start">
+        <!-- Banner Meteo & Assistenza -->
+        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-900 rounded-2xl p-4 text-white shadow-lg border border-cyan-500/30">
+            <div class="flex justify-between items-center">
                 <div>
-                    <span class="bg-cyan-500/20 text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-400/30">Noleggio Attivo</span>
-                    <h2 class="text-xl font-extrabold mt-2" id="welcome-nome">Benvenuto a Bordo!</h2>
-                    <p class="text-xs text-slate-300 mt-0.5">Barca: <span class="font-bold text-cyan-300" id="welcome-barca">Marlin 1</span></p>
+                    <span class="bg-emerald-500/20 text-emerald-300 text-[10px] px-2.5 py-0.5 rounded-full font-semibold border border-emerald-400/30">100% Senza Patente</span>
+                    <h2 class="text-lg font-black mt-1">Prenota Barca o SUP</h2>
                 </div>
-                <a href="tel:+393000000000" class="bg-red-500 hover:bg-red-600 text-white p-3 rounded-xl shadow-lg transition flex items-center justify-center">
-                    <i class="fa-solid fa-phone-volume text-lg"></i>
+                <a href="tel:+393000000000" class="bg-red-500 hover:bg-red-600 text-white p-2.5 rounded-xl shadow transition text-xs font-bold flex items-center gap-1.5">
+                    <i class="fa-solid fa-phone"></i> SOS
                 </a>
             </div>
-            <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs text-slate-300">
+            <div class="mt-3 pt-2.5 border-t border-slate-700/60 flex justify-between items-center text-xs text-slate-300">
                 <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-sun text-amber-400 text-base"></i>
+                    <i class="fa-solid fa-sun text-amber-400"></i>
                     <span>28°C • Mare Calmo</span>
                 </div>
                 <div class="flex items-center gap-1.5 text-cyan-300 font-medium">
@@ -62,16 +57,100 @@
             </div>
         </div>
 
-        <!-- Navigazione a Schede / Tab -->
+        <!-- Navigazione a Schede -->
         <div class="flex bg-slate-200 p-1 rounded-xl text-xs font-bold text-slate-600 gap-1 shadow-inner">
-            <button onclick="switchTab('poi')" id="tab-poi" class="tab-btn flex-1 py-2.5 rounded-lg bg-white text-slate-900 shadow">Punti d'Interesse</button>
-            <button onclick="switchTab('guida')" id="tab-guida" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Guida Barca</button>
-            <button onclick="switchTab('regole')" id="tab-regole" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Regole Mare</button>
+            <button onclick="switchTab('prenota')" id="tab-prenota" class="tab-btn flex-1 py-2.5 rounded-lg bg-white text-slate-900 shadow">Barche</button>
+            <button onclick="switchTab('sup')" id="tab-sup" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Noleggio SUP</button>
+            <button onclick="switchTab('poi')" id="tab-poi" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Mappa & POI</button>
+            <button onclick="switchTab('regole')" id="tab-regole" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Regole</button>
         </div>
 
-        <!-- SEZIONE 1: MAPPA + SCHEDE FOTOGRAFICHE PUNTI D'INTERESSE -->
-        <div id="sec-poi" class="tab-content space-y-4">
-            <!-- Mappa Interattiva -->
+        <!-- SEZIONE 1: PRENOTAZIONE BARCHE & FLOTTA -->
+        <div id="sec-prenota" class="tab-content space-y-4">
+            
+            <!-- Selettore Data & Orario -->
+            <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200 space-y-3">
+                <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-calendar-days text-cyan-600"></i> 1. Seleziona Data e Turno
+                </h3>
+                
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Data Noleggio</label>
+                        <input type="date" id="booking-date" onchange="calcolaPrezzi()" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none font-semibold">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Fascia Oraria</label>
+                        <select id="booking-slot" onchange="calcolaPrezzi()" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none bg-white font-semibold">
+                            <option value="mattina">Mattina (09:00 - 13:00)</option>
+                            <option value="pomeriggio">Pomeriggio (14:00 - 18:00)</option>
+                            <option value="intera">Giornata Intera (09:00 - 18:00)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Box Informativo Caparra -->
+                <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs space-y-1">
+                    <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-shield-halved text-amber-600"></i> Condizioni di Prenotazione
+                    </div>
+                    <p class="text-amber-800 text-[11px] leading-relaxed">
+                        Richiesta <b>caparra del 50%</b> entro il giorno prima del noleggio tramite Bonifico Istantaneo, PayPal o Contanti in sede.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Lista Flotta -->
+            <div class="space-y-3">
+                <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5 px-1">
+                    <i class="fa-solid fa-ship text-cyan-600"></i> 2. Scegli l'Imbarcazione
+                </h3>
+
+                <div id="flotta-cards-container" class="space-y-4">
+                    <!-- Cards Generate da JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SEZIONE 2: NOLEGGIO SUP AD ORE -->
+        <div id="sec-sup" class="tab-content hidden space-y-4">
+            <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
+                <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" alt="Noleggio SUP" class="w-full h-44 object-cover">
+                <div class="p-5 space-y-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Attività Indipendente</span>
+                            <h3 class="text-lg font-bold text-slate-800 mt-1">Noleggio Stand Up Paddle (SUP)</h3>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xl font-black text-emerald-600">€10</span>
+                            <span class="text-xs text-slate-400 block">/ ora</span>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Pagaia alla scoperta delle grotte dell'Isola di Dino a ritmo lento. Noleggio ad ore autonomo rispetto alle imbarcazioni.
+                    </p>
+
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-2">
+                        <label class="block font-bold text-slate-700">Seleziona Ore di Noleggio:</label>
+                        <select id="sup-ore" onchange="calcolaPrezzoSUP()" class="w-full p-2 border rounded-lg bg-white font-semibold outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="1">1 Ora - €10</option>
+                            <option value="2">2 Ore - €20</option>
+                            <option value="3">3 Ore - €30</option>
+                            <option value="4">Mezza Giornata (4 Ore) - €40</option>
+                        </select>
+                    </div>
+
+                    <button onclick="prenotaSUP()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
+                        <i class="fa-brands fa-whatsapp text-base"></i> Prenota SUP su WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEZIONE 3: MAPPA & PUNTI D'INTERESSE -->
+        <div id="sec-poi" class="tab-content hidden space-y-4">
             <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200">
                 <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2 text-sm">
                     <i class="fa-solid fa-map-location-dot text-cyan-600"></i> Mappa Calette & Grotte
@@ -79,37 +158,30 @@
                 <div id="map" class="shadow-inner border border-slate-200"></div>
             </div>
 
-            <!-- Elenco Schede Foto Punti di Interesse -->
-            <div class="space-y-3">
-                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 px-1">
-                    <i class="fa-solid fa-camera text-cyan-600"></i> Luoghi da Non Perdere
-                </h3>
-                <div id="poi-cards-container" class="space-y-4">
-                    <!-- Popolato da JS -->
-                </div>
+            <div id="poi-cards-container" class="space-y-4">
+                <!-- Popolato da JS -->
             </div>
         </div>
 
-        <!-- SEZIONE 2: GUIDA SPECIFICA BARCA -->
-        <div id="sec-guida" class="tab-content hidden space-y-3">
+        <!-- SEZIONE 4: GUIDA & REGOLE MARE -->
+        <div id="sec-regole" class="tab-content hidden space-y-3">
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2 text-sm">
-                    <i class="fa-solid fa-compass text-cyan-600"></i> Istruzioni Imbarcazione
+                    <i class="fa-solid fa-shield-halved text-cyan-600"></i> Condizioni & Regole di Bordo
                 </h3>
-                <div id="guida-barca-lista" class="space-y-3 text-xs">
-                    <!-- Popolato da JS -->
-                </div>
-            </div>
-        </div>
-
-        <!-- SEZIONE 3: REGOLE NAVIGAZIONE GENERALI -->
-        <div id="sec-regole" class="tab-content hidden space-y-3">
-            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
-                <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2 text-sm">
-                    <i class="fa-solid fa-shield-halved text-cyan-600"></i> Normative Mare & Sicurezza
-                </h3>
-                <ul id="regole-generali-lista" class="text-xs space-y-3 text-slate-600">
-                    <!-- Popolato da JS -->
+                <ul class="text-xs space-y-3 text-slate-600">
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-snowflake text-cyan-500 text-sm mt-0.5"></i>
+                        <span><b>Dotazione Bordo:</b> Su richiesta forniamo frigo rigido con ghiaccio incluso per le tue bevande.</span>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-credit-card text-emerald-500 text-sm mt-0.5"></i>
+                        <span><b>Caparra 50%:</b> Da versare entro il giorno prima via Bonifico Istantaneo, PayPal o Contanti.</span>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-500 text-sm mt-0.5"></i>
+                        <span><b>Senza Patente:</b> Tutti i nostri natanti si guidano in totale semplicità senza patente nautica.</span>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -125,63 +197,19 @@
     <script>
         let map;
 
-        // DATI INCORPORATI (Sicurezza 100% caricamento)
-        const db = {
-            noleggi: [
-                {
-                    id: "1",
-                    cliente: "Marco Rossi",
-                    barca: "Marlin 1 (Senza Patente)",
-                    regole_barca: [
-                        "Accensione: Leva in folle (N) e inserire lo stacco di sicurezza prima di girare la chiave.",
-                        "Ancoraggio: Calare l'ancora sempre su fondale sabbioso, mai sulla roccia o sulla posidonia.",
-                        "Dotazioni di Bordo: Giubbotti di salvataggio e ciambella sotto la panca di poppa."
-                    ]
-                },
-                {
-                    id: "2",
-                    cliente: "Giuseppe Bianchi",
-                    barca: "Poseidon (Con Skipper)",
-                    regole_barca: [
-                        "Seguire le indicazioni dello skipper a bordo per la massima sicurezza.",
-                        "È vietato fumare nelle cabine di prua.",
-                        "Utilizzare il tendalino solo con imbarcazione ferma o a bassa velocità."
-                    ]
-                }
-            ],
-            regole_generali: [
-                "Distanza dalla Costa: Mantenere almeno 200 metri di distanza dalle spiagge con bagnanti.",
-                "Isola di Dino: Ingresso nelle grotte marine consentito solo a motore al minimo o a remi.",
-                "Aree Protette: Vietato gettare l'ancora sulle praterie protette di Posidonia Oceanica.",
-                "Limiti di Velocità: Massimo 3 nodi nei pressi della costa ed entro i 300 metri."
-            ],
-            punti_interesse: [
-                {
-                    nome: "Isola di Dino & Grotta Azzurra",
-                    categoria: "Grotta Marina",
-                    descrizione: "Una meravigliosa grotta naturale caratterizzata da acque cristalline e riflessi azzurri unici. Accessibile via mare, è la tappa principale di Praia a Mare.",
-                    immagine: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80",
-                    lat: 39.8731,
-                    lng: 15.7735
-                },
-                {
-                    nome: "Grotta del Leone",
-                    categoria: "Grotta & Snorkeling",
-                    descrizione: "Prende il nome da una roccia immersa che ricorda la forma di un leone sdraiato. Un fondale spettacolare e ricco di vita marina, ideale per lo snorkeling.",
-                    immagine: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
-                    lat: 39.8695,
-                    lng: 15.7720
-                },
-                {
-                    nome: "Arco Magno (San Nicola Arcella)",
-                    categoria: "Baia Naturale",
-                    descrizione: "Un maestoso arco di roccia naturale che custodisce una piccola spiaggia incantata. Uno dei luoghi più iconici ed emozionanti della Riviera dei Cedri.",
-                    immagine: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80",
-                    lat: 39.8456,
-                    lng: 15.7889
-                }
-            ]
-        };
+        const flotta = [
+            { id: "g1", nome: "Gommone 40 CV (Marlin 1)", tipo: "Gommone", motore: "40 CV (Senza Patente)", persone: "6 Persone", immagine: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80", prezzoBassa: { mezza: 120, intera: 200 }, prezzoAlta: { mezza: 150, intera: 220 } },
+            { id: "g2", nome: "Gommone 40 CV (Marlin 2)", tipo: "Gommone", motore: "40 CV (Senza Patente)", persone: "6 Persone", immagine: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80", prezzoBassa: { mezza: 120, intera: 200 }, prezzoAlta: { mezza: 150, intera: 220 } },
+            { id: "s1", nome: "Scafo Open 40 CV (Poseidon 1)", tipo: "Scafo Rigido", motore: "40 CV (Senza Patente)", persone: "5 Persone", immagine: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", prezzoBassa: { mezza: 120, intera: 200 }, prezzoAlta: { mezza: 150, intera: 220 } },
+            { id: "s2", nome: "Scafo Open 40 CV (Poseidon 2)", tipo: "Scafo Rigido", motore: "40 CV (Senza Patente)", persone: "5 Persone", immagine: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", prezzoBassa: { mezza: 120, intera: 200 }, prezzoAlta: { mezza: 150, intera: 220 } },
+            { id: "l1", nome: "Lancia Tradizionale 30 CV", tipo: "Lancia", motore: "30 CV (Senza Patente)", persone: "4 Persone", immagine: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80", prezzoBassa: { mezza: 80, intera: 150 }, prezzoAlta: { mezza: 100, intera: 180 } }
+        ];
+
+        const poiList = [
+            { nome: "Isola di Dino & Grotta Azzurra", cat: "Grotta Marina", desc: "Siti principali con acque cristalline e riflessi azzurri unici.", img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80", lat: 39.8731, lng: 15.7735 },
+            { nome: "Grotta del Leone", cat: "Snorkeling", desc: "Spettacolare roccia sommersa e fondali ricchi di pesci.", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", lat: 39.8695, lng: 15.7720 },
+            { nome: "Arco Magno", cat: "Baia Naturale", desc: "Maestoso arco di roccia su spiaggia incantata.", img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80", lat: 39.8456, lng: 15.7889 }
+        ];
 
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -192,77 +220,100 @@
             document.getElementById('sec-' + tab).classList.remove('hidden');
             document.getElementById('tab-' + tab).classList.add('bg-white', 'text-slate-900', 'shadow');
 
-            if(tab === 'poi' && map) {
-                setTimeout(() => { map.invalidateSize(); }, 200);
+            if(tab === 'poi') {
+                if(!map) initMap();
+                setTimeout(() => map.invalidateSize(), 200);
             }
         }
 
-        function initApp() {
-            // Recupera l'ID del cliente dall'URL (es. ?id=2)
-            const urlParams = new URLSearchParams(window.location.search);
-            const clientId = urlParams.get('id') || '1';
+        function calcolaPrezzi() {
+            const dateInput = document.getElementById('booking-date').value;
+            const slot = document.getElementById('booking-slot').value;
+            
+            let isAltaStagione = false;
+            if (dateInput) {
+                const mese = new Date(dateInput).getMonth() + 1;
+                if (mese === 7 || mese === 8) isAltaStagione = true;
+            }
 
-            const noleggio = db.noleggi.find(n => n.id === clientId) || db.noleggi[0];
+            const container = document.getElementById('flotta-cards-container');
+            container.innerHTML = '';
 
-            // Popola Dati Cliente
-            document.getElementById('welcome-nome').innerText = `Benvenuto, ${noleggio.cliente}!`;
-            document.getElementById('welcome-barca').innerText = noleggio.barca;
+            flotta.forEach(barca => {
+                const prezzi = isAltaStagione ? barca.prezzoAlta : barca.prezzoBassa;
+                const prezzoTotale = (slot === 'intera') ? prezzi.intera : prezzi.mezza;
+                const caparra = prezzoTotale / 2;
 
-            // Popola Guida Barca
-            const guidaBox = document.getElementById('guida-barca-lista');
-            guidaBox.innerHTML = '';
-            noleggio.regole_barca.forEach((regola, index) => {
-                guidaBox.innerHTML += `
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
-                        <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold text-xs">${index + 1}</div>
-                        <p class="text-slate-700 font-medium">${regola}</p>
-                    </div>
-                `;
-            });
+                const msgWhatsapp = encodeURIComponent(`Ciao Nauticovi! Vorrei prenotare la barca ${barca.nome} per il giorno ${dateInput || 'da concordare'} (Turno: ${slot}). Prezzo Totale: €${prezzoTotale} (Caparra 50%: €${caparra})`);
 
-            // Popola Regole Mare
-            const regoleBox = document.getElementById('regole-generali-lista');
-            regoleBox.innerHTML = '';
-            db.regole_generali.forEach(regola => {
-                regoleBox.innerHTML += `
-                    <li class="flex items-start gap-2.5">
-                        <i class="fa-solid fa-circle-check text-emerald-500 text-sm mt-0.5"></i>
-                        <span>${regola}</span>
-                    </li>
-                `;
-            });
-
-            // Inizializza Mappa Leaflet
-            map = L.map('map').setView([39.8700, 15.7750], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
-
-            const cardsContainer = document.getElementById('poi-cards-container');
-            cardsContainer.innerHTML = '';
-
-            // Popola Mappa e Schede Foto
-            db.punti_interesse.forEach(poi => {
-                L.marker([poi.lat, poi.lng]).addTo(map)
-                    .bindPopup(`<b>${poi.nome}</b><br><span style="font-size:11px">${poi.categoria}</span>`);
-
-                cardsContainer.innerHTML += `
+                container.innerHTML += `
                     <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
-                        <img src="${poi.immagine}" alt="${poi.nome}" class="w-full h-48 object-cover">
-                        <div class="p-4 space-y-1.5">
-                            <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">${poi.categoria}</span>
-                            <h4 class="font-bold text-slate-800 text-base">${poi.nome}</h4>
-                            <p class="text-xs text-slate-600 leading-relaxed">${poi.descrizione}</p>
+                        <img src="${barca.immagine}" alt="${barca.nome}" class="w-full h-40 object-cover">
+                        <div class="p-4 space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">${barca.tipo}</span>
+                                    <h4 class="font-bold text-slate-800 text-base mt-1">${barca.nome}</h4>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs text-slate-400 block">Totale</span>
+                                    <span class="text-xl font-black text-emerald-600">€${prezzoTotale}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between text-xs text-slate-500 border-t border-b py-2 my-1">
+                                <span><i class="fa-solid fa-gauge-high text-cyan-600"></i> ${barca.motore}</span>
+                                <span><i class="fa-solid fa-snowflake text-cyan-600"></i> Frigo + Ghiaccio</span>
+                                <span><i class="fa-solid fa-users text-cyan-600"></i> ${barca.persone}</span>
+                            </div>
+
+                            <div class="text-[11px] text-amber-800 bg-amber-50 p-2 rounded-lg font-medium flex justify-between items-center">
+                                <span>Caparra 50% richiesta:</span>
+                                <b class="text-xs font-bold">€${caparra}</b>
+                            </div>
+
+                            <a href="https://wa.me/393000000000?text=${msgWhatsapp}" target="_blank" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
+                                <i class="fa-brands fa-whatsapp text-base"></i> Richiedi Disponibilità
+                            </a>
                         </div>
                     </div>
                 `;
             });
-
-            setTimeout(() => { map.invalidateSize(); }, 300);
         }
 
-        // Avvio automatico al caricamento della pagina
-        window.addEventListener('DOMContentLoaded', initApp);
+        function prenotaSUP() {
+            const ore = document.getElementById('sup-ore').value;
+            const prezzo = ore * 10;
+            const msg = encodeURIComponent(`Ciao Nauticovi! Vorrei prenotare un SUP per ${ore} ora/e (Prezzo: €${prezzo}).`);
+            window.open(`https://wa.me/393000000000?text=${msg}`, '_blank');
+        }
+
+        function initMap() {
+            map = L.map('map').setView([39.8700, 15.7750], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+
+            const container = document.getElementById('poi-cards-container');
+            container.innerHTML = '';
+
+            poiList.forEach(poi => {
+                L.marker([poi.lat, poi.lng]).addTo(map).bindPopup(`<b>${poi.nome}</b><br><span style="font-size:11px">${poi.cat}</span>`);
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
+                        <img src="${poi.img}" alt="${poi.nome}" class="w-full h-40 object-cover">
+                        <div class="p-4 space-y-1">
+                            <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">${poi.cat}</span>
+                            <h4 class="font-bold text-slate-800 text-base">${poi.nome}</h4>
+                            <p class="text-xs text-slate-600">${poi.desc}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('booking-date').value = new Date().toISOString().split('T')[0];
+            calcolaPrezzi();
+        });
     </script>
 </body>
 </html>
