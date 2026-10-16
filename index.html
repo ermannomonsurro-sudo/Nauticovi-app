@@ -12,12 +12,39 @@
             background-size: cover;
             background-position: center;
         }
+        .review-card-slide {
+            transition: opacity 0.5s ease-in-out;
+        }
+        .flag-btn {
+            cursor: pointer;
+            filter: grayscale(40%);
+            transition: all 0.2s ease;
+        }
+        .flag-btn.active {
+            filter: grayscale(0%);
+            transform: scale(1.15);
+            border-color: #06b6d4;
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans pb-16">
 
     <!-- HERO SECTION SCENOGRAFICA CON LOGO & COVER MARE -->
-    <header class="hero-bg text-white pt-12 pb-16 px-4 text-center shadow-2xl border-b-4 border-cyan-500 relative overflow-hidden">
+    <header class="hero-bg text-white pt-6 pb-16 px-4 text-center shadow-2xl border-b-4 border-cyan-500 relative overflow-hidden">
+        
+        <!-- SELETTORE LINGUA CON BANDIERE -->
+        <div class="max-w-md mx-auto flex justify-end gap-3 mb-6 relative z-30">
+            <button onclick="setLanguage('it')" id="flag-it" class="flag-btn active bg-slate-800/80 p-1.5 rounded-full border-2 border-slate-600 shadow" title="Italiano">
+                <span class="text-base">🇮🇹</span>
+            </button>
+            <button onclick="setLanguage('en')" id="flag-en" class="flag-btn bg-slate-800/80 p-1.5 rounded-full border-2 border-slate-600 shadow" title="English">
+                <span class="text-base">🇬🇧</span>
+            </button>
+            <button onclick="setLanguage('es')" id="flag-es" class="flag-btn bg-slate-800/80 p-1.5 rounded-full border-2 border-slate-600 shadow" title="Español">
+                <span class="text-base">🇪🇸</span>
+            </button>
+        </div>
+
         <div class="max-w-md mx-auto space-y-4 relative z-10">
             
             <!-- Logo & Brand Header -->
@@ -26,16 +53,16 @@
                 <h1 class="text-3xl font-black tracking-widest text-white">NAUTICOVI</h1>
             </div>
             
-            <p class="text-[10px] tracking-widest text-cyan-300 font-extrabold uppercase bg-cyan-950/80 inline-block px-3.5 py-1 rounded-full border border-cyan-400/30 shadow-md">
+            <p class="text-[10px] tracking-widest text-cyan-300 font-extrabold uppercase bg-cyan-950/80 inline-block px-3.5 py-1 rounded-full border border-cyan-400/30 shadow-md" data-i18n="tagline">
                 NOLEGGIO BARCHE & SUP • PRAIA A MARE
             </p>
 
             <!-- Headline Emozionale Persuasiva -->
-            <h2 class="text-2xl font-black text-white leading-tight pt-2">
+            <h2 class="text-2xl font-black text-white leading-tight pt-2" data-i18n="hero_title">
                 Il Tuo Mare, la Tua Barca, Zero Pensieri.
             </h2>
             
-            <p class="text-xs text-slate-200 max-w-xs mx-auto leading-relaxed">
+            <p class="text-xs text-slate-200 max-w-xs mx-auto leading-relaxed" data-i18n="hero_desc">
                 Noleggia gommoni e scafi nuovi <b>100% senza patente</b>. Vivi l'Isola di Dino, la Grotta Azzurra e l'Arco Magno in totale autonomia.
             </p>
 
@@ -43,7 +70,7 @@
             <div class="pt-4">
                 <a href="catalogo.html" class="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600 text-white text-base font-black px-8 py-4 rounded-2xl shadow-2xl transform active:scale-95 transition border border-white/20 w-full max-w-xs">
                     <i class="fa-solid fa-ship text-xl"></i>
-                    <span>SCOPRI FLOTTA & PREZZI</span>
+                    <span data-i18n="btn_catalog">SCOPRI FLOTTA & PREZZI</span>
                     <i class="fa-solid fa-arrow-right text-sm"></i>
                 </a>
             </div>
@@ -57,18 +84,18 @@
         <div class="grid grid-cols-3 gap-2 text-center text-xs">
             <div class="bg-white p-3 rounded-2xl shadow-md border border-slate-200/80">
                 <i class="fa-solid fa-id-card text-cyan-600 text-lg mb-1 block"></i>
-                <b class="text-slate-800 text-[11px] block">Senza Patente</b>
-                <span class="text-[9px] text-slate-400">Guida facile 30/40 CV</span>
+                <b class="text-slate-800 text-[11px] block" data-i18n="stat_no_license_title">Senza Patente</b>
+                <span class="text-[9px] text-slate-400" data-i18n="stat_no_license_sub">Guida facile 30/40 CV</span>
             </div>
             <div class="bg-white p-3 rounded-2xl shadow-md border border-slate-200/80">
                 <i class="fa-solid fa-shield-heart text-emerald-600 text-lg mb-1 block"></i>
-                <b class="text-slate-800 text-[11px] block">Garanzia Meteo</b>
-                <span class="text-[9px] text-slate-400">100% Rimborsabile</span>
+                <b class="text-slate-800 text-[11px] block" data-i18n="stat_weather_title">Garanzia Meteo</b>
+                <span class="text-[9px] text-slate-400" data-i18n="stat_weather_sub">100% Rimborsabile</span>
             </div>
             <div class="bg-white p-3 rounded-2xl shadow-md border border-slate-200/80">
                 <i class="fa-solid fa-snowflake text-amber-500 text-lg mb-1 block"></i>
-                <b class="text-slate-800 text-[11px] block">Frigo + Ghiaccio</b>
-                <span class="text-[9px] text-slate-400">Su richiesta (15€)</span>
+                <b class="text-slate-800 text-[11px] block" data-i18n="stat_fridge_title">Frigo + Ghiaccio</b>
+                <span class="text-[9px] text-slate-400" data-i18n="stat_fridge_sub">Su richiesta (15€)</span>
             </div>
         </div>
 
@@ -76,7 +103,7 @@
         <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
             <div class="flex justify-between items-center border-b pb-2">
                 <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-map-marked-alt text-cyan-600"></i> Le Meraviglie da Esplorare
+                    <i class="fa-solid fa-map-marked-alt text-cyan-600"></i> <span data-i18n="destinations_title">Le Meraviglie da Esplorare</span>
                 </h3>
                 <span class="text-[10px] text-cyan-600 font-bold">Praia a Mare</span>
             </div>
@@ -85,8 +112,8 @@
             <div class="relative rounded-xl overflow-hidden shadow-sm h-28 group">
                 <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" alt="Isola di Dino" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent p-3 flex flex-col justify-end text-white">
-                    <b class="text-sm font-bold">Isola di Dino & Grotta Azzurra</b>
-                    <span class="text-[10px] text-cyan-300">A soli 5 minuti di navigazione dalla costa</span>
+                    <b class="text-sm font-bold" data-i18n="dest_dino_title">Isola di Dino & Grotta Azzurra</b>
+                    <span class="text-[10px] text-cyan-300" data-i18n="dest_dino_sub">A soli 5 minuti di navigazione dalla costa</span>
                 </div>
             </div>
 
@@ -94,48 +121,226 @@
             <div class="relative rounded-xl overflow-hidden shadow-sm h-28 group">
                 <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" alt="Arco Magno" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent p-3 flex flex-col justify-end text-white">
-                    <b class="text-sm font-bold">Arco Magno (San Nicola Arcella)</b>
-                    <span class="text-[10px] text-cyan-300">Un parco naturale unico incastonato nella roccia</span>
+                    <b class="text-sm font-bold" data-i18n="dest_arcomagno_title">Arco Magno (San Nicola Arcella)</b>
+                    <span class="text-[10px] text-cyan-300" data-i18n="dest_arcomagno_sub">Un parco naturale unico incastonato nella roccia</span>
                 </div>
             </div>
         </div>
 
-                <!-- SOCIAL PROOF & RECENSIONI REALI GOOGLE -->
-        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3 text-center">
-            <div class="flex items-center justify-center gap-1 text-amber-400">
+        <!-- CAROUSEL DINAMICO DELLE RECENSIONI REALI GOOGLE -->
+        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3 text-center relative overflow-hidden">
+            
+            <div class="flex items-center justify-center gap-1.5 text-amber-400">
                 <i class="fa-solid fa-star"></i>
                 <i class="fa-solid fa-star"></i>
                 <i class="fa-solid fa-star"></i>
                 <i class="fa-solid fa-star"></i>
                 <i class="fa-solid fa-star"></i>
-                <span class="text-slate-800 font-bold text-xs ml-1" id="google-rating-num">5.0 / 5</span>
+                <span class="text-slate-800 font-extrabold text-xs ml-1">5.0 / 5 su Google Maps</span>
             </div>
             
-            <div id="google-reviews-carousel" class="space-y-2">
-                <p class="text-xs text-slate-600 italic" id="review-text">"Gommoni nuovi e pulitissimi, facilità unica di guida. Un tour fantastico tra Grotta Azzurra e Arco Magno!"</p>
-                <span class="text-[10px] text-slate-400 font-bold block" id="review-author">- Recensione verificata su Google Maps</span>
+            <div class="min-h-[75px] flex flex-col items-center justify-center">
+                <p class="text-xs text-slate-700 italic font-medium leading-relaxed review-card-slide" id="review-text">
+                    "Gommoni nuovi e pulitissimi, facilità unica di guida. Un tour fantastico tra Grotta Azzurra e Arco Magno!"
+                </p>
+                <div class="flex items-center justify-center gap-2 mt-2">
+                    <span class="text-[10px] text-cyan-700 font-bold" id="review-author">Marco V.</span>
+                    <span class="text-[9px] text-slate-400" data-i18n="review_verified">• Recensione verificata su Google</span>
+                </div>
             </div>
 
+            <div class="flex justify-center items-center gap-1.5 pt-1" id="carousel-dots"></div>
+
             <div class="pt-2 border-t border-slate-100 flex justify-center items-center gap-2">
-                <a href="https://share.google/x81whRHwldPZQKUrw" id="google-maps-link" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-600 hover:text-cyan-700 bg-cyan-50 px-3 py-1.5 rounded-xl border border-cyan-100 transition">
-                    <i class="fa-brands fa-google text-red-500"></i> Leggi o Lascia una Recensione su Google
+                <a href="https://share.google/x81whRHwldPZQKUrw" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-700 hover:text-cyan-800 bg-cyan-50 px-3.5 py-2 rounded-xl border border-cyan-100 shadow-sm transition">
+                    <i class="fa-brands fa-google text-red-500"></i> <span data-i18n="btn_read_reviews">Leggi tutte le Recensioni Ufficiali</span>
                 </a>
             </div>
         </div>
+
+        <!-- FASCIA FAQ RAPIDE PER SUPERARE LE FRIZIONI -->
+        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
+            <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider border-b pb-2 flex items-center gap-2">
+                <i class="fa-solid fa-circle-question text-cyan-600"></i> <span data-i18n="faq_title">Hai Domande prima di Noleggiare?</span>
+            </h3>
+
+            <div class="space-y-2.5 text-xs text-slate-600">
+                <div>
+                    <b class="text-slate-800 block" data-i18n="faq_q1">E se non ho mai guidato una barca?</b>
+                    <span data-i18n="faq_a1">Nessun problema! Prima di salpare faremo un briefing di 5 minuti dove ti spiegheremo comandi, ancora e sicurezza.</span>
+                </div>
+                <div class="border-t pt-2">
+                    <b class="text-slate-800 block" data-i18n="faq_q2">Come funziona in caso di brutto tempo?</b>
+                    <span data-i18n="faq_a2">In caso di mare mosso o allerta meteo, la caparra del 50% viene rimborsata al 100% o la data spostata gratuitamente.</span>
+                </div>
+            </div>
         </div>
 
     </main>
 
-    <!-- FOOTER IN FONDO CON AREA RISERVATA AMMINISTRATORE -->
     <footer class="mt-8 text-center pb-8 border-t border-slate-200 pt-6 bg-white">
         <p class="text-xs font-bold text-slate-700">NAUTICOVI • Praia a Mare (CS)</p>
-        <p class="text-[10px] text-slate-400 mt-0.5">Noleggio Barche & SUP senza patente</p>
+        <p class="text-[10px] text-slate-400 mt-0.5" data-i18n="footer_sub">Noleggio Barche & SUP senza patente</p>
         <div class="mt-4">
             <a href="admin.html" class="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-cyan-600 font-medium transition bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
-                <i class="fa-solid fa-lock text-cyan-600"></i> Area Riservata Gestore
+                <i class="fa-solid fa-lock text-cyan-600"></i> <span data-i18n="admin_access">Area Riservata Gestore</span>
             </a>
         </div>
     </footer>
 
+    <!-- DIZIONARIO DI TRADUZIONE IT / EN / ES -->
+    <script>
+        const translations = {
+            it: {
+                tagline: "NOLEGGIO BARCHE & SUP • PRAIA A MARE",
+                hero_title: "Il Tuo Mare, la Tua Barca, Zero Pensieri.",
+                hero_desc: "Noleggia gommoni e scafi nuovi <b>100% senza patente</b>. Vivi l'Isola di Dino, la Grotta Azzurra e l'Arco Magno in totale autonomia.",
+                btn_catalog: "SCOPRI FLOTTA & PREZZI",
+                stat_no_license_title: "Senza Patente",
+                stat_no_license_sub: "Guida facile 30/40 CV",
+                stat_weather_title: "Garanzia Meteo",
+                stat_weather_sub: "100% Rimborsabile",
+                stat_fridge_title: "Frigo + Ghiaccio",
+                stat_fridge_sub: "Su richiesta (15€)",
+                destinations_title: "Le Meraviglie da Esplorare",
+                dest_dino_title: "Isola di Dino & Grotta Azzurra",
+                dest_dino_sub: "A soli 5 minuti di navigazione dalla costa",
+                dest_arcomagno_title: "Arco Magno (San Nicola Arcella)",
+                dest_arcomagno_sub: "Un parco naturale unico incastonato nella roccia",
+                review_verified: "• Recensione verificata su Google",
+                btn_read_reviews: "Leggi tutte le Recensioni Ufficiali",
+                faq_title: "Hai Domande prima di Noleggiare?",
+                faq_q1: "E se non ho mai guidato una barca?",
+                faq_a1: "Nessun problema! Prima di salpare faremo un briefing di 5 minuti dove ti spiegheremo comandi, ancora e sicurezza.",
+                faq_q2: "Come funziona in caso di brutto tempo?",
+                faq_a2: "In caso di mare mosso o allerta meteo, la caparra del 50% viene rimborsata al 100% o la data spostata gratuitamente.",
+                footer_sub: "Noleggio Barche & SUP senza patente",
+                admin_access: "Area Riservata Gestore"
+            },
+            en: {
+                tagline: "BOAT & SUP RENTAL • PRAIA A MARE",
+                hero_title: "Your Sea, Your Boat, Zero Worries.",
+                hero_desc: "Rent new RIBs and motorboats <b>100% no license required</b>. Explore Dino Island, the Blue Grotto and Arco Magno on your own.",
+                btn_catalog: "EXPLORE FLEET & PRICES",
+                stat_no_license_title: "No License",
+                stat_no_license_sub: "Easy driving 30/40 HP",
+                stat_weather_title: "Weather Guarantee",
+                stat_weather_sub: "100% Refundable",
+                stat_fridge_title: "Ice Cooler Box",
+                stat_fridge_sub: "On request (€15)",
+                destinations_title: "Wonders to Explore",
+                dest_dino_title: "Dino Island & Blue Grotto",
+                dest_dino_sub: "Just 5 minutes navigation from the beach",
+                dest_arcomagno_title: "Arco Magno (San Nicola Arcella)",
+                dest_arcomagno_sub: "A unique natural lagoon set into the cliffs",
+                review_verified: "• Verified review on Google",
+                btn_read_reviews: "Read all Official Reviews",
+                faq_title: "Questions before Renting?",
+                faq_q1: "What if I have never driven a boat?",
+                faq_a1: "No problem! Before sailing we will do a 5-minute briefing explaining controls, anchor and safety rules.",
+                faq_q2: "What happens in case of bad weather?",
+                faq_a2: "In case of rough sea or weather warning, your 50% deposit is 100% refunded or rescheduled for free.",
+                footer_sub: "Boat & SUP rental without license",
+                admin_access: "Manager Private Area"
+            },
+            es: {
+                tagline: "ALQUILER DE BARCOS & SUP • PRAIA A MARE",
+                hero_title: "Tu Mar, Tu Barco, Cero Preocupaciones.",
+                hero_desc: "Alquila lanchas y neumáticas <b>100% sin licencia</b>. Descubre la Isla de Dino, la Cueva Azul y el Arco Magno a tu ritmo.",
+                btn_catalog: "VER FLOTA Y PRECIOS",
+                stat_no_license_title: "Sin Licencia",
+                stat_no_license_sub: "Fácil manejo 30/40 CV",
+                stat_weather_title: "Garantía Clima",
+                stat_weather_sub: "100% Reembolsable",
+                stat_fridge_title: "Nevera con Hielo",
+                stat_fridge_sub: "Bajo petición (15€)",
+                destinations_title: "Maravillas por Explorar",
+                dest_dino_title: "Isla de Dino y Cueva Azul",
+                dest_dino_sub: "A solo 5 minutos de navegación",
+                dest_arcomagno_title: "Arco Magno (San Nicola Arcella)",
+                dest_arcomagno_sub: "Un parque natural único entre acantilados",
+                review_verified: "• Reseña verificada en Google",
+                btn_read_reviews: "Leer todas las Reseñas Oficiales",
+                faq_title: "¿Preguntas antes de Alquilar?",
+                faq_q1: "¿Y si nunca he conducido un barco?",
+                faq_a1: "¡Sin problema! Antes de salir te daremos una instrucción de 5 minutos sobre mandos, ancla y seguridad.",
+                faq_q2: "¿Qué pasa si hay mal tiempo?",
+                faq_a2: "En caso de mar picado o aviso meteorológico, se reembolsa el 100% de la señal o se cambia de fecha gratis.",
+                footer_sub: "Alquiler de barcos y SUP sin titulación",
+                admin_access: "Área Privada Gestión"
+            }
+        };
+
+        const googleReviewsMultilang = {
+            it: [
+                { testo: '"Gommoni nuovi e pulitissimi, facilità unica di guida. Un tour fantastico tra Grotta Azzurra e Arco Magno!"', autore: 'Marco V.' },
+                { testo: '"Accoglienza super professionale! Ci hanno spiegato tutto prima di partire. L'Isola di Dino vista in gommone è uno spettacolo!"', autore: 'Giulia R.' },
+                { testo: '"Barche perfette, scafi in ottimo stato e frigo con ghiaccio comodissimo per le bevande al fresco. Consigliatissimo!"', autore: 'Antonio M.' }
+            ],
+            en: [
+                { testo: '"Brand new and super clean RIBs, very easy to drive. Fantastic tour around Blue Grotto and Arco Magno!"', autore: 'Mark V.' },
+                { testo: '"Super professional welcome! They explained everything before departure. Dino Island by boat is breathtaking!"', autore: 'Julia R.' },
+                { testo: '"Perfect boats, great condition and the ice cooler was very convenient for cold drinks. Highly recommended!"', autore: 'Anthony M.' }
+            ],
+            es: [
+                { testo: '"Neumáticas nuevas y muy limpias, facilísimas de llevar. ¡Un tour fantástico por la Cueva Azul y Arco Magno!"', autore: 'Marco V.' },
+                { testo: '"¡Atención superprofesional! Nos explicaron todo antes de salir. ¡La Isla de Dino vista desde la lancha es espectacular!"', autore: 'Julia R.' },
+                { testo: '"Barcos perfectos y la nevera con hielo superpráctica para llevar bebida fresca. ¡Muy recomendable!"', autore: 'Antonio M.' }
+            ]
+        };
+
+        let currentLang = 'it';
+        let reviewIndex = 0;
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('nauticovi_lang', lang);
+
+            // Cambia stato visivo bandiere
+            document.querySelectorAll('.flag-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('flag-' + lang).classList.add('active');
+
+            // Traduce tutti gli elementi con attributo data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+
+            // Aggiorna carousel recensioni nella lingua selezionata
+            reviewIndex = 0;
+            updateReviewCarousel();
+        }
+
+        function updateReviewCarousel() {
+            const list = googleReviewsMultilang[currentLang] || googleReviewsMultilang['it'];
+            const reviewTextEl = document.getElementById('review-text');
+            const reviewAuthorEl = document.getElementById('review-author');
+            const dotsContainer = document.getElementById('carousel-dots');
+
+            reviewTextEl.style.opacity = 0;
+            setTimeout(() => {
+                reviewTextEl.innerText = list[reviewIndex].testo;
+                reviewAuthorEl.innerText = list[reviewIndex].autore;
+                reviewTextEl.style.opacity = 1;
+
+                dotsContainer.innerHTML = list.map((_, idx) => `
+                    <span class="${idx === reviewIndex ? 'w-2.5 h-2.5 bg-cyan-600' : 'w-1.5 h-1.5 bg-slate-300'} rounded-full transition-all"></span>
+                `).join('');
+            }, 250);
+        }
+
+        setInterval(() => {
+            const list = googleReviewsMultilang[currentLang] || googleReviewsMultilang['it'];
+            reviewIndex = (reviewIndex + 1) % list.length;
+            updateReviewCarousel();
+        }, 4000);
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('nauticovi_lang') || 'it';
+            setLanguage(savedLang);
+        });
+    </script>
 </body>
 </html>
