@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NAUTICOVI - Guest Portal & Navigatore Open</title>
+    <title>NAUTICOVI - Guest Portal & Navigatore GPS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- CSS & JS Leaflet Mappa -->
@@ -13,10 +13,17 @@
     
     <style>
         #nav-map {
-            height: 420px !important;
+            height: 400px !important;
             width: 100% !important;
             border-radius: 1rem;
             z-index: 10;
+        }
+        /* Rotazione fluida dell'icona della barca in base alla prua GPS */
+        .boat-marker-icon {
+            transition: transform 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            justify-center: center;
         }
     </style>
 </head>
@@ -33,7 +40,7 @@
                     <i class="fa-solid fa-water text-cyan-400 text-lg"></i>
                     <h1 class="text-xl font-black tracking-widest text-white">NAUTICOVI</h1>
                 </div>
-                <p class="text-[8px] tracking-widest text-cyan-400 font-bold uppercase">GUEST PORTAL • PRAIA A MARE</p>
+                <p class="text-[8px] tracking-widest text-cyan-400 font-bold uppercase">GUEST PORTAL • NAVIGATORE GPS</p>
             </div>
             <a href="tel:+393000000000" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1 shadow">
                 <i class="fa-solid fa-phone"></i> SOS
@@ -60,84 +67,92 @@
 
         <!-- TAB NAVIGAZIONE INTERNA -->
         <div class="flex bg-slate-200 p-1 rounded-xl text-xs font-bold text-slate-600 gap-1 shadow-inner">
-            <button onclick="switchTab('navigatore')" id="tab-navigatore" class="tab-btn flex-1 py-2.5 rounded-lg bg-white text-slate-900 shadow flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-location-arrow text-cyan-600"></i> Navigatore GPS
+            <button onclick="switchTab('destinazioni')" id="tab-destinazioni" class="tab-btn flex-1 py-2.5 rounded-lg bg-white text-slate-900 shadow flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-location-dot text-cyan-600"></i> Destinazioni
+            </button>
+            <button onclick="switchTab('navigatore')" id="tab-navigatore" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-compass text-cyan-600"></i> Mappa GPS
             </button>
             <button onclick="switchTab('tips')" id="tab-tips" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900 flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-compass"></i> Tips Barca
+                <i class="fa-solid fa-lightbulb"></i> Tips
             </button>
             <button onclick="switchTab('regole')" id="tab-regole" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900 flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-ban text-red-500"></i> Divieti
             </button>
         </div>
 
-        <!-- SEZIONE 1: NAVIGATORE NAUTICO INTEGRATO OPEN -->
-        <div id="sec-navigatore" class="tab-content space-y-4">
+        <!-- SEZIONE 1: LISTA PUNTI ESATTI DI NAVIGAZIONE -->
+        <div id="sec-destinazioni" class="tab-content space-y-3">
+            <h3 class="font-black text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5 px-1">
+                <i class="fa-solid fa-map-pin text-cyan-600"></i> Seleziona la Destinazione di Oggi
+            </h3>
+            <p class="text-xs text-slate-500 px-1">Clicca su uno dei punti esatti per avviare il navigatore GPS in tempo reale verso la meta.</p>
+
+            <div id="punti-esatti-lista" class="space-y-3 pt-1">
+                <!-- Popolato da JS -->
+            </div>
+        </div>
+
+        <!-- SEZIONE 2: NAVIGATORE GPS LIVE IN STILE AUTO -->
+        <div id="sec-navigatore" class="tab-content hidden space-y-4">
             
-            <!-- Telemetria GPS Live Bar -->
-            <div class="bg-slate-900 text-white p-3 rounded-2xl shadow-md border border-cyan-500/30 flex justify-between items-center text-center font-mono text-xs">
+            <!-- Dashboard Telemetria Navigazione -->
+            <div class="bg-slate-900 text-white p-3.5 rounded-2xl shadow-md border border-cyan-500/30 flex justify-between items-center text-center font-mono text-xs">
                 <div>
                     <span class="text-[9px] text-slate-400 block uppercase">Velocità</span>
-                    <b class="text-cyan-400 text-sm" id="live-speed">0.0 Nodi</b>
+                    <b class="text-cyan-400 text-base" id="live-speed">0.0 Nodi</b>
                 </div>
                 <div class="border-x border-slate-700 px-3">
-                    <span class="text-[9px] text-slate-400 block uppercase">Prua / Rotta</span>
-                    <b class="text-emerald-400 text-sm" id="live-heading">---°</b>
+                    <span class="text-[9px] text-slate-400 block uppercase">Prua (Bussola)</span>
+                    <b class="text-emerald-400 text-base" id="live-heading">0°</b>
                 </div>
                 <div>
-                    <span class="text-[9px] text-slate-400 block uppercase">Stato GPS</span>
-                    <span class="inline-flex items-center gap-1 text-emerald-400 font-bold text-[10px]" id="gps-status">
-                        <i class="fa-solid fa-circle text-[8px] animate-pulse"></i> Attivo
-                    </span>
+                    <span class="text-[9px] text-slate-400 block uppercase">Destinazione</span>
+                    <b class="text-amber-400 text-xs truncate max-w-[100px] block" id="target-poi-name">Nessuna</b>
                 </div>
             </div>
 
-            <!-- Selezionatore Itinerario / Filtro Rotta sulla Mappa -->
-            <div class="bg-white p-3.5 rounded-2xl shadow-md border border-slate-200 space-y-2">
-                <label class="block font-bold text-slate-700 text-xs flex items-center gap-1.5">
-                    <i class="fa-solid fa-route text-cyan-600"></i> Seleziona Rotta da Seguire:
-                </label>
-                <select id="select-rotta" onchange="filtraRotta()" class="w-full p-2 border rounded-xl bg-slate-50 font-bold text-slate-800 text-xs outline-none focus:ring-2 focus:ring-cyan-500">
-                    <option value="tutti">Tutti i Punti d'Interesse in Zona</option>
-                    <option value="arcomagno">Rotta Sud: Isola di Dino ➔ Arco Magno</option>
-                    <option value="maratea">Rotta Nord: Isola di Dino ➔ Costa di Maratea</option>
-                </select>
+            <!-- Banner Navigazione Attiva (se avviata) -->
+            <div id="active-nav-banner" class="hidden bg-cyan-600 text-white p-3 rounded-xl shadow text-xs flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-location-arrow text-base animate-bounce"></i>
+                    <div>
+                        <span class="text-[10px] opacity-80 block uppercase font-bold">Navigazione Attiva verso:</span>
+                        <b class="text-sm font-black" id="active-target-title">Arco Magno</b>
+                    </div>
+                </div>
+                <button onclick="annullaNavigazione()" class="bg-slate-900/80 hover:bg-slate-900 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold">
+                    Interrompi
+                </button>
             </div>
 
-            <!-- Mappa GPS Live con OpenSeaMap integrata -->
-            <div class="bg-white p-3 rounded-2xl shadow-md border border-slate-200 relative">
+            <!-- Mappa GPS Live -->
+            <div class="bg-white p-2.5 rounded-2xl shadow-md border border-slate-200 relative">
                 <div id="nav-map"></div>
                 
-                <!-- Bottone Ricentra Posizione -->
-                <button onclick="ricentraGPS()" class="absolute bottom-6 right-6 z-20 bg-slate-900 text-cyan-400 p-3 rounded-full shadow-2xl border border-cyan-500/40 text-sm" title="Ricentra GPS">
+                <!-- Bottone Ricentra Posizione sulla Barca -->
+                <button onclick="ricentraGPS()" class="absolute bottom-6 right-6 z-20 bg-slate-900 text-cyan-400 p-3 rounded-full shadow-2xl border border-cyan-500/40 text-sm" title="Ricentra Posizione Barca">
                     <i class="fa-solid fa-crosshairs"></i>
                 </button>
             </div>
 
-            <!-- Card Dettaglio POI Selezionato sulla Mappa -->
-            <div id="poi-detail-card" class="bg-white p-4 rounded-2xl shadow-md border border-cyan-500/40 hidden space-y-1 text-xs">
+            <!-- Card Dettaglio POI Selezionato -->
+            <div id="poi-detail-card" class="bg-white p-4 rounded-2xl shadow-md border border-cyan-500/40 hidden space-y-2 text-xs">
                 <div class="flex justify-between items-start">
-                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" id="poi-cat">Grotta</span>
+                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" id="poi-cat">Attrazione</span>
                     <button onclick="chiudiPoiCard()" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark"></i></button>
                 </div>
-                <h4 class="font-extrabold text-slate-800 text-sm mt-1" id="poi-title">Isola di Dino</h4>
-                <p class="text-slate-600 text-[11px] leading-relaxed" id="poi-desc">Descrizione del punto di interesse.</p>
-            </div>
-
-            <!-- Info Navigatore Open -->
-            <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md space-y-2">
-                <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
-                    <i class="fa-solid fa-compass-drafting text-cyan-400 text-sm"></i>
-                    <h3 class="font-bold text-xs">Navigazione con Cartografia OpenSeaMap</h3>
-                </div>
-                <p class="text-[11px] text-slate-300 leading-relaxed">
-                    Il navigatore utilizza i layer nautici open-source di **OpenSeaMap**: mostra automaticamente boe, segnalamenti marittimi, pericoli e secche direttamente sulla mappa.
-                </p>
+                <h4 class="font-extrabold text-slate-800 text-sm" id="poi-title">Nome Punto</h4>
+                <p class="text-slate-600 text-[11px] leading-relaxed" id="poi-desc">Descrizione del punto.</p>
+                
+                <button id="btn-avvia-card" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl shadow text-xs flex justify-center items-center gap-1.5">
+                    <i class="fa-solid fa-play"></i> Avvia Navigatore verso questo Punto
+                </button>
             </div>
 
         </div>
 
-        <!-- SEZIONE 2: TIPS GUIDA BARCA -->
+        <!-- SEZIONE 3: TIPS GUIDA BARCA -->
         <div id="sec-tips" class="tab-content hidden space-y-3">
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2 text-sm">
@@ -172,7 +187,7 @@
             </div>
         </div>
 
-        <!-- SEZIONE 3: DIVIETI DA NON INFRANGERE -->
+        <!-- SEZIONE 4: DIVIETI DA NON INFRANGERE -->
         <div id="sec-regole" class="tab-content hidden space-y-3">
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <h3 class="font-bold text-red-600 flex items-center gap-2 border-b pb-2 text-sm">
@@ -198,16 +213,106 @@
 
     </main>
 
-    <script>
-        let map, userMarker, markersGroup;
+    <!-- MODALE DI CONFERMA AVVIO NAVIGATORE -->
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl p-5 max-w-xs w-full text-center space-y-4 shadow-2xl border border-slate-200">
+            <div class="w-12 h-12 bg-cyan-100 text-cyan-600 rounded-full flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-location-arrow"></i>
+            </div>
+            <div>
+                <h3 class="font-extrabold text-slate-900 text-base">Avviare Navigatore GPS?</h3>
+                <p class="text-xs text-slate-500 mt-1">Confermi di voler avviare la navigazione in tempo reale verso:</p>
+                <b class="text-cyan-700 text-sm block mt-1" id="modal-target-name">Arco Magno</b>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-2 text-xs font-bold">
+                <button onclick="chiudiModale()" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition">
+                    Annulla
+                </button>
+                <button onclick="confermaAvvioNavigazione()" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow transition">
+                    Sì, Avvia!
+                </button>
+            </div>
+        </div>
+    </div>
 
-        const poiList = [
-            { id: "dino", nome: "Isola di Dino & Grotta Azzurra", cat: "Grotta Marina", desc: "Entrare a motore al minimo o a remi. Fondali azzurri spettacolari.", lat: 39.8731, lng: 15.7735, rotta: "tutti" },
-            { id: "leone", nome: "Grotta del Leone", cat: "Snorkeling", desc: "Roccia caratteristica a leone sdraiato. Ottimo punto per snorkeling.", lat: 39.8695, lng: 15.7720, rotta: "tutti" },
-            { id: "arcomagno", nome: "Baia dell'Arco Magno", cat: "San Nicola Arcella", desc: "Arco naturale di roccia. Mantenere 200m dalla spiaggia.", lat: 39.8456, lng: 15.7889, rotta: "arcomagno" },
-            { id: "prete", nome: "Scoglio del Prete", cat: "Ancoraggio", desc: "Fondale sabbioso chiaro sicuro per l'ancoraggio.", lat: 39.8420, lng: 15.7870, rotta: "arcomagno" },
-            { id: "maratea", nome: "Castrocucco & Secca della Giada", cat: "Costa Maratea", desc: "Insenature selvagge verso nord con acque cristalline.", lat: 39.9000, lng: 15.7500, rotta: "maratea" }
+    <script>
+        let map, userMarker, markersGroup, routePolyline;
+        let destinazioneSelezionata = null;
+        let destinazioneAttiva = null;
+        let currentHeading = 0;
+
+        // I 5 PUNTI ESATTI DI NAVIGAZIONE
+        const puntiEsatti = [
+            {
+                id: "arcomagno",
+                nome: "Arco Magno (San Nicola Arcella)",
+                cat: "Baia Naturale",
+                desc: "Famoso arco di roccia su baia incantata. Mantenere la distanza di sicurezza dalle spiagge.",
+                lat: 39.8456,
+                lng: 15.7889,
+                img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: "grotta_leone",
+                nome: "Grotta del Leone",
+                cat: "Grotta & Snorkeling",
+                desc: "Roccia immersa con sagoma a leone. Fondale sabbioso eccezionale per l'ancoraggio.",
+                lat: 39.8695,
+                lng: 15.7720,
+                img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: "grotta_azzurra",
+                nome: "Grotta Azzurra (Isola di Dino)",
+                cat: "Grotta Marina",
+                desc: "Grotta principale dell'Isola di Dino. Entrare esclusivamente a motore al minimo o a remi.",
+                lat: 39.8731,
+                lng: 15.7735,
+                img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: "secca_castrocucco",
+                nome: "Secca di Castrocucco (Maratea)",
+                cat: "Secca & Fondali",
+                desc: "Prima insenatura della costa di Maratea verso nord. Acque trasparenti ricche di pesci.",
+                lat: 39.9000,
+                lng: 15.7500,
+                img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: "secca_giumenta",
+                nome: "Secca della Giumenta (Maratea)",
+                cat: "Punto Immersione",
+                desc: "Spettacolare secca rocciosa sommersa lungo la costa di Maratea. Attenzione ai segnali d'onda.",
+                lat: 39.9150,
+                lng: 15.7380,
+                img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80"
+            }
         ];
+
+        function generaListaPunti() {
+            const container = document.getElementById('punti-esatti-lista');
+            container.innerHTML = '';
+
+            puntiEsatti.forEach(poi => {
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
+                        <img src="${poi.img}" alt="${poi.nome}" class="w-full h-36 object-cover">
+                        <div class="p-4 space-y-2">
+                            <div class="flex justify-between items-start">
+                                <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">${poi.cat}</span>
+                            </div>
+                            <h4 class="font-extrabold text-slate-800 text-base">${poi.nome}</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">${poi.desc}</p>
+                            
+                            <button onclick="chiediConfermaNavigazione('${poi.id}')" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
+                                <i class="fa-solid fa-location-arrow"></i> Avvia Navigatore GPS
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
 
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -223,44 +328,102 @@
             }
         }
 
+        function chiediConfermaNavigazione(idPoi) {
+            destinazioneSelezionata = puntiEsatti.find(p => p.id === idPoi);
+            if(destinazioneSelezionata) {
+                document.getElementById('modal-target-name').innerText = destinazioneSelezionata.nome;
+                document.getElementById('confirm-modal').classList.remove('hidden');
+            }
+        }
+
+        function chiudiModale() {
+            document.getElementById('confirm-modal').classList.add('hidden');
+        }
+
+        function confermaAvvioNavigazione() {
+            chiudiModale();
+            destinazioneAttiva = destinazioneSelezionata;
+            
+            // Passa alla tab del navigatore
+            switchTab('navigatore');
+
+            // Aggiorna interfaccia navigazione
+            document.getElementById('target-poi-name').innerText = destinazioneAttiva.nome;
+            document.getElementById('active-target-title').innerText = destinazioneAttiva.nome;
+            document.getElementById('active-nav-banner').classList.remove('hidden');
+
+            // Disegna rotta visiva sulla mappa se la posizione user esiste
+            tracciaRottaSullaMappa();
+        }
+
+        function annullaNavigazione() {
+            destinazioneAttiva = null;
+            document.getElementById('target-poi-name').innerText = "Nessuna";
+            document.getElementById('active-nav-banner').classList.add('hidden');
+            if(routePolyline) map.removeLayer(routePolyline);
+        }
+
         function initMapNav() {
-            map = L.map('nav-map', { zoomControl: false }).setView([39.8700, 15.7750], 13);
+            map = L.map('nav-map', { zoomControl: false }).setView([39.8700, 15.7750], 12);
 
-            // 1. Mappa Base OpenStreetMap
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
-
-            // 2. Layer Nautico OpenSeaMap (Boe, Segnalamenti, Pericoli)
-            L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
-                attribution: '© OpenSeaMap'
-            }).addTo(map);
+            // Mappa Base OpenStreetMap + Layer Nautico OpenSeaMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+            L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', { attribution: '© OpenSeaMap' }).addTo(map);
 
             markersGroup = L.layerGroup().addTo(map);
-            caricaPOIMappa("tutti");
 
-            // Geolocation Live
+            // Aggiungi tutti i 5 Punti esatti sulla mappa
+            puntiEsatti.forEach(poi => {
+                const m = L.marker([poi.lat, poi.lng]).addTo(markersGroup);
+                m.on('click', () => {
+                    document.getElementById('poi-title').innerText = poi.nome;
+                    document.getElementById('poi-cat').innerText = poi.cat;
+                    document.getElementById('poi-desc').innerText = poi.desc;
+                    document.getElementById('btn-avvia-card').onclick = () => chiediConfermaNavigazione(poi.id);
+                    document.getElementById('poi-detail-card').classList.remove('hidden');
+                });
+            });
+
+            // CREAZIONE ICONA BARCA PERSONALIZZATA (LOGO CON FRECCIA DI PRUA)
+            const boatIcon = L.divIcon({
+                className: 'boat-marker-container',
+                html: `<div id="boat-icon-inner" class="boat-marker-icon" style="transform: rotate(0deg);">
+                          <div class="bg-slate-900 text-cyan-400 p-2 rounded-full border-2 border-cyan-400 shadow-2xl flex items-center justify-center">
+                              <i class="fa-solid fa-location-arrow text-base"></i>
+                          </div>
+                       </div>`,
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            });
+
+            // Geolocation Live con rotazione prua
             if ("geolocation" in navigator) {
                 navigator.geolocation.watchPosition(
                     pos => {
                         const lat = pos.coords.latitude;
                         const lng = pos.coords.longitude;
                         const speed = pos.coords.speed ? (pos.coords.speed * 1.94384).toFixed(1) : "0.0";
-                        const heading = pos.coords.heading ? Math.round(pos.coords.heading) + "°" : "---°";
+                        currentHeading = pos.coords.heading ? Math.round(pos.coords.heading) : currentHeading;
 
                         document.getElementById('live-speed').innerText = `${speed} Nodi`;
-                        document.getElementById('live-heading').innerText = heading;
+                        document.getElementById('live-heading').innerText = `${currentHeading}°`;
 
+                        // Aggiorna posizione Marker Barca
                         if (!userMarker) {
-                            userMarker = L.circleMarker([lat, lng], {
-                                radius: 8,
-                                fillColor: "#06b6d4",
-                                color: "#ffffff",
-                                weight: 2,
-                                fillOpacity: 0.9
-                            }).addTo(map);
+                            userMarker = L.marker([lat, lng], { icon: boatIcon }).addTo(map);
                         } else {
                             userMarker.setLatLng([lat, lng]);
+                        }
+
+                        // Ruota l'icona della barca secondo la prua GPS
+                        const boatEl = document.getElementById('boat-icon-inner');
+                        if(boatEl) {
+                            boatEl.style.transform = `rotate(${currentHeading}deg)`;
+                        }
+
+                        // Aggiorna linea di rotta se c'è una destinazione attiva
+                        if(destinazioneAttiva) {
+                            tracciaRottaSullaMappa();
                         }
                     },
                     err => {
@@ -271,25 +434,19 @@
             }
         }
 
-        function caricaPOIMappa(rottaSelezionata) {
-            markersGroup.clearLayers();
+        function tracciaRottaSullaMappa() {
+            if(!destinazioneAttiva || !userMarker) return;
+            const userLatLng = userMarker.getLatLng();
+            const targetLatLng = [destinazioneAttiva.lat, destinazioneAttiva.lng];
 
-            poiList.forEach(poi => {
-                if(rottaSelezionata === "tutti" || poi.rotta === rottaSelezionata || poi.rotta === "tutti") {
-                    const m = L.marker([poi.lat, poi.lng]).addTo(markersGroup);
-                    m.on('click', () => {
-                        document.getElementById('poi-title').innerText = poi.nome;
-                        document.getElementById('poi-cat').innerText = poi.cat;
-                        document.getElementById('poi-desc').innerText = poi.desc;
-                        document.getElementById('poi-detail-card').classList.remove('hidden');
-                    });
-                }
-            });
-        }
+            if(routePolyline) map.removeLayer(routePolyline);
 
-        function filtraRotta() {
-            const val = document.getElementById('select-rotta').value;
-            caricaPOIMappa(val);
+            routePolyline = L.polyline([userLatLng, targetLatLng], {
+                color: '#06b6d4',
+                weight: 4,
+                dashArray: '8, 8',
+                opacity: 0.9
+            }).addTo(map);
         }
 
         function ricentraGPS() {
@@ -304,7 +461,10 @@
             document.getElementById('poi-detail-card').classList.add('hidden');
         }
 
-        window.addEventListener('DOMContentLoaded', initMapNav);
+        window.addEventListener('DOMContentLoaded', () => {
+            generaListaPunti();
+            initMapNav();
+        });
     </script>
 </body>
 </html>
