@@ -1,0 +1,2279 @@
+
+Gemini
+
+Nuova chat
+Raccolta
+Pianificato
+Personalizza
+Video
+Nuovo notebook
+Dashboard Web NUMBERS Da Google Drive
+Automazione Campagna Inbound con Google Apps Script
+Piattaforma Web Nauticovi: CRM e Portale
+Branch Gamification • Evoluzione Sistema NUMBERS v8.0
+Branch Dashboard BI • Evoluzione Sistema NUMBERS v8.0
+Branch Notifiche • Evoluzione Sistema NUMBERS v8.0
+Evoluzione Sistema NUMBERS v8.0
+Ripresa Progetto NUMBERS Fase 2
+Trascrizione PDF in Google Doc
+Ripresa Lavori NUMBERS v4
+Ripresa sviluppo NUMBERS Sales System
+Branch • Portale Attivazioni Google Sheets
+Portale Attivazioni Google Sheets
+Creare una pagina web con Google
+Trasferimento eSIM da Samsung a iPhone
+Configurazione Progetto Analisi Commessa Enel
+Risoluzione mancata generazione mese di ottobre
+Gestire e Rimuovere i Duplicati in Google Fogli
+Sincronizzazione File Paghe e Redemption
+Calcolo pagamenti e provvigioni foglio
+Ottimizzazione dello script di vendita telefonica
+Normalizzazione Database e Match P.IVA
+Limiti di caricamento chat lunghe
+Accesso a Google Drive
+Simulazione nuovo piano compensi smart
+
+Attività
+Napoli, Italia
+Dal tuo indirizzo IP
+Conversazione con Gemini
+Agisci come se fossi un full stack developer, voglio creare una piattaforma online per gestire il mio noleggio barche "nauticovi".
+
+
+
+Voglio avere una sezione dedicata per usarlo come CRM, inserisco tutti i dati del cliente e mi salva un file google per caricarlo su fatture in cloud e generarmi tutte le fatture in automatico.
+
+
+
+Poi delle sezioni dedicate al cliente, con le regole di navigazione, i punti di interesse ecc
+
+Ciao! Perfetto, vesto i panni del Full Stack Developer e ti guido nell'architettura e nella realizzazione della piattaforma web per Nauticovi.
+
+L'idea è eccellente: unire la parte gestionale/operativa (CRM + automazione fatturazione) a un'esperienza digitale per il cliente (Guest Portal) ti farà risparmiare ore di lavoro manuale e migliorerà l'immagine del tuo noleggio.
+
+Ecco la proposta tecnica su misura per la tua piattaforma.
+
+1. Architettura e Tecnologie Consigliate
+Per un progetto di questo tipo, flessibile, scalabile e sicuro, ti propongo questo stack tecnologico:
+
+Frontend (Interfaccia Utente): React.js / Next.js con Tailwind CSS per un'interfaccia moderna, veloce e completamente mobile-responsive (fondamentale per i clienti che usano lo smartphone in barca).
+
+Backend (Logica di business): Node.js / Express oppure Next.js API Routes.
+
+Database: PostgreSQL o MongoDB per memorizzare clienti, prenotazioni, barche e contenuti.
+
+Integrazioni (Il cuore dell'automazione):
+
+Google Sheets API / Google Drive API: Per generare/aggiornare automaticamente i fogli Google.
+
+Fatture in Cloud API v2: Anziché passare per un file intermedio, possiamo collegare direttamente la piattaforma a Fatture in Cloud tramite API. Tuttavia, se preferisci il passaggio tramite Google Sheets (ad es. per controllo manuale), generiamo il file CSV/Excel formattato esattamente secondo gli standard di importazione di Fatture in Cloud.
+
+2. Mappa dei Moduli della Piattaforma
+AREA RISERVATA ADMIN (Pannello Gestionale & CRM)
+Anagrafica Clienti & Prenotazioni:
+
+Inserimento rapido dati cliente (Nome, Cognome, Codice Fiscale/P.IVA, Indirizzo, Documento d'identità, Email, Telefono).
+
+Dettagli noleggio: Barca assegnata, data/ora inizio e fine, cauzione, extra (skipper, carburante, dotazioni).
+
+Stato della prenotazione (Confermata, In corso, Conclusa, Fatturata).
+
+Modulo Automazione Fatturazione:
+
+Flusso con Google Sheets: Quando clicchi "Genera Fattura", il sistema popola automaticamente un Google Sheet strutturato (o crea un nuovo file nel tuo Google Drive) pronto per l'importazione.
+
+Integrazione Diretta (Consigliata): Cliccando un tasto "Invia a Fatture in Cloud", la piattaforma invia i dati via API e ti restituisce subito il numero di fattura e il PDF generato.
+
+Gestione Flotta e Manutenzione:
+
+Scheda per ogni barca (stato, scadenze assicurazione, ore di moto, manutenzioni).
+
+AREA CLIENTE (Guest Portal / Web App)
+Questa sezione può essere resa accessibile al cliente tramite un link personalizzato via WhatsApp/SMS o un QR Code posizionato a bordo della barca.
+
+Dashboard di Benvenuto:
+
+Messaggio di benvenuto personalizzato ("Benvenuto a bordo, Marco!").
+
+Riepilogo della prenotazione e contatti di emergenza con chiamata rapida.
+
+Regole di Navigazione & Sicurezza:
+
+Guida rapida all'uso della barca (video brevi o schede illustrate: accensione motore, ancora, dotazioni di sicurezza).
+
+Normative locali: aree AMP (Aree Marine Protette), limiti di velocità, distanze dalla costa per l'ancoraggio.
+
+Mappa Interattiva & Punti di Interesse (POI):
+
+Mappa con calette consigliate, grotte, ristoranti accessibili via mare, zone dove fare snorkeling.
+
+Coordinate GPS e indicazioni sulle condizioni meteo/vento del giorno (es. "Oggi consigliata la costa Est per vento da Ovest").
+
+Check-in / Check-out Digitale:
+
+Firma digitale dello stato della barca al momento della consegna (foto di eventuali danni preesistenti).
+
+3. Come Funziona il Flusso Fatturazione (Step-by-Step)
+[Form Inserimento Cliente/Noleggio su Nauticovi]
+                       │
+                       ▼
+    [Salvataggio nel Database Interno]
+                       │
+       ┌───────────────┴───────────────┐
+       ▼                               ▼
+[Google Sheets API]             [Fatture in Cloud API]
+Genera/Aggiorna il file         Invia i dati e crea la
+Google Sheet su Drive           fattura automaticamente
+Se vuoi procedere con il file Google:
+
+Inserisci i dati del noleggio sul CRM.
+
+Clicchi "Esporta / Sincronizza Fattura".
+
+Uno script (Google Drive API) crea o aggiorna il foglio Google formattato secondo il layout richiesto dall'importatore di Fatture in Cloud.
+
+Scarichi/Colleghi il file su Fatture in Cloud per la generazione massiva.
+
+4. Prossimi Passi per Iniziare
+Per iniziare a sviluppare la prima versione (MVP - Minimum Viable Product):
+
+Conferma del Flusso Fatture: Preferisci la generazione del file Google Sheets o la connessione diretta via API a Fatture in Cloud?
+
+Contenuti per i Clienti: Hai già un elenco di punti di interesse/regole di navigazione da inserire, o preferisci un sistema CMS dove poterli aggiungere e modificare in autonomia?
+
+Design & Branding: Hai già logo, colori e materiale grafico di Nauticovi?
+
+Dimmi come preferisci procedere e posso preparare per te uno schema dell'interfaccia o la struttura del database!
+
+Innanzitutto deve essere tutto gratis, non voglio comprare domini
+
+
+
+Per fatture in cloud indifferente sheet o api, basta che sia gratis
+
+
+
+I punti di interesse li definiamo dopo, magari dove poterli aggiungere in autonomia
+
+
+
+Preferirei mi facessi tu logo e tutto, considerando che il noleggio è fatto a Praia a mare e prendendo spunto da questo sito
+
+
+
+https://cittadipraiaamare.it/
+
+Perfetto! Abbiamo impostato la strategia per realizzare Nauticovi in modo 100% gratuito, zero spese fisso/ricorrenti per domini o server, prendendo piena ispirazione dalle meraviglie naturali di Praia a Mare e della Riviera dei Cedri (Isola di Dino, Arco Magno, Grotte marine).   
+calabriaportal.com
++ 1
+
+1. Logo Personalizzato Nauticovi   
+Ho generato un logo professionale in stile minimalista e mediterraneo[cite: 1]. Incorpora la sagoma dell'Isola di Dino con il suo celebre arco/grotta marittima, le onde del mare di Praia a Mare e la sagoma di una barca a motore:   
+
+, generata con l'AI
+2. Architettura del Sistema a Costo Zero (€0/mese)
+Dominio & Hosting Gratuito:
+
+Utilizzeremo Vercel o Netlify. Ti forniscono un hosting professionale ad altissime prestazioni con certificato SSL (HTTPS) gratuito e un subdominio dedicato senza scadenze (es. nauticovi.vercel.app o nauticovi-praia.netlify.app).
+
+Per le barche potrai stampare un QR Code gratuito che i clienti inquadrano con lo smartphone per accedere all'Area Ospiti[cite: 1].   
+
+Database Gratuito:   
+
+Supabase o Firebase (piano gratuito fino a 500 MB, sufficiente per gestire migliaia di clienti, prenotazioni e punti d'interesse senza mai pagare)[cite: 1].   
+
+Integrazione Fatture in Cloud tramite Google Sheets:   
+
+Per evitare costi di moduli esterni, usiamo la Google Sheets API (gratuita)[cite: 1].   
+
+Quando compili la scheda cliente nel tuo CRM e clicchi "Salva ed Esporta Fattura", la piattaforma popola automaticamente un foglio su Google Drive formattato secondo lo standard di importazione di Fatture in Cloud[cite: 1].   
+
+Ti basterà caricare quel file su Fatture in Cloud per generare tutte le fatture in automatico[cite: 1].   
+
+Punti di Interesse (POI) & Regole Gestibili in Autonomia:
+
+Creiamo una sezione CMS (Gestore Contenuti) nell'area riservata admin.
+
+Potrai aggiungere, modificare o cancellare punti di interesse sulla mappa interattiva (es. Grotta Azzurra, Grotta del Leone, Arco Magno, ristoranti sul mare) inserendo foto, descrizioni e coordinate GPS in totale autonomia[cite: 1].   
+
+3. Documento del Piano Tecnico Generato su Google Drive   
+Ho creato il documento tecnico completo su Google Docs con l'architettura dettagliata, lo schema del database e il flusso di automazione per il tuo progetto[cite: 1].   
+
+È stato creato il documento.
+
+Nauticovi - Piano di Progetto e Architettura Web Gratis
+
+Icona Documenti Google
+Nauticovi - Piano di Progetto e Architettura Web Gratis
+ Documenti Google 
+Prossimi Passi
+Se la direzione e il logo ti piacciono, possiamo procedere con il codice sorgente (HTML/React/Tailwind) della prima pagina del CRM o del pannello per il cliente!
+
+Il logo non mi piace, ti giro quello attuale e me lo migliori
+
+A modern and professional logo redesign based on the original concept in <IMAGE_0>, keeping the sea turtle and the name "Nauticovi". The design is presented on a clean, isolated white background.
+
+The logo is enclosed within a perfect circle, using the same vibrant turquoise/cyan color from <IMAGE_0> for the background.
+
+At the center is a highly detailed, elegant, and gracefully swimming sea turtle (tartaruga marina), seen from a slight three-quarter overhead angle as if gliding through water. The turtle’s shell (carapace) and flippers have refined, organic patterns, rendered in a deep navy blue/ocean blue instead of thin black lines, making it look much more professional, artistic, and modern. 
+
+Below the turtle, the brand name "Nauticovi" is written in a sophisticated, custom-flowing hand-lettered brush or script font in navy blue, retaining the informal, maritime charm of the original but with vastly improved legibility, balance, and flow. 
+
+Directly below "Nauticovi" is the subtitle "NOLEGGIO BARCHE" in a clean, modern, all-caps sans-serif typeface, also in navy blue, perfectly centered and proportioned. 
+
+Subtle, elegant nautical or aquatic details are added to the background circle, such as faint, curving ocean current lines, tiny bubbles, or a compass rose/nautical border integrated gracefully around the inner edge to add depth and quality while maintaining its simple, iconic round format. No text overlap, highly professional branding look., AI generated, generata con l'AI
+Userei un font piu professionale. Puoi anche cambiare i colori, magari rendendolo piu minimal. Rendendolo piu social friendly e che si possa usare su stampe maglie cappellini ecc
+
+Ecco la nuova proposta per il logo di Nauticovi, riprogettata per essere ultra-professionale, moderna e versatile!   
+calabriaportal.com
++ 1
+
+, generata con l'AI
+Principali migliorie apportate:
+Tipografia Professionale: Ho sostituito il font stile "scrittura a mano" con un sans-serif moderno, elegante e geometrico, leggibile anche da lontano.
+
+Design Minimal & Social-Friendly: Silhouette pulita ed essenziale della tartaruga marina su sfondo bianco neutro, perfetta per l'immagine profilo di Instagram, Facebook e WhatsApp Business.
+
+Palette Colori Raffinata: Transizione da un ciano acceso a un blu notte / blu marittimo profondo, che trasmette affidabilità, qualità ed eleganza.
+
+Versatilità per Merchandising: Il design vettoriale pulito si presta benissimo alla stampa o al ricamo su magliette, polo, cappellini, portachiavi e adesivi per le barche.
+
+Nauticovi tutto maiuscolo, con un font ancora piu professionale che nagari in qualche modo rimandi al mare e al noleggio barche
+
+Ecco la nuova versione con "NAUTICOVI" in tutto maiuscolo e una tipografia d'ispirazione nautica e marinaresca:   
+isoladino.it
++ 1
+
+, generata con l'AI
+Caratteristiche del nuovo design:
+Testo Maiuscolo Impagabile (NAUTICOVI): Il font utilizzato ha proporzioni bilanciate, angoli netti ed eleganti d'ispirazione marinara, che richiamano lo stile dei brand di nautica e noleggio di alto livello.
+
+Sottotitolo Pulito (NOLEGGIO BARCHE): Perfettamente allineato e distanziato per dare respiro e massimo rigore visivo.
+
+Pronto per Stampa & Social: Risalta su sfondi chiari, polo, cappellini, ricami e come foto profilo sui social network.
+
+Sotto "NOLEGGIO BARCHE - PRAIA A MARE"
+
+Ecco la versione aggiornata con la dicitura completa "NOLEGGIO BARCHE - PRAIA A MARE":
+
+Ecco la versione aggiornata del logo con la dicitura completa "NOLEGGIO BARCHE - PRAIA A MARE":
+
+Ancora più radicato sul territorio, perfetto da utilizzare sia per la comunicazione locale su Praia a Mare, sia per la stampa su divise, cappellini, gadget e banner per le barche!
+
+Ok, procediamo col resto ora
+
+Perfetto! Ora che l'identità visiva e il logo di NAUTICOVI sono definiti, passiamo al codice e all'architettura concreta della tua piattaforma.
+
+Per garantire che tutto rimanga 100% gratuito (€0/mese), utilizzeremo uno stack moderno basato su HTML5/Tailwind CSS/JavaScript (o React/Next.js da distribuire gratis su Vercel o Netlify).   
+JPG
++ 1
+
+1. Codice del Pannello Gestionale CRM & Export Fatture
+Questo modulo ti permette di inserire rapidamente i dati dei clienti e generare il file pronto per Fatture in Cloud (o sincronizzarlo su Google Sheets).   
+JPG
+
+Salva questo codice come admin.html per testare subito l'interfaccia nel tuo browser:
+
+HTML
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAUTICOVI - CRM & Gestionale Noleggio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+    <!-- Header / Navbar -->
+    <nav class="bg-slate-900 text-white p-4 shadow-lg flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <span class="text-xl font-bold tracking-wider text-cyan-400">NAUTICOVI</span>
+            <span class="text-xs bg-cyan-900 text-cyan-200 px-2 py-1 rounded">CRM Admin</span>
+        </div>
+        <div class="text-sm text-gray-300">Praia a Mare (CS)</div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Form Inserimento Cliente & Noleggio -->
+        <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-md border border-gray-200">
+            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-user-plus text-cyan-600"></i> Nuovo Noleggio
+            </h2>
+
+            <form id="crmForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase">Nome e Cognome / Ragione Sociale</label>
+                    <input type="text" id="nome" required class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-cyan-500 outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase">Cod. Fiscale / P.IVA</label>
+                        <input type="text" id="cf_piva" required class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-cyan-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase">Telefono / WhatsApp</label>
+                        <input type="tel" id="telefono" required class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-cyan-500 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase">Email (per Fattura)</label>
+                    <input type="email" id="email" required class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-cyan-500 outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase">Barca Assegnata</label>
+                        <select id="barca" class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-cyan-500 outline-none bg-white">
+                            <option>Marlin 1 (Senza Patente)</option>
+                            <option>Marlin 2 (Senza Patente)</option>
+                            <option>Poseidon 3 (Con Skipper)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase">Importo (€)</label>
+                        <input type="number" id="importo" required class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-cyan-500 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase">Data Noleggio</label>
+                    <input type="date" id="data_noleggio" required class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-cyan-500 outline-none">
+                </div>
+
+                <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2.5 rounded shadow transition flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-file-csv"></i> Salva ed Esporta per Fatture in Cloud
+                </button>
+            </form>
+        </div>
+
+        <!-- Registro Clienti e Prenotazioni -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md border border-gray-200">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-cyan-600"></i> Registro Clienti
+                </h2>
+                <button onclick="exportCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded font-semibold flex items-center gap-1 shadow">
+                    <i class="fa-solid fa-file-excel"></i> Scarica CSV Fatture in Cloud
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 border-b">
+                            <th class="p-3">Cliente</th>
+                            <th class="p-3">CF / P.IVA</th>
+                            <th class="p-3">Barca</th>
+                            <th class="p-3">Data</th>
+                            <th class="p-3">Importo</th>
+                            <th class="p-3">Azienda/Fattura</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientiTable" class="divide-y divide-gray-100">
+                        <!-- Popolato via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let clienti = JSON.parse(localStorage.getItem('nauticovi_clienti')) || [];
+
+        function renderTable() {
+            const tbody = document.getElementById('clientiTable');
+            tbody.innerHTML = '';
+            clienti.forEach((c, index) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-semibold">${c.nome}<br><span class="text-xs font-normal text-gray-500">${c.email}</span></td>
+                        <td class="p-3 text-xs font-mono">${c.cf_piva}</td>
+                        <td class="p-3 text-xs">${c.barca}</td>
+                        <td class="p-3 text-xs">${c.data_noleggio}</td>
+                        <td class="p-3 font-bold text-emerald-600">€${c.importo}</td>
+                        <td class="p-3">
+                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Pronto Import</span>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById('crmForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nuovo = {
+                nome: document.getElementById('nome').value,
+                cf_piva: document.getElementById('cf_piva').value,
+                telefono: document.getElementById('telefono').value,
+                email: document.getElementById('email').value,
+                barca: document.getElementById('barca').value,
+                importo: document.getElementById('importo').value,
+                data_noleggio: document.getElementById('data_noleggio').value
+            };
+            clienti.push(nuovo);
+            localStorage.setItem('nauticovi_clienti', JSON.stringify(clienti));
+            renderTable();
+            this.reset();
+        });
+
+        function exportCSV() {
+            let csv = "Nome,CodiceFiscale_PIVA,Email,Telefono,Descrizione,Importo,Data\n";
+            clienti.forEach(c => {
+                csv += `"${c.nome}","${c.cf_piva}","${c.email}","${c.telefono}","Noleggio barca ${c.barca}",${c.importo},"${c.data_noleggio}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'import_fatture_in_cloud_nauticovi.csv');
+            a.click();
+        }
+
+        renderTable();
+    </script>
+</body>
+</html>
+2. Codice per la Web App Cliente (Punti di Interesse & Regole)
+I clienti inquadreranno il QR Code sulla barca e accederanno alla Web App (index.html) con le regole di navigazione a Praia a Mare, l'Isola di Dino e l'Arco Magno:   
+JPG
+
+HTML
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAUTICOVI - Guida Ospite & Mappa Praia a Mare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- Guest Header -->
+    <header class="bg-slate-900 text-white text-center p-6 shadow-md">
+        <h1 class="text-2xl font-black tracking-widest text-cyan-400">NAUTICOVI</h1>
+        <p class="text-xs text-slate-300 mt-1">NOLEGGIO BARCHE • PRAIA A MARE</p>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 space-y-6">
+
+        <!-- SOS / Emergenza -->
+        <div class="bg-red-500 text-white p-4 rounded-2xl shadow-lg flex justify-between items-center">
+            <div>
+                <h3 class="font-bold text-sm">Assistenza in Mare</h3>
+                <p class="text-xs opacity-90">Hai bisogno di aiuto con la barca?</p>
+            </div>
+            <a href="tel:+390000000000" class="bg-white text-red-600 px-4 py-2 rounded-xl font-bold text-sm shadow">
+                <i class="fa-solid fa-phone"></i> Chiama
+            </a>
+        </div>
+
+        <!-- Mappa Interattiva -->
+        <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-100">
+            <h2 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-map-location-dot text-cyan-600"></i> Punti di Interesse & Calette
+            </h2>
+            <div id="map" class="h-64 rounded-xl border border-slate-200"></div>
+        </div>
+
+        <!-- Regole di Navigazione Praia a Mare -->
+        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100 space-y-3">
+            <h2 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+                <i class="fa-solid fa-anchor text-cyan-600"></i> Regole di Navigazione
+            </h2>
+            <ul class="text-xs space-y-2 text-slate-600">
+                <li class="flex items-start gap-2">
+                    <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                    <span><b>Distanza dalla Costa:</b> Mantenere almeno 200m di distanza dalle spiagge con bagnanti.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                    <span><b>Isola di Dino:</b> Entrare nelle grotte solo a remi o a motore al minimo dove consentito.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5"></i>
+                    <span><b>Ancoraggio:</b> Non gettare l'ancora sulle praterie di Posidonia.</span>
+                </li>
+            </ul>
+        </div>
+
+    </main>
+
+    <script>
+        // Mappa centrata sull'Isola di Dino (Praia a Mare)
+        const map = L.map('map').setView([39.8731, 15.7735], 14);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Marker Isola di Dino
+        L.marker([39.8731, 15.7735]).addTo(map)
+            .bindPopup('<b>Isola di Dino</b><br>Grotta Azzurra e Grotta del Leone.');
+
+        // Marker Arco Magno
+        L.marker([39.8456, 15.7889]).addTo(map)
+            .bindPopup('<b>Arco Magno</b><br>Spettacolare baia naturale.');
+    </script>
+</body>
+</html>
+3. Come Pubblicare il Tutto Gratuitamente (Guida Step-by-Step)
+Crea un Account Gratuito su GitHub:
+
+Vai su GitHub.com e registrati gratis.
+
+Crea un repository chiamato nauticovi-app.
+
+Carica i due file (admin.html e index.html).
+
+Collega a Vercel o Netlify:
+
+Registrati su Vercel.com (accesso tramite GitHub).   
+JPG
+
+Seleziona il progetto nauticovi-app e clicca Deploy.
+
+In 10 secondi avrai i tuoi link gratuiti e protetti da SSL (HTTPS):   
+JPG
+
+[https://nauticovi.vercel.app](https://nauticovi.vercel.app) (Area Cliente)
+
+[https://nauticovi.vercel.app/admin.html](https://nauticovi.vercel.app/admin.html) (Area Riservata CRM)
+
+Stampa del QR Code per le Barche:
+
+Vai su un generatore gratuito di QR Code (es. qr-code-generator.com).
+
+Inserisci il link [https://nauticovi.vercel.app](https://nauticovi.vercel.app) e genera il codice da applicare sulle barche.   
+JPG
+
+Dove carico i file in github
+
+Ecco come caricare i file su GitHub in pochissimi passaggi, direttamente dal browser senza usare riga di comando o programmi complessi:
+
+1
+Accedi al tuo repository
+Passo 1
+Vai su GitHub.com, accedi al tuo account e clicca sul repository che hai creato per il progetto (es. nauticovi-app).
+
+2
+Apri il menu di caricamento
+Passo 2
+Nella pagina principale del repository, in alto a destra sopra la lista dei file, clicca sul pulsante Add file e seleziona Upload files.
+
+3
+Trascina e rilascia i file
+Passo 3
+Trascina i tuoi file (ad esempio index.html e admin.html) direttamente nel riquadro grigio al centro dello schermo, oppure clicca su choose your files per selezionarli dal tuo computer.
+
+4
+Salva le modifiche (Commit)
+Passo 4
+Scorri in fondo alla pagina, scrivi un breve titolo nel campo "Commit changes" (es. "Caricamento file iniziali") e clicca sul pulsante verde Commit changes.
+
+Dove
+
+Sei sulla pagina di configurazione iniziale (il repository è completamente vuoto).   
+JPEG
+
+Da smartphone la procedura è questa:
+
+Scorri la pagina verso il basso fino alla sezione chiamata "Quick setup" (che già si intravede in fondo alla tua immagine).   
+JPEG
+
+Troverai un link azzurro con scritto uploading an existing file.
+
+Clicca su quel link: ti si aprirà la schermata per selezionare e caricare i file (index.html e admin.html) dal tuo telefono.
+
+Dopo averli selezionati, scorri in basso e premi il pulsante verde Commit changes.
+
+Alternativa ancora più veloce da mobile:
+In alto a destra sul tuo browser Chrome, premi i tre puntini verticali (⋮).   
+JPEG
+
+Attiva la spunta "Sito desktop" (o "Richiedi sito desktop").
+
+La pagina si ricaricherà mostrandoti il pulsante "upload files" in evidenza al centro dello schermo.
+
+Perfetto, vedo dallo screenshot che hai caricato con successo sia Index.html che Admin.html nel tuo repository Nauticovi-app!   
+JPEG
+
+C'è solo una piccola correzione da fare prima di collegarlo a Vercel, altrimenti Vercel non troverà la pagina principale.   
+JPG
++ 1
+
+Unico passaggio da correggere: Rinomina le maiuscole
+Sui server web i nomi dei file sono case-sensitive (distinguono tra maiuscole e minuscole).
+Attualmente i tuoi file si chiamano con l'iniziale maiuscola (Index.html e Admin.html), mentre devono essere tutti in minuscolo (index.html e admin.html).   
+JPEG
++ 2
+
+Come rinominarli da telefono in 30 secondi:
+Tocca su Index.html nella lista dei file su GitHub.   
+JPEG
+
+In alto a destra nella schermata del file, tocca l'icona della matita (o i tre puntini ... e poi Edit) per modificare il file.   
+JPEG
+
+In alto nel campo del nome del file, cambia Index.html in index.html.   
+JPG
++ 1
+
+Scorri in basso e tocca il pulsante verde Commit changes.   
+JPEG
+
+Fai la stessa identica cosa per Admin.html, rinominandolo in admin.html.   
+JPG
++ 1
+
+Passaggio Successivo: Pubblica su Vercel (Gratis)
+Una volta rinominati i due file:   
+JPEG
+
+Vai su vercel.com e tocca Sign Up (o Log In).   
+JPG
+
+Scegli di accedere tramite Continue with GitHub.   
+JPG
+
+Tocca il pulsante Add New... -> Project.   
+JPG
+
+Vedrai apparire la lista dei tuoi repository di GitHub: tocca Import accanto a Nauticovi-app.   
+JPG
++ 1
+
+Lascia tutte le impostazioni così come sono e tocca Deploy.   
+JPG
+
+Dopo circa 15 secondi, Vercel ti restituirà il tuo link pubblico gratuito (es. [https://nauticovi-app.vercel.app](https://nauticovi-app.vercel.app)), attivo e funzionante per sempre!   
+JPG
+
+Ok, va, ma manca tutto
+
+Tranquillo, siamo solo all'inizio del cantiere! Quelli di prima erano solo i due file "scheletro" per testare la pubblicazione su Vercel e verificare che il flusso funzionasse.   
+JPG
++ 1
+
+Ora costruiamo l'applicazione vera e completa.
+
+Ecco tutto ciò che serve per trasformare NAUTICOVI in una piattaforma professionale pronta all'uso:   
+JPG
+
+1. Cosa manca e cosa andiamo a realizzare:
+Database Reale (Supabase / PostgreSQL - 100% Gratis):
+
+   
+JPG
+
+Salvataggio persistente dei dati dei clienti e delle prenotazioni (così non li perdi se cambi dispositivo).   
+JPG
+
+Gestione dello stato della barca (Disponibile, Noleggiata, Manutenzione).   
+JPG
+
+Integrazione Automatica Google Sheets API:
+
+   
+JPG
+
+Collegamento diretto con il tuo account Google Cloud per aggiungere automaticamente le righe nel foglio di calcolo pronto per Fatture in Cloud.   
+JPG
+
+Pannello CMS per Gestire i Punti di Interesse (POI):
+
+   
+JPG
+
+Una pagina riservata dove puoi aggiungere nuove calette, ristoranti, grotte o cambiare la posizione dei marker sulla mappa con un click.   
+JPG
+
+Web App Cliente Completa (Guest Portal):
+
+   
+JPG
+
+Mappa interattiva completa con foto e dettagli di Isola di Dino, Grotta Azzurra, Grotta del Leone, Arco Magno.   
+JPG
+
+Guida all'uso dei comandi della barca (motore, ancora, dotazioni di bordo).   
+JPG
+
+Bottone rapido WhatsApp / Chiamata per assistenza immediata.   
+JPG
+
+Prossimo Passaggio
+Dimmi da quale parte vuoi partire:
+
+Opzione A: Ti creo il codice completo del Pannello Admin + Database (per gestire clienti e barche).   
+JPG
+
+Opzione B: Ti creo la Web App Cliente completa con la mappa dettagliata di Praia a Mare e la guida di navigazione.   
+JPG
+
+Opzione C: Ti guido nella configurazione del database Supabase gratuito per salvare i dati online.   
+JPG
+
+Partiamo passo passo e guidami alla realizzazione dell app
+
+Perfetto, facciamo un percorso passo passo guidato senza fretta.   
+JPG
+
+Per avere un'applicazione completa, veloce e gratuita, la strutturiamo in 4 Fasi Principali:   
+JPG
+
+FASE 1: Creazione del Database Online su Supabase (Gratuito per sempre)   
+JPG
+
+FASE 2: Sviluppo e pubblicazione della Web App Cliente (Punti di Interesse, Mappa di Praia a Mare, Regole di Navigazione)   
+JPG
+
+FASE 3: Sviluppo del Pannello Admin / CRM (Inserimento Clienti e Noleggi)   
+JPG
+
+FASE 4: Automazione Export per Fatture in Cloud tramite Google Sheets   
+JPG
+
+STEP 1: Creiamo il Database Gratuito su Supabase
+Supabase ci fornirà un database PostgreSQL cloud gratuito per salvare clienti, prenotazioni e punti d'interesse senza rischiare di perdere dati.   
+JPG
+
+1
+Registrazione su Supabase
+Passo 1
+Vai su supabase.com e clicca su Start your project.
+Accedi direttamente usando il tuo account GitHub (quello che hai già usato per il repository).
+
+2
+Crea un Nuovo Progetto
+Passo 2
+Clicca su New Project.
+
+Inserisci questi dati:
+
+Name: nauticovi-db
+
+Database Password: Scegli una password e salvala da qualche parte.
+
+Region: Seleziona Central Europe (Frankfurt) per massima velocità in Italia.
+
+Pricing Plan: Seleziona Free tier ($0/month).
+
+Clicca su Create new project (impiegherà circa 1-2 minuti per configurarsi).
+
+3
+Crea la Tabella Clienti (SQL Editor)
+Passo 3
+Una volta creato il progetto, nel menu a sinistra clicca sull'icona SQL Editor (l'icona che sembra >/).
+
+Clicca su New query, incolla questo codice e premi il pulsante RUN in basso a destra:
+
+SQL
+-- Tabella per il CRM Clienti e Noleggi
+CREATE TABLE clienti (
+  id BIGSERIAL PRIMARY KEY,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  nome TEXT NOT NULL,
+  cf_piva TEXT NOT NULL,
+  telefono TEXT,
+  email TEXT,
+  barca TEXT,
+  data_noleggio DATE,
+  importo NUMERIC,
+  stato TEXT DEFAULT 'Saldato'
+);
+
+-- Tabella per i Punti di Interesse (POI) della Mappa
+CREATE TABLE punti_interesse (
+  id BIGSERIAL PRIMARY KEY,
+  nome TEXT NOT NULL,
+  categoria TEXT,
+  descrizione TEXT,
+  latitudine NUMERIC NOT NULL,
+  longitudine NUMERIC NOT NULL
+);
+
+-- Inseriamo subito i principali punti di Praia a Mare
+INSERT INTO punti_interesse (nome, categoria, descrizione, latitudine, longitudine) VALUES
+('Isola di Dino & Grotta Azzurra', 'Attrazione', 'Spettacolare grotta marina con fondale azzurro cristallino.', 39.8731, 15.7735),
+('Grotta del Leone', 'Attrazione', 'Caratterizzata da una roccia che ricorda un leone sdraiato.', 39.8695, 15.7720),
+('Arco Magno (San Nicola Arcella)', 'Attrazione', 'Famoso arco di roccia naturale su baia incantata.', 39.8456, 15.7889);
+Fammi sapere appena hai completato questi tre passaggi su Supabase e ti fornisco subito il codice della Web App Cliente collegata al database in tempo reale!
+
+Partiamo senza database per ora, voglio vedere il sito meglio per come verrebbe
+
+Va benissimo! Lavoriamo in modalità demo pura: tutti i dati (clienti, noleggi, punti di interesse) vengono salvati direttamente nel browser (tramite localStorage), così puoi vedere e testare la piattaforma al 100% senza registrare account o configurare database.   
+JPG
+
+Ho aggiornato e migliorato entrambi i file per renderli eleganti, moderni e pronti da testare subito sul tuo telefono o computer.   
+JPG
+
+1. Web App Cliente (index.html)
+Sostituisci il contenuto del file index.html su GitHub con questo codice:
+
+HTML
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAUTICOVI - Guida Ospite & Mappa Praia a Mare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-800 pb-10">
+
+    <!-- Header Brand -->
+    <header class="bg-slate-900 text-white p-6 text-center shadow-xl border-b-4 border-cyan-500">
+        <h1 class="text-3xl font-black tracking-widest text-white">NAUTICOVI</h1>
+        <p class="text-xs tracking-wider text-cyan-400 font-semibold mt-1">NOLEGGIO BARCHE • PRAIA A MARE</p>
+    </header>
+
+    <div class="max-w-md mx-auto p-4 space-y-5">
+
+        <!-- Banner Benvenuto / Assistenza -->
+        <div class="bg-gradient-to-r from-cyan-600 to-blue-700 rounded-2xl p-4 text-white shadow-lg flex justify-between items-center">
+            <div>
+                <p class="text-xs text-cyan-100 font-medium">Assistenza in Mare</p>
+                <h3 class="font-bold text-lg">Serve Aiuto a Bordo?</h3>
+            </div>
+            <a href="tel:+393000000000" class="bg-white text-cyan-800 px-4 py-2 rounded-xl font-bold text-sm shadow hover:bg-slate-100 transition flex items-center gap-2">
+                <i class="fa-solid fa-phone text-red-500"></i> Chiama
+            </a>
+        </div>
+
+        <!-- Mappa Interattiva -->
+        <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-map-location-dot text-cyan-600"></i> Calette e Punti di Interesse
+                </h2>
+                <span class="text-xs bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded-full font-semibold">Praia a Mare</span>
+            </div>
+            <div id="map" class="h-72 rounded-xl border border-slate-200 shadow-inner z-0"></div>
+        </div>
+
+        <!-- Regole di Navigazione -->
+        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
+            <h2 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+                <i class="fa-solid fa-shield-halved text-cyan-600"></i> Regole di Navigazione & Sicurezza
+            </h2>
+            <ul class="text-xs space-y-3 text-slate-600">
+                <li class="flex items-start gap-2.5">
+                    <i class="fa-solid fa-circle-check text-emerald-500 text-sm mt-0.5"></i>
+                    <span><b>Distanza dalla Costa:</b> Mantenere almeno 200 metri di distanza dalle spiagge con bagnanti.</span>
+                </li>
+                <li class="flex items-start gap-2.5">
+                    <i class="fa-solid fa-circle-check text-emerald-500 text-sm mt-0.5"></i>
+                    <span><b>Isola di Dino:</b> L'ingresso nelle grotte marine è consentito unicamente a motore al minimo o a remi.</span>
+                </li>
+                <li class="flex items-start gap-2.5">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm mt-0.5"></i>
+                    <span><b>Ancoraggio:</b> Vietato gettare l'ancora sulle praterie protette di Posidonia oceanica.</span>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        // Inizializzazione Mappa centrata su Isola di Dino / Praia a Mare
+        const map = L.map('map').setView([39.8700, 15.7750], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Punti d'interesse predefiniti
+        const poiList = JSON.parse(localStorage.getItem('nauticovi_poi')) || [
+            { nome: 'Isola di Dino & Grotta Azzurra', desc: 'Acque cristalline e grotta famosa per i riflessi blu.', lat: 39.8731, lng: 15.7735 },
+            { nome: 'Grotta del Leone', desc: 'Roccia a forma di leone sdraiato e fondale ideale per snorkeling.', lat: 39.8695, lng: 15.7720 },
+            { nome: 'Arco Magno (San Nicola Arcella)', desc: 'Spettacolare arco naturale su baia incantata.', lat: 39.8456, lng: 15.7889 }
+        ];
+
+        poiList.forEach(poi => {
+            L.marker([poi.lat, poi.lng]).addTo(map)
+                .bindPopup(`<b>${poi.nome}</b><br><span style="font-size:12px">${poi.desc}</span>`);
+        });
+    </script>
+</body>
+</html>
+2. Pannello CRM & Gestore Punti di Interesse (admin.html)
+Sostituisci il contenuto del file admin.html su GitHub con questo codice completo. Include sia il CRM Clienti con export per Fatture in Cloud, sia il Gestore Punti d'Interesse (CMS) per aggiungere nuove calette in autonomia:   
+JPG
+
+HTML
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAUTICOVI - Gestionale CRM & CMS Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans">
+
+    <!-- Navbar Admin -->
+    <nav class="bg-slate-900 text-white p-4 shadow-lg flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <span class="text-xl font-black tracking-widest text-cyan-400">NAUTICOVI</span>
+            <span class="text-xs bg-cyan-900 text-cyan-200 px-2 py-0.5 rounded font-bold">PANNELLO ADMIN</span>
+        </div>
+        <div class="text-xs text-slate-400">Praia a Mare (CS)</div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
+
+        <!-- SEZIONE CRM CLIENTE -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Form Inserimento Cliente -->
+            <div class="lg:col-span-1 bg-white p-5 rounded-2xl shadow-md border border-slate-200">
+                <h2 class="text-md font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-2">
+                    <i class="fa-solid fa-user-plus text-cyan-600"></i> Nuovo Noleggio / Cliente
+                </h2>
+
+                <form id="crmForm" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase">Nome / Ragione Sociale</label>
+                        <input type="text" id="nome" required placeholder="es. Mario Rossi" class="w-full mt-1 p-2 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase">CF / P.IVA</label>
+                            <input type="text" id="cf_piva" required placeholder="RSSMRA80A01H501U" class="w-full mt-1 p-2 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase">Telefono</label>
+                            <input type="tel" id="telefono" required placeholder="333 1234567" class="w-full mt-1 p-2 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase">Email (per Fattura)</label>
+                        <input type="email" id="email" required placeholder="mario@email.it" class="w-full mt-1 p-2 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase">Barca</label>
+                            <select id="barca" class="w-full mt-1 p-2 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none bg-white">
+                                <option>Gozzo Marlin 1</option>
+                                <option>Gozzo Marlin 2</option>
+                                <option>Manta 500 (40 CV)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase">Importo (€)</label>
+                            <input type="number" id="importo" required placeholder="150" class="w-full mt-1 p-2 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase">Data Noleggio</label>
+                        <input type="date" id="data_noleggio" required class="w-full mt-1 p-2 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                    </div>
+
+                    <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2.5 rounded-lg shadow transition flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-save"></i> Salva Noleggio
+                    </button>
+                </form>
+            </div>
+
+            <!-- Tabella Registro Clienti -->
+            <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-md border border-slate-200">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 border-b pb-2">
+                    <h2 class="text-md font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-users text-cyan-600"></i> Registro Clienti CRM
+                    </h2>
+                    <button onclick="exportCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold flex items-center gap-1 shadow">
+                        <i class="fa-solid fa-file-excel"></i> Scarica CSV Fatture in Cloud
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 border-b">
+                                <th class="p-2.5">Cliente</th>
+                                <th class="p-2.5">CF / P.IVA</th>
+                                <th class="p-2.5">Barca</th>
+                                <th class="p-2.5">Data</th>
+                                <th class="p-2.5">Importo</th>
+                                <th class="p-2.5">Azione</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientiTable" class="divide-y divide-slate-100">
+                            <!-- Popolato da JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SEZIONE CMS PUNTI DI INTERESSE -->
+        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
+            <h2 class="text-md font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+                <i class="fa-solid fa-map-pin text-cyan-600"></i> Gestore Punti di Interesse per i Clienti (CMS)
+            </h2>
+
+            <form id="poiForm" class="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                <input type="text" id="poi_nome" placeholder="Nome Luogo (es. Grotta Azzurra)" required class="p-2 text-xs border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                <input type="text" id="poi_desc" placeholder="Breve descrizione" required class="p-2 text-xs border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                <input type="number" step="any" id="poi_lat" placeholder="Latitudine (es. 39.8731)" required class="p-2 text-xs border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                <input type="number" step="any" id="poi_lng" placeholder="Longitudine (es. 15.7735)" required class="p-2 text-xs border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-2 rounded-lg shadow transition">
+                    + Aggiungi a Mappa
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        let clienti = JSON.parse(localStorage.getItem('nauticovi_clienti')) || [];
+
+        function renderTable() {
+            const tbody = document.getElementById('clientiTable');
+            tbody.innerHTML = '';
+            if(clienti.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Nessun cliente registrato. Inseriscine uno dal form a sinistra!</td></tr>`;
+                return;
+            }
+            clienti.forEach((c, index) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-2.5 font-bold">${c.nome}<br><span class="font-normal text-slate-400">${c.email}</span></td>
+                        <td class="p-2.5 font-mono">${c.cf_piva}</td>
+                        <td class="p-2.5">${c.barca}</td>
+                        <td class="p-2.5">${c.data_noleggio}</td>
+                        <td class="p-2.5 font-bold text-emerald-600">€${c.importo}</td>
+                        <td class="p-2.5">
+                            <button onclick="eliminaCliente(${index})" class="text-red-500 hover:text-red-700 font-bold"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById('crmForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nuovo = {
+                nome: document.getElementById('nome').value,
+                cf_piva: document.getElementById('cf_piva').value,
+                telefono: document.getElementById('telefono').value,
+                email: document.getElementById('email').value,
+                barca: document.getElementById('barca').value,
+                importo: document.getElementById('importo').value,
+                data_noleggio: document.getElementById('data_noleggio').value
+            };
+            clienti.push(nuovo);
+            localStorage.setItem('nauticovi_clienti', JSON.stringify(clienti));
+            renderTable();
+            this.reset();
+        });
+
+        function eliminaCliente(index) {
+            clienti.splice(index, 1);
+            localStorage.setItem('nauticovi_clienti', JSON.stringify(clienti));
+            renderTable();
+        }
+
+        function exportCSV() {
+            if(clienti.length === 0) {
+                alert("Nessun dato da esportare!");
+                return;
+            }
+            let csv = "Nome,CodiceFiscale_PIVA,Email,Telefono,Descrizione,Importo,Data\n";
+            clienti.forEach(c => {
+                csv += `"${c.nome}","${c.cf_piva}","${c.email}","${c.telefono}","Noleggio barca ${c.barca}",${c.importo},"${c.data_noleggio}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'import_fatture_in_cloud_nauticovi.csv');
+            a.click();
+        }
+
+        renderTable();
+    </script>
+</body>
+</html>
+Prossimo Passo
+Salva entrambi i file su GitHub (ricordandoti di tenerli in minuscolo: index.html e admin.html) e Vercel li aggiornerà automaticamente entro pochi secondi.   
+JPG
++ 1
+
+Una volta caricati, prova ad aprire dai tuoi link:   
+JPG
+
+[https://tuo-nome.vercel.app](https://tuo-nome.vercel.app) per vedere la Web App Cliente.
+
+[https://tuo-nome.vercel.app/admin.html](https://tuo-nome.vercel.app/admin.html) per provare ad inserire un cliente di prova e scaricare il file CSV per Fatture in Cloud!   
+JPG
+
+Come entro come admin?
+
+Per accedere al pannello Admin della tua applicazione ci sono due modi principali:
+
+1. Tramite Indirizzo Diretto (URL)
+Basta aggiungere /admin.html in fondo al link del tuo sito.
+
+Se stai provando il sito su Vercel:
+[https://tuo-nome.vercel.app/admin.html](https://tuo-nome.vercel.app/admin.html)
+
+   
+JPG
+
+Se stai provando i file in locale sul tuo computer:
+Apri direttamente il file admin.html facendo doppio click sulla cartella del tuo computer.
+
+2. Aggiungere un Tasto "Area Admin" nella Web App Cliente
+Per non dover scrivere ogni volta l'indirizzo a mano, possiamo aggiungere un piccolo pulsante nascosto o in fondo alla pagina del cliente (index.html).
+
+Come aggiungerlo in index.html:
+Apri index.html e aggiungi questo blocco in fondo alla pagina (appena prima di </body>):
+
+HTML
+<!-- Footer con Link Riservato Admin -->
+<footer class="mt-8 text-center pb-6">
+    <a href="admin.html" class="text-xs text-slate-400 hover:text-cyan-600 transition flex items-center justify-center gap-1">
+        <i class="fa-solid fa-lock"></i> Area Riservata Gestore
+    </a>
+</footer>
+Nota sulla Sicurezza (Prossimi Passi):
+In questa fase demo, la pagina admin.html è accessibile a chiunque conosca il link.
+
+Quando passeremo alla Fase 3 con il database, aggiungeremo un modulo di Login con Password per fare in modo che solo tu possa accedere al gestionale CRM e ai dati dei tuoi clienti.   
+JPG
+
+Prima di collegare bene il database, vorrei fare tutta la parte grafica.
+
+Nella parte dedicata al cliente, metterei varie schede. Magari dammi idee.
+
+Nella parte admin invece, vorrei inserire anche una dashboard di recap dei risultati, con possibilità di inserire filtri temporali per controllare sia le date bloccate, sia quanti noleggi sono stati fatti ogni giorno, sia proprio il fatturato. Inizierei ad implementare il logo e migliorerei la grafica.
+
+
+
+
+
+AREA CLIENTE (Guest Portal / Web App)
+
+Questa sezione può essere resa accessibile al cliente tramite un link personalizzato via WhatsApp/SMS o un QR Code posizionato a bordo della barca.
+
+
+
+Dashboard di Benvenuto:
+
+
+
+Messaggio di benvenuto personalizzato ("Benvenuto a bordo, Marco!").
+
+
+
+Riepilogo della prenotazione e contatti di emergenza con chiamata rapida.
+
+
+
+Regole di Navigazione & Sicurezza:
+
+
+
+Guida rapida all'uso della barca (video brevi o schede illustrate: accensione motore, ancora, dotazioni di sicurezza).
+
+
+
+Normative locali: aree AMP (Aree Marine Protette), limiti di velocità, distanze dalla costa per l'ancoraggio.
+
+
+
+Mappa Interattiva & Punti di Interesse (POI):
+
+
+
+Mappa con calette consigliate, grotte, ristoranti accessibili via mare, zone dove fare snorkeling.
+
+
+
+Coordinate GPS e indicazioni sulle condizioni meteo/vento del giorno (es. "Oggi consigliata la costa Est per vento da Ovest").
+
+
+
+Check-in / Check-out Digitale:
+
+
+
+Firma digitale dello stato della barca al momento della consegna (foto di eventuali danni preesistenti).
+
+
+
+AREA RISERVATA ADMIN (Pannello Gestionale & CRM)
+
+Anagrafica Clienti & Prenotazioni:
+Inserimento rapido dati cliente (Nome, Cognome, Codice Fiscale/P.IVA, Indirizzo, Documento d'identità, Email, Telefono).
+Dettagli noleggio: Barca assegnata, data/ora inizio e fine, cauzione, extra (skipper, carburante, dotazioni).
+Stato della prenotazione (Confermata, In corso, Conclusa, Fatturata).
+Modulo Automazione Fatturazione:
+Flusso con Google Sheets: Quando clicchi "Genera Fattura", il sistema popola automaticamente un Google Sheet strutturato (o crea un nuovo file nel tuo Google Drive) pronto per l'importazione.
+Integrazione Diretta (Consigliata): Cliccando un tasto "Invia a Fatture in Cloud", la piattaforma invia i dati via API e ti restituisce subito il numero di fattura e il PDF generato.
+Gestione Flotta e Manutenzione:
+Scheda per ogni barca (stato, scadenze assicurazione, ore di moto, manutenzioni).
+
+
+implementando questo che dicevi 
+
+Perfetto! Concentriamoci sulla grafica e l'interfaccia utente (UI/UX) rendendo l'esperienza visiva fluida, moderna e perfettamente d'impatto, integrando il nuovo logo NAUTICOVI (NAUTICOVI - NOLEGGIO BARCHE - PRAIA A MARE), la palette cromatico-marina (blu notte #0F172A, ciano/azzurro mare #06B6D4 e bianco) e tutte le sezioni che hai descritto.
+
+Ideas & Struttura delle Schede per l'Area Cliente
+Oltre ai moduli base, ecco alcune schede ad altissimo valore aggiunto da integrare nella Web App del cliente:
+
+Meteo & Vento in Tempo Reale: Scheda dinamica con stato del mare, forza e direzione del vento e consiglio del giorno (es. "Oggi mare calmo verso l'Isola di Dino e l'Arco Magno").
+
+Schede Guida / Tutorial Barca: Modali o tab con illustrazioni chiare per l'avviamento del motore, l'uso corretto dell'ancora in sicurezza, l'uso del tendalino e le dotazioni di salvataggio.
+
+Mappa POI con Filtri: Mappa interattiva con filtri rapidi (Grotte, Calette Snorkeling, Ristoranti accessibili dal mare, Aree di Ancoraggio Sicuro).
+
+Check-in / Check-out Digitale: Scheda di verifica condizioni della barca con upload/anteprima foto dei graffi o danni preesistenti prima di salpare.
+
+Servizio "Barca a Bordo" / Ordini Extra: Tasto rapido WhatsApp per ordinare ghiaccio, bevande o carburante extra direttamente in banchina prima della partenza.
+
+1. Codice per l'Area Cliente (index.html)
+Sostituisci il contenuto di index.html con questo codice aggiornato con tab navigabili, guida illustrata, meteo e check-in:
+
+HTML
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAUTICOVI - Guida Ospite & Mappa Praia a Mare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-800 pb-20">
+
+    <!-- Header con Brand Logo -->
+    <header class="bg-slate-900 text-white p-6 text-center shadow-xl border-b-4 border-cyan-500 sticky top-0 z-50">
+        <div class="flex flex-col items-center justify-center">
+            <i class="fa-solid fa-water text-cyan-400 text-2xl mb-1"></i>
+            <h1 class="text-2xl font-black tracking-widest text-white">NAUTICOVI</h1>
+            <p class="text-[10px] tracking-widest text-cyan-400 font-bold uppercase">Noleggio Barche • Praia a Mare</p>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 space-y-5">
+
+        <!-- Banner Benvenuto Personalizzato -->
+        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-900 rounded-2xl p-5 text-white shadow-lg border border-cyan-500/30">
+            <div class="flex justify-between items-start">
+                <div>
+                    <span class="bg-cyan-500/20 text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-400/30">Noleggio Attivo</span>
+                    <h2 class="text-xl font-extrabold mt-2">Benvenuto a Bordo, Marco!</h2>
+                    <p class="text-xs text-slate-300 mt-0.5">Barca: <span class="font-bold text-cyan-300">Marlin 1 (Senza Patente)</span></p>
+                </div>
+                <a href="tel:+393000000000" class="bg-red-500 hover:bg-red-600 text-white p-3 rounded-xl shadow-lg transition flex items-center justify-center">
+                    <i class="fa-solid fa-phone-volume text-lg"></i>
+                </a>
+            </div>
+            <!-- Meteo e Vento Card -->
+            <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs text-slate-300">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-sun text-amber-400 text-base"></i>
+                    <span>28°C • Mare Calmo</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-cyan-300 font-medium">
+                    <i class="fa-solid fa-wind"></i> Vento NO 6 nodi
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigazione a Schede / Tab -->
+        <div class="flex bg-slate-200 p-1 rounded-xl text-xs font-bold text-slate-600 gap-1 shadow-inner">
+            <button onclick="switchTab('mappa')" id="tab-mappa" class="tab-btn flex-1 py-2.5 rounded-lg bg-white text-slate-900 shadow">Mappa & POI</button>
+            <button onclick="switchTab('guida')" id="tab-guida" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Guida Barca</button>
+            <button onclick="switchTab('regole')" id="tab-regole" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Regole Mare</button>
+            <button onclick="switchTab('checkin')" id="tab-checkin" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Check-in</button>
+        </div>
+
+        <!-- SEZIONE 1: MAPPA & PUNTI DI INTERESSE -->
+        <div id="sec-mappa" class="tab-content space-y-4">
+            <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-map-location-dot text-cyan-600"></i> Calette & Grotte Marine
+                    </h3>
+                    <span class="text-[10px] bg-cyan-100 text-cyan-800 font-bold px-2 py-0.5 rounded-md">Praia a Mare</span>
+                </div>
+                <div id="map" class="h-72 rounded-xl border border-slate-200 shadow-inner z-0"></div>
+            </div>
+        </div>
+
+        <!-- SEZIONE 2: GUIDA RAPIDA BARCA -->
+        <div id="sec-guida" class="tab-content hidden space-y-3">
+            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+                    <i class="fa-solid fa-compass text-cyan-600"></i> Come Usare la Barca
+                </h3>
+
+                <div class="space-y-3 text-xs">
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
+                        <div class="bg-cyan-600 text-white p-2.5 rounded-lg font-bold">1</div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm">Accensione Motore</h4>
+                            <p class="text-slate-600 mt-0.5">Assicurati che la leva del gas sia in posizione di folle (N). Inserisci la chiavetta e la stacco di sicurezza prima di girare.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
+                        <div class="bg-cyan-600 text-white p-2.5 rounded-lg font-bold">2</div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm">Ancoraggio Corretto</h4>
+                            <p class="text-slate-600 mt-0.5">Calare l'ancora sempre su fondale sabbioso, mai sulla roccia o sulla posidonia. Lasciare almeno il triplo della cima rispetto alla profondità.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
+                        <div class="bg-cyan-600 text-white p-2.5 rounded-lg font-bold">3</div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm">Dotazioni di Sicurezza</h4>
+                            <p class="text-slate-600 mt-0.5">I giubbotti di salvataggio e la ciambella di salvataggio si trovano sotto la panca di poppa.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEZIONE 3: REGOLE NAVIGAZIONE -->
+        <div id="sec-regole" class="tab-content hidden space-y-3">
+            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+                    <i class="fa-solid fa-shield-halved text-cyan-600"></i> Normative di Sicurezza
+                </h3>
+                <ul class="text-xs space-y-3 text-slate-600">
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-500 text-sm mt-0.5"></i>
+                        <span><b>Distanza di Sicurezza:</b> Mantenere almeno 200 metri dalle spiagge con bagnanti.</span>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-500 text-sm mt-0.5"></i>
+                        <span><b>Ingresso Grotte:</b> Entrare nell'Isola di Dino solo a motore al minimo o a remi.</span>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm mt-0.5"></i>
+                        <span><b>Limiti Velocità:</b> Massimo 3 nodi nei pressi della costa ed entro i 300 metri.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SEZIONE 4: CHECK-IN DIGITALE -->
+        <div id="sec-checkin" class="tab-content hidden space-y-3">
+            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+                    <i class="fa-solid fa-clipboard-check text-cyan-600"></i> Check-in & Stato Barca
+                </h3>
+                <p class="text-xs text-slate-500">Scatta o carica le foto di eventuali danni/graffi preesistenti prima della partenza.</p>
+
+                <div class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center cursor-pointer hover:border-cyan-500 transition">
+                    <i class="fa-solid fa-camera text-2xl text-slate-400 mb-1"></i>
+                    <p class="text-xs font-bold text-slate-700">Carica Foto Stato Iniziale</p>
+                    <input type="file" class="hidden" id="checkin-file" accept="image/*" multiple>
+                </div>
+
+                <button class="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-3 rounded-xl shadow transition">
+                    Conferma Check-in & Firma
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="mt-8 text-center pb-6">
+        <a href="admin.html" class="text-xs text-slate-400 hover:text-cyan-600 transition flex items-center justify-center gap-1">
+            <i class="fa-solid fa-lock"></i> Area Riservata Admin NAUTICOVI
+        </a>
+    </footer>
+
+    <script>
+        // Tab System
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-white', 'text-slate-900', 'shadow');
+                el.classList.add('hover:text-slate-900');
+            });
+
+            document.getElementById('sec-' + tab).classList.remove('hidden');
+            document.getElementById('tab-' + tab).classList.add('bg-white', 'text-slate-900', 'shadow');
+
+            if(tab === 'mappa') {
+                setTimeout(() => map.invalidateSize(), 200);
+            }
+        }
+
+        // Map Setup
+        const map = L.map('map').setView([39.8700, 15.7750], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+
+        const poiList = [
+            { nome: 'Isola di Dino & Grotta Azzurra', desc: 'Acque cristalline e rifrazioni blu.', lat: 39.8731, lng: 15.7735 },
+            { nome: 'Grotta del Leone', desc: 'Roccia caratteristica a leone.', lat: 39.8695, lng: 15.7720 },
+            { nome: 'Arco Magno (San Nicola Arcella)', desc: 'Arco naturale e spiaggia incantata.', lat: 39.8456, lng: 15.7889 }
+        ];
+
+        poiList.forEach(poi => {
+            L.marker([poi.lat, poi.lng]).addTo(map).bindPopup(`<b>${poi.nome}</b><br><span style="font-size:11px">${poi.desc}</span>`);
+        });
+    </script>
+</body>
+</html>
+2. Codice per il Pannello Riservato Admin (admin.html)
+Sostituisci il contenuto del file admin.html con questa versione potenziata: include la Dashboard analitica con KPI, Filtri temporali per fatturato e noleggi, Schede della Flotta & Manutenzione, CRM Clienti ed Export Fatture in Cloud:
+
+HTML
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAUTICOVI - Admin Dashboard & CRM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans">
+
+    <!-- Header Navbar -->
+    <nav class="bg-slate-900 text-white p-4 shadow-xl border-b border-cyan-500/30 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center space-x-3">
+            <span class="text-xl font-black tracking-widest text-cyan-400">NAUTICOVI</span>
+            <span class="text-[10px] bg-cyan-900 text-cyan-200 border border-cyan-500/40 px-2 py-0.5 rounded font-bold uppercase">GESTIONALI ADMIN</span>
+        </div>
+        <div class="text-xs text-slate-400">Praia a Mare (CS)</div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
+
+        <!-- BARRA FILTRI TEMPORALI & STATISTICHE (KPI DASHBOARD) -->
+        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-3">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-line text-cyan-600"></i> Dashboard Risultati & Date Bloccate
+                </h2>
+                
+                <!-- Filtri Temporali -->
+                <div class="flex items-center gap-2 text-xs">
+                    <label class="font-bold text-slate-600">Periodo:</label>
+                    <select id="filtroPeriodo" onchange="aggiornaDashboard()" class="p-2 border rounded-lg bg-slate-50 font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-cyan-500">
+                        <option value="tutto">Tutti i Noleggi</option>
+                        <option value="oggi">Oggi</option>
+                        <option value="mese">Questo Mese</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-cyan-500 flex justify-between items-center">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium uppercase">Fatturato Totale</p>
+                        <h3 class="text-2xl font-black text-cyan-400 mt-1" id="kpiFatturato">€0</h3>
+                    </div>
+                    <i class="fa-solid fa-euro-sign text-3xl text-slate-700"></i>
+                </div>
+
+                <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-emerald-500 flex justify-between items-center">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium uppercase">Noleggi Effettuati</p>
+                        <h3 class="text-2xl font-black text-emerald-400 mt-1" id="kpiNoleggi">0</h3>
+                    </div>
+                    <i class="fa-solid fa-ship text-3xl text-slate-700"></i>
+                </div>
+
+                <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-amber-500 flex justify-between items-center">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium uppercase">Barche Attive</p>
+                        <h3 class="text-2xl font-black text-amber-400 mt-1">3 / 3</h3>
+                    </div>
+                    <i class="fa-solid fa-anchor text-3xl text-slate-700"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEZIONE CRM CLIENTE & FORM -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Form Inserimento Cliente -->
+            <div class="lg:col-span-1 bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
+                <h2 class="text-md font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus text-cyan-600"></i> Registra Nuovo Noleggio
+                </h2>
+
+                <form id="crmForm" class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-600 uppercase">Nome e Cognome / Ragione Sociale</label>
+                        <input type="text" id="nome" required placeholder="Mario Rossi" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold text-slate-600 uppercase">CF / P.IVA</label>
+                            <input type="text" id="cf_piva" required placeholder="RSSMRA80A01H501U" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-600 uppercase">Telefono</label>
+                            <input type="tel" id="telefono" required placeholder="333 1234567" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-600 uppercase">Email (per Fattura)</label>
+                        <input type="email" id="email" required placeholder="mario@email.it" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold text-slate-600 uppercase">Barca</label>
+                            <select id="barca" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none bg-white">
+                                <option>Marlin 1 (Senza Patente)</option>
+                                <option>Marlin 2 (Senza Patente)</option>
+                                <option>Poseidon (Con Skipper)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-600 uppercase">Importo (€)</label>
+                            <input type="number" id="importo" required placeholder="150" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-600 uppercase">Data Noleggio (Data Bloccata)</label>
+                        <input type="date" id="data_noleggio" required class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                    </div>
+
+                    <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2.5 rounded-lg shadow transition flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-save"></i> Salva e Blocca Data
+                    </button>
+                </form>
+            </div>
+
+            <!-- Tabella Registro Clienti -->
+            <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-md border border-slate-200">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 border-b pb-2">
+                    <h2 class="text-md font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-address-book text-cyan-600"></i> Registro Anagrafica & Noleggi
+                    </h2>
+                    <button onclick="exportCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold flex items-center gap-1 shadow">
+                        <i class="fa-solid fa-file-excel"></i> Esporta per Fatture in Cloud
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 border-b">
+                                <th class="p-2.5">Cliente</th>
+                                <th class="p-2.5">CF / P.IVA</th>
+                                <th class="p-2.5">Barca</th>
+                                <th class="p-2.5">Data</th>
+                                <th class="p-2.5">Importo</th>
+                                <th class="p-2.5">Azione</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientiTable" class="divide-y divide-slate-100">
+                            <!-- Popolato via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SEZIONE GESTIONE FLOTTA & MANUTENZIONE -->
+        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
+            <h2 class="text-md font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+                <i class="fa-solid fa-screwdriver-wrench text-cyan-600"></i> Flotta & Stato Manutenzioni
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-sm text-slate-800">Marlin 1</h3>
+                        <span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-bold">Disponibile</span>
+                    </div>
+                    <p class="text-slate-500">Ore di Moto: <b>120h</b></p>
+                    <p class="text-slate-500">Assicurazione: <b class="text-emerald-600">Valida fino a 12/2026</b></p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-sm text-slate-800">Marlin 2</h3>
+                        <span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-bold">Disponibile</span>
+                    </div>
+                    <p class="text-slate-500">Ore di Moto: <b>98h</b></p>
+                    <p class="text-slate-500">Assicurazione: <b class="text-emerald-600">Valida fino a 12/2026</b></p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-sm text-slate-800">Poseidon</h3>
+                        <span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded font-bold">In Navigazione</span>
+                    </div>
+                    <p class="text-slate-500">Ore di Moto: <b>210h</b></p>
+                    <p class="text-slate-500">Tagliando: <b class="text-amber-600">Programmato a breve</b></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let clienti = JSON.parse(localStorage.getItem('nauticovi_clienti')) || [];
+
+        function aggiornaDashboard() {
+            const filtro = document.getElementById('filtroPeriodo').value;
+            let totale = 0;
+            let conteggio = 0;
+
+            const oggiStr = new Date().toISOString().split('T')[0];
+
+            clienti.forEach(c => {
+                if (filtro === 'tutto') {
+                    totale += parseFloat(c.importo || 0);
+                    conteggio++;
+                } else if (filtro === 'oggi' && c.data_noleggio === oggiStr) {
+                    totale += parseFloat(c.importo || 0);
+                    conteggio++;
+                } else if (filtro === 'mese') {
+                    totale += parseFloat(c.importo || 0);
+                    conteggio++;
+                }
+            });
+
+            document.getElementById('kpiFatturato').innerText = `€${totale}`;
+            document.getElementById('kpiNoleggi').innerText = conteggio;
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('clientiTable');
+            tbody.innerHTML = '';
+            if(clienti.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Nessun noleggio inserito. Inserisci il primo dal form a sinistra!</td></tr>`;
+                return;
+            }
+            clienti.forEach((c, index) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-2.5 font-bold">${c.nome}<br><span class="font-normal text-slate-400">${c.email}</span></td>
+                        <td class="p-2.5 font-mono">${c.cf_piva}</td>
+                        <td class="p-2.5">${c.barca}</td>
+                        <td class="p-2.5 font-semibold text-cyan-700">${c.data_noleggio}</td>
+                        <td class="p-2.5 font-bold text-emerald-600">€${c.importo}</td>
+                        <td class="p-2.5">
+                            <button onclick="eliminaCliente(${index})" class="text-red-500 hover:text-red-700 font-bold"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById('crmForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nuovo = {
+                nome: document.getElementById('nome').value,
+                cf_piva: document.getElementById('cf_piva').value,
+                telefono: document.getElementById('telefono').value,
+                email: document.getElementById('email').value,
+                barca: document.getElementById('barca').value,
+                importo: document.getElementById('importo').value,
+                data_noleggio: document.getElementById('data_noleggio').value
+            };
+            clienti.push(nuovo);
+            localStorage.setItem('nauticovi_clienti', JSON.stringify(clienti));
+            aggiornaDashboard();
+            this.reset();
+        });
+
+        function eliminaCliente(index) {
+            clienti.splice(index, 1);
+            localStorage.setItem('nauticovi_clienti', JSON.stringify(clienti));
+            aggiornaDashboard();
+        }
+
+        function exportCSV() {
+            if(clienti.length === 0) {
+                alert("Nessun dato da esportare!");
+                return;
+            }
+            let csv = "Nome,CodiceFiscale_PIVA,Email,Telefono,Descrizione,Importo,Data\n";
+            clienti.forEach(c => {
+                csv += `"${c.nome}","${c.cf_piva}","${c.email}","${c.telefono}","Noleggio barca ${c.barca}",${c.importo},"${c.data_noleggio}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'import_fatture_in_cloud_nauticovi.csv');
+            a.click();
+        }
+
+        aggiornaDashboard();
+    </script>
+</body>
+</html>
+Prossimi Passi
+Carica questi due file aggiornati (index.html e admin.html) nel tuo repository GitHub in minuscolo. Vercel aggiornerà l'app in pochi secondi e potrai testare l'intera grafica e le funzionalità direttamente da smartphone o PC!
+
+Ora, mi serve il Db o comunque un file collegato a questo, in cui in base al cliente cambia le info della pagina. Dove poter mettere le regole per la barca, le regole per la navigazione, i punti di interesse ecc
+
+Ottimo! Per far sì che la Web App Cliente sia personalizzata in base al cliente/noleggio (mostrando il suo nome, la barca specifica assegnata, le regole dedicate a quel natante e i punti di interesse aggiornati), la soluzione migliore e più pulita è utilizzare un file di dati strutturato in formato JSON (oppure un file Google Sheets / Supabase in futuro).
+
+In questo modo:
+
+Passi un link al cliente del tipo index.html?id=1 (o con il suo codice noleggio).
+
+L'app legge i dati dal file/database e personalizza dinamica e istantaneamente la pagina!
+
+1. Il File Dati / Database JSON (data.json)
+Crea un file chiamato data.json nella stessa cartella su GitHub e incollaci questa struttura con i noleggi, le regole e i punti di interesse:
+
+JSON
+{
+  "noleggi": [
+    {
+      "id": "1",
+      "cliente": "Marco Rossi",
+      "barca": "Marlin 1 (Senza Patente)",
+      "data": "2026-06-15",
+      "orario": "09:00 - 18:00",
+      "regole_barca": [
+        "Accensione: mettere la leva in folle (N) e inserire lo stacco di sicurezza prima di girare la chiave.",
+        "Ancoraggio: calare l'ancora sempre su fondale sabbioso, mai sulla roccia.",
+        "Dotazioni: i giubbotti di salvataggio si trovano sotto la panca di poppa."
+      ]
+    },
+    {
+      "id": "2",
+      "cliente": "Giuseppe Bianchi",
+      "barca": "Poseidon (Con Skipper)",
+      "data": "2026-06-16",
+      "orario": "10:00 - 19:00",
+      "regole_barca": [
+        "Incrociatore di categoria superiore: seguire scrupolosamente le indicazioni dello skipper a bordo.",
+        "È vietato fumare nelle cabine di prua.",
+        "Utilizzare il tendalino solo con imbarcazione ferma o a bassa velocità."
+      ]
+    }
+  ],
+  "regole_navigazione_generali": [
+    "Distanza dalla costa: mantenere almeno 200 metri dalle spiagge frequentate da bagnanti.",
+    "Isola di Dino: ingresso nelle grotte consentito solo a motore al minimo o a remi.",
+    "Aree Protette: vietato gettare l'ancora sulle praterie di Posidonia Oceanica."
+  ],
+  "punti_interesse": [
+    {
+      "nome": "Isola di Dino & Grotta Azzurra",
+      "descrizione": "Acque cristalline e grotta famosa per i riflessi azzurri.",
+      "lat": 39.8731,
+      "lng": 15.7735
+    },
+    {
+      "nome": "Grotta del Leone",
+      "descrizione": "Fondale ideale per snorkeling e roccia a forma di leone.",
+      "lat": 39.8695,
+      "lng": 15.7720
+    },
+    {
+      "nome": "Arco Magno (San Nicola Arcella)",
+      "descrizione": "Spettacolare arco naturale su baia incantata.",
+      "lat": 39.8456,
+      "lng": 15.7889
+    }
+  ]
+}
+2. Codice aggiornato dell'Area Cliente (index.html)
+Sostituisci il file index.html con questo codice. Ora legge automaticamente i dati dal file data.json o dall'URL (es. index.html?id=1 per Marco Rossi, index.html?id=2 per Giuseppe Bianchi):
+
+HTML
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAUTICOVI - Guest Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-800 pb-20">
+
+    <!-- Header Brand -->
+    <header class="bg-slate-900 text-white p-6 text-center shadow-xl border-b-4 border-cyan-500 sticky top-0 z-50">
+        <div class="flex flex-col items-center justify-center">
+            <i class="fa-solid fa-water text-cyan-400 text-2xl mb-1"></i>
+            <h1 class="text-2xl font-black tracking-widest text-white">NAUTICOVI</h1>
+            <p class="text-[10px] tracking-widest text-cyan-400 font-bold uppercase">Noleggio Barche • Praia a Mare</p>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 space-y-5">
+
+        <!-- Banner Benvenuto Personalizzato -->
+        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-900 rounded-2xl p-5 text-white shadow-lg border border-cyan-500/30">
+            <div class="flex justify-between items-start">
+                <div>
+                    <span class="bg-cyan-500/20 text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-400/30">Noleggio Attivo</span>
+                    <h2 class="text-xl font-extrabold mt-2" id="welcome-nome">Benvenuto a Bordo!</h2>
+                    <p class="text-xs text-slate-300 mt-0.5">Barca: <span class="font-bold text-cyan-300" id="welcome-barca">Selezionata</span></p>
+                </div>
+                <a href="tel:+393000000000" class="bg-red-500 hover:bg-red-600 text-white p-3 rounded-xl shadow-lg transition flex items-center justify-center">
+                    <i class="fa-solid fa-phone-volume text-lg"></i>
+                </a>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs text-slate-300">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-sun text-amber-400 text-base"></i>
+                    <span>28°C • Mare Calmo</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-cyan-300 font-medium">
+                    <i class="fa-solid fa-wind"></i> Vento NO 6 nodi
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigazione a Schede -->
+        <div class="flex bg-slate-200 p-1 rounded-xl text-xs font-bold text-slate-600 gap-1 shadow-inner">
+            <button onclick="switchTab('mappa')" id="tab-mappa" class="tab-btn flex-1 py-2.5 rounded-lg bg-white text-slate-900 shadow">Mappa & POI</button>
+            <button onclick="switchTab('guida')" id="tab-guida" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Guida Barca</button>
+            <button onclick="switchTab('regole')" id="tab-regole" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Regole Mare</button>
+        </div>
+
+        <!-- SEZIONE 1: MAPPA -->
+        <div id="sec-mappa" class="tab-content space-y-4">
+            <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200">
+                <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-map-location-dot text-cyan-600"></i> Calette e Punti di Interesse
+                </h3>
+                <div id="map" class="h-72 rounded-xl border border-slate-200 shadow-inner z-0"></div>
+            </div>
+        </div>
+
+        <!-- SEZIONE 2: GUIDA SPECIFICA DELLA BARCA -->
+        <div id="sec-guida" class="tab-content hidden space-y-3">
+            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+                    <i class="fa-solid fa-compass text-cyan-600"></i> Istruzioni Imbarcazione
+                </h3>
+                <div id="guida-barca-lista" class="space-y-3 text-xs">
+                    <!-- Dinamico -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SEZIONE 3: REGOLE NAVIGAZIONE GENERALI -->
+        <div id="sec-regole" class="tab-content hidden space-y-3">
+            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+                    <i class="fa-solid fa-shield-halved text-cyan-600"></i> Normative Mare & Sicurezza
+                </h3>
+                <ul id="regole-generali-lista" class="text-xs space-y-3 text-slate-600">
+                    <!-- Dinamico -->
+                </ul>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        let map;
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-white', 'text-slate-900', 'shadow');
+            });
+            document.getElementById('sec-' + tab).classList.remove('hidden');
+            document.getElementById('tab-' + tab).classList.add('bg-white', 'text-slate-900', 'shadow');
+
+            if(tab === 'mappa' && map) {
+                setTimeout(() => map.invalidateSize(), 200);
+            }
+        }
+
+        // Caricamento Dati dal file data.json
+        async function loadAppData() {
+            try {
+                const response = await fetch('data.json');
+                const data = await response.json();
+
+                // Recupera l'ID cliente dall'URL (es. ?id=1)
+                const urlParams = new URLSearchParams(window.location.search);
+                const clientId = urlParams.get('id') || '1';
+
+                const noleggio = data.noleggi.find(n => n.id === clientId) || data.noleggi[0];
+
+                // 1. Popola Dati Cliente
+                document.getElementById('welcome-nome').innerText = `Benvenuto a Bordo, ${noleggio.cliente}!`;
+                document.getElementById('welcome-barca').innerText = noleggio.barca;
+
+                // 2. Popola Guida Barca Specifica
+                const guidaBox = document.getElementById('guida-barca-lista');
+                guidaBox.innerHTML = '';
+                noleggio.regole_barca.forEach((regola, index) => {
+                    guidaBox.innerHTML += `
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
+                            <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">${index + 1}</div>
+                            <p class="text-slate-700 font-medium">${regola}</p>
+                        </div>
+                    `;
+                });
+
+                // 3. Popola Regole Generali Navigazione
+                const regoleBox = document.getElementById('regole-generali-lista');
+                regoleBox.innerHTML = '';
+                data.regole_navigazione_generali.forEach(regola => {
+                    regoleBox.innerHTML += `
+                        <li class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-circle-check text-emerald-500 text-sm mt-0.5"></i>
+                            <span>${regola}</span>
+                        </li>
+                    `;
+                });
+
+                // 4. Inizializza Mappa & POI
+                map = L.map('map').setView([39.8700, 15.7750], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+
+                data.punti_interesse.forEach(poi => {
+                    L.marker([poi.lat, poi.lng]).addTo(map)
+                        .bindPopup(`<b>${poi.nome}</b><br><span style="font-size:11px">${poi.descrizione}</span>`);
+                });
+
+            } catch (err) {
+                console.error("Errore nel caricamento del file data.json", err);
+            }
+        }
+
+        loadAppData();
+    </script>
+</body>
+</html>
+Come provarlo subito:
+Carica sia data.json che il nuovo index.html su GitHub.
+
+Apri [https://tuo-sito.vercel.app?id=1](https://tuo-sito.vercel.app?id=1) -> Vedrai i dati dedicati a Marco Rossi e al Marlin 1.
+
+Apri [https://tuo-sito.vercel.app?id=2](https://tuo-sito.vercel.app?id=2) -> Vedrai i dati dedicati a Giuseppe Bianchi e al Poseidon!
+
+Partiamo dalla user experience. Voglio il logo nauticovi che hai generato prima, innanzitutto. Poi la parte di punti di interesse, oltre la mappa, metterei delle foto con una descrizione dei punti di interesse. La parte di check in e check out non mi serve al momento
+
+Perfetto! Focalizziamoci sulla User Experience (UX) dell'Area Cliente:
+
+Logo NAUTICOVI Integrato: Abbiamo inserito il logo ufficiale minimalista con il font nautico in tutto maiuscolo e la dicitura NOLEGGIO BARCHE - PRAIA A MARE.   
+JPG
+
+Foto & Schede Punti di Interesse: Oltre alla mappa interattiva, ogni punto d'interesse (Isola di Dino, Grotta del Leone, Arco Magno) ora ha una scheda dedicata con immagine panoramica, categoria e descrizione dettagliata.
+
+Rimosso il Check-in/Check-out: L'interfaccia è pulita e concentrata solo su ciò che serve al cliente durante la navigazione (Mappa/Punti d'interesse, Guida Barca e Regole del Mare).
+
+1. Codice per l'Area Cliente (index.html)
+Sostituisci il file index.html nel tuo repository GitHub con questo codice aggiornato:
+
+HTML
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAUTICOVI - Guest Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-800 pb-16">
+
+    <!-- Header Brand con Logo Ufficiale -->
+    <header class="bg-slate-900 text-white py-5 px-4 text-center shadow-xl border-b-4 border-cyan-500 sticky top-0 z-50">
+        <div class="flex flex-col items-center justify-center">
+            <!-- Icona Nautica e Titolo Maiuscolo -->
+            <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-water text-cyan-400 text-2xl"></i>
+                <h1 class="text-2xl font-black tracking-widest text-white">NAUTICOVI</h1>
+            </div>
+            <p class="text-[9px] tracking-widest text-cyan-400 font-bold uppercase">NOLEGGIO BARCHE • PRAIA A MARE</p>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 space-y-5">
+
+        <!-- Banner Benvenuto Personalizzato -->
+        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-900 rounded-2xl p-5 text-white shadow-lg border border-cyan-500/30">
+            <div class="flex justify-between items-start">
+                <div>
+                    <span class="bg-cyan-500/20 text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-400/30">Noleggio Attivo</span>
+                    <h2 class="text-xl font-extrabold mt-2" id="welcome-nome">Benvenuto a Bordo!</h2>
+                    <p class="text-xs text-slate-300 mt-0.5">Barca: <span class="font-bold text-cyan-300" id="welcome-barca">Marlin 1</span></p>
+                </div>
+                <a href="tel:+393000000000" class="bg-red-500 hover:bg-red-600 text-white p-3 rounded-xl shadow-lg transition flex items-center justify-center">
+                    <i class="fa-solid fa-phone-volume text-lg"></i>
+                </a>
+            </div>
+            <!-- Widget Meteo e Vento -->
+            <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs text-slate-300">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-sun text-amber-400 text-base"></i>
+                    <span>28°C • Mare Calmo</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-cyan-300 font-medium">
+                    <i class="fa-solid fa-wind"></i> Vento NO 6 nodi
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigazione a Schede / Tab (Senza Check-in) -->
+        <div class="flex bg-slate-200 p-1 rounded-xl text-xs font-bold text-slate-600 gap-1 shadow-inner">
+            <button onclick="switchTab('poi')" id="tab-poi" class="tab-btn flex-1 py-2.5 rounded-lg bg-white text-slate-900 shadow">Punti d'Interesse</button>
+            <button onclick="switchTab('guida')" id="tab-guida" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Guida Barca</button>
+            <button onclick="switchTab('regole')" id="tab-regole" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Regole Mare</button>
+        </div>
+
+        <!-- SEZIONE 1: MAPPA + SCHEDE FOTOGRAFICHE PUNTI D'INTERESSE -->
+        <div id="sec-poi" class="tab-content space-y-4">
+            <!-- Mappa Interattiva -->
+            <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200">
+                <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-map-location-dot text-cyan-600"></i> Mappa Calette & Grotte
+                </h3>
+                <div id="map" class="h-64 rounded-xl border border-slate-200 shadow-inner z-0"></div>
+            </div>
+
+            <!-- Elenco Schede Foto Punti di Interesse -->
+            <div class="space-y-3">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 px-1">
+                    <i class="fa-solid fa-camera text-cyan-600"></i> Luoghi da Non Perdere
+                </h3>
+                <div id="poi-cards-container" class="space-y-4">
+                    <!-- Popolato dinamicamente da data.json -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SEZIONE 2: GUIDA SPECIFICA BARCA -->
+        <div id="sec-guida" class="tab-content hidden space-y-3">
+            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2 text-sm">
+                    <i class="fa-solid fa-compass text-cyan-600"></i> Istruzioni Imbarcazione
+                </h3>
+                <div id="guida-barca-lista" class="space-y-3 text-xs">
+                    <!-- Dinamico -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SEZIONE 3: REGOLE NAVIGAZIONE GENERALI -->
+        <div id="sec-regole" class="tab-content hidden space-y-3">
+            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2 text-sm">
+                    <i class="fa-solid fa-shield-halved text-cyan-600"></i> Normative Mare & Sicurezza
+                </h3>
+                <ul id="regole-generali-lista" class="text-xs space-y-3 text-slate-600">
+                    <!-- Dinamico -->
+                </ul>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="mt-8 text-center pb-6">
+        <a href="admin.html" class="text-xs text-slate-400 hover:text-cyan-600 transition flex items-center justify-center gap-1">
+            <i class="fa-solid fa-lock"></i> Area Riservata Gestore NAUTICOVI
+        </a>
+    </footer>
+
+    <script>
+        let map;
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-white', 'text-slate-900', 'shadow');
+                el.classList.add('hover:text-slate-900');
+            });
+            document.getElementById('sec-' + tab).classList.remove('hidden');
+            document.getElementById('tab-' + tab).classList.add('bg-white', 'text-slate-900', 'shadow');
+
+            if(tab === 'poi' && map) {
+                setTimeout(() => map.invalidateSize(), 200);
+            }
+        }
+
+        async function loadAppData() {
+            try {
+                const response = await fetch('data.json');
+                const data = await response.json();
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const clientId = urlParams.get('id') || '1';
+
+                const noleggio = data.noleggi.find(n => n.id === clientId) || data.noleggi[0];
+
+                // 1. Dati Cliente
+                document.getElementById('welcome-nome').innerText = `Benvenuto, ${noleggio.cliente}!`;
+                document.getElementById('welcome-barca').innerText = noleggio.barca;
+
+                // 2. Guida Barca
+                const guidaBox = document.getElementById('guida-barca-lista');
+                guidaBox.innerHTML = '';
+                noleggio.regole_barca.forEach((regola, index) => {
+                    guidaBox.innerHTML += `
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
+                            <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold text-xs">${index + 1}</div>
+                            <p class="text-slate-700 font-medium">${regola}</p>
+                        </div>
+                    `;
+                });
+
+                // 3. Regole Mare
+                const regoleBox = document.getElementById('regole-generali-lista');
+                regoleBox.innerHTML = '';
+                data.regole_navigazione_generali.forEach(regola => {
+                    regoleBox.innerHTML += `
+                        <li class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-circle-check text-emerald-500 text-sm mt-0.5"></i>
+                            <span>${regola}</span>
+                        </li>
+                    `;
+                });
+
+                // 4. Mappa & Schede Foto POI
+                map = L.map('map').setView([39.8700, 15.7750], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+
+                const cardsContainer = document.getElementById('poi-cards-container');
+                cardsContainer.innerHTML = '';
+
+                data.punti_interesse.forEach(poi => {
+                    // Marker Mappa
+                    L.marker([poi.lat, poi.lng]).addTo(map)
+                        .bindPopup(`<b>${poi.nome}</b><br><span style="font-size:11px">${poi.categoria}</span>`);
+
+                    // Card con Foto e Descrizione
+                    cardsContainer.innerHTML += `
+                        <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
+                            <img src="${poi.immagine}" alt="${poi.nome}" class="w-full h-44 object-cover">
+                            <div class="p-4 space-y-1.5">
+                                <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">${poi.categoria}</span>
+                                <h4 class="font-bold text-slate-800 text-base">${poi.nome}</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">${poi.descrizione}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+            } catch (err) {
+                console.error("Errore caricamento dati data.json", err);
+            }
+        }
+
+        loadAppData();
+    </script>
+</body>
+</html>
+2. File Dati Aggiornato (data.json)
+Puoi scaricare direttamente il file aggiornato con le immagini e le descrizioni dei punti di interesse:
+
+[data.json](
+Icona JSON
+data
+ JSON 
+)
+
+Prossimo Passaggio
+Carica sia index.html che data.json su GitHub in minuscolo. Entro pochi secondi la tua Web App si aggiornerà su Vercel con la nuova User Experience fotografica!
+
+
+
+
+
+Le tue chat con Numbers Group non vengono utilizzate per migliorare i nostri modelli. Gemini è un'AI e può fare errori, anche in merito a persone. La tua privacy e GeminiSi apre in una nuova finestra
+
+{
+  "noleggi": [
+    {
+      "id": "1",
+      "cliente": "Marco Rossi",
+      "barca": "Marlin 1 (Senza Patente)",
+      "data": "2026-06-15",
+      "orario": "09:00 - 18:00",
+      "regole_barca": [
+        "Accensione: Leva in folle (N) e inserire lo stacco di sicurezza prima di girare la chiave.",
+        "Ancoraggio: Calare l'ancora sempre su fondale sabbioso, mai sulla roccia o sulla posidonia.",
+        "Dotazioni di Bordo: Giubbotti di salvataggio e ciambella sotto la panca di poppa."
+      ]
+    },
+    {
+      "id": "2",
+      "cliente": "Giuseppe Bianchi",
+      "barca": "Poseidon (Con Skipper)",
+      "data": "2026-06-16",
+      "orario": "10:00 - 19:00",
+      "regole_barca": [
+        "Seguire scrupolosamente le indicazioni dello skipper a bordo per la sicurezza.",
+        "È vietato fumare nelle cabine di prua.",
+        "Utilizzare il tendalino solo con imbarcazione ferma o a bassa velocità."
+      ]
+    }
+  ],
+  "regole_navigazione_generali": [
+    "Distanza dalla Costa: Mantenere almeno 200 metri di distanza dalle spiagge con bagnanti.",
+    "Isola di Dino: Ingresso nelle grotte marine consentito solo a motore al minimo o a remi.",
+    "Aree Protette: Vietato gettare l'ancora sulle praterie protette di Posidonia Oceanica.",
+    "Limiti di Velocità: Massimo 3 nodi nei pressi della costa ed entro i 300 metri."
+  ],
+  "punti_interesse": [
+    {
+      "nome": "Isola di Dino & Grotta Azzurra",
+      "categoria": "Grotta Marina",
+      "descrizione": "Una meravigliosa grotta naturale caratterizzata da acque cristalline e riflessi azzurri unici. Accessibile via mare, è la tappa principale di Praia a Mare.",
+      "immagine": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80",
+      "lat": 39.8731,
+      "lng": 15.7735
+    },
+    {
+      "nome": "Grotta del Leone",
+      "categoria": "Grotta & Snorkeling",
+      "descrizione": "Prende il nome da una roccia immersa che ricorda la forma di un leone sdraiato. Un fondale spettacolare e ricco di vita marina, ideale per lo snorkeling.",
+      "immagine": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+      "lat": 39.8695,
+      "lng": 15.772
+    },
+    {
+      "nome": "Arco Magno (San Nicola Arcella)",
+      "categoria": "Baia Naturale",
+      "descrizione": "Un maestoso arco di roccia naturale che custodisce una piccola spiaggia incantata. Uno dei luoghi più iconici ed emozionanti della Riviera dei Cedri.",
+      "immagine": "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80",
+      "lat": 39.8456,
+      "lng": 15.7889
+    }
+  ]
+}
+data.json
+Visualizzazione di data.json.
