@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAUTICOVI - Guest Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-800 pb-16 font-sans">
+
+    <!-- Header Brand -->
+    <header class="bg-slate-900 text-white py-5 px-4 text-center shadow-xl border-b-4 border-cyan-500 sticky top-0 z-50">
+        <div class="flex flex-col items-center justify-center">
+            <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-water text-cyan-400 text-2xl"></i>
+                <h1 class="text-2xl font-black tracking-widest text-white">NAUTICOVI</h1>
+            </div>
+            <p class="text-[9px] tracking-widest text-cyan-400 font-bold uppercase">NOLEGGIO BARCHE • PRAIA A MARE</p>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 space-y-5">
+
+        <!-- Banner Benvenuto Personalizzato -->
+        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-900 rounded-2xl p-5 text-white shadow-lg border border-cyan-500/30">
+            <div class="flex justify-between items-start">
+                <div>
+                    <span class="bg-cyan-500/20 text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-400/30">Noleggio Attivo</span>
+                    <h2 class="text-xl font-extrabold mt-2" id="welcome-nome">Benvenuto a Bordo!</h2>
+                    <p class="text-xs text-slate-300 mt-0.5">Barca: <span class="font-bold text-cyan-300" id="welcome-barca">Marlin 1</span></p>
+                </div>
+                <!-- Chiamata Assistenza al Gestore -->
+                <a href="tel:+393000000000" class="bg-red-500 hover:bg-red-600 text-white p-3 rounded-xl shadow-lg transition flex items-center justify-center">
+                    <i class="fa-solid fa-phone-volume text-lg"></i>
+                </a>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs text-slate-300">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-sun text-amber-400 text-base"></i>
+                    <span>28°C • Mare Calmo</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-cyan-300 font-medium">
+                    <i class="fa-solid fa-wind"></i> Vento NO 6 nodi
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigazione a Schede -->
+        <div class="flex bg-slate-200 p-1 rounded-xl text-xs font-bold text-slate-600 gap-1 shadow-inner">
+            <button onclick="switchTab('rotta')" id="tab-rotta" class="tab-btn flex-1 py-2.5 rounded-lg bg-white text-slate-900 shadow">Scegli Rotta</button>
+            <button onclick="switchTab('tips')" id="tab-tips" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Tips Barca</button>
+            <button onclick="switchTab('regole')" id="tab-regole" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900">Divieti</button>
+        </div>
+
+        <!-- SEZIONE 1: SELEZIONATORE ROTTA DEL GIORNO -->
+        <div id="sec-rotta" class="tab-content space-y-4">
+            <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200 space-y-3">
+                <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-compass text-cyan-600"></i> Seleziona la Tua Meta di Oggi
+                </h3>
+                <select id="select-itinerario" onchange="cambiaItinerario()" class="w-full p-2.5 border rounded-xl bg-slate-50 font-bold text-slate-800 text-xs outline-none focus:ring-2 focus:ring-cyan-500">
+                    <option value="generico">Tutti i Punti d'Interesse in Zona (Isola, Arco Magno, Grotte)</option>
+                    <option value="arcomagno">Vuoi Visitare l'Arco Magno? (Rotta e punti dedicati)</option>
+                    <option value="maratea">Vuoi Visitare Maratea? (Rotta verso Nord e insenature)</option>
+                </select>
+            </div>
+
+            <!-- Contenitore Punti d'Interesse Dinamico -->
+            <div id="punti-container" class="space-y-3">
+                <!-- Popolato da JS in base alla scelta -->
+            </div>
+        </div>
+
+        <!-- SEZIONE 2: TIPS GUIDA BARCA -->
+        <div id="sec-tips" class="tab-content hidden space-y-3">
+            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2 text-sm">
+                    <i class="fa-solid fa-lightbulb text-cyan-600"></i> Consigli per la Navigazione
+                </h3>
+
+                <div class="space-y-3 text-xs">
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
+                        <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">1</div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm">Accensione Motore</h4>
+                            <p class="text-slate-600 mt-0.5">Mettere la leva in folle (N) e agganciare lo stacco di sicurezza prima di girare la chiave.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
+                        <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">2</div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm">Ancoraggio Corretto</h4>
+                            <p class="text-slate-600 mt-0.5">Calare l'ancora sempre su fondale sabbioso di colore chiaro, mai sulla roccia o sulla posidonia.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
+                        <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">3</div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm">Tendalino Parasole</h4>
+                            <p class="text-slate-600 mt-0.5">Fissare il tendalino solo a barca ferma o a velocità bassissima per evitare danni alla struttura.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEZIONE 3: DIVIETI DA NON INFRANGERE -->
+        <div id="sec-regole" class="tab-content hidden space-y-3">
+            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
+                <h3 class="font-bold text-red-600 flex items-center gap-2 border-b pb-2 text-sm">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Regole Tassative di Bordo
+                </h3>
+
+                <ul class="text-xs space-y-3 text-slate-700">
+                    <li class="flex items-start gap-2.5 p-2 bg-red-50 rounded-lg border border-red-100">
+                        <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
+                        <span><b>Distanza Bagnanti:</b> VIETATO avvicinarsi a meno di 200 metri dalle spiagge con bagnanti.</span>
+                    </li>
+                    <li class="flex items-start gap-2.5 p-2 bg-red-50 rounded-lg border border-red-100">
+                        <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
+                        <span><b>Velocità nelle Grotte:</b> VIETATO entrare veloci nelle grotte. Procedere solo a motore al minimo o a remi.</span>
+                    </li>
+                    <li class="flex items-start gap-2.5 p-2 bg-red-50 rounded-lg border border-red-100">
+                        <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
+                        <span><b>Protezione Fondali:</b> VIETATO gettare l'ancora sulle praterie protette di Posidonia oceanica.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-white', 'text-slate-900', 'shadow');
+                el.classList.add('hover:text-slate-900');
+            });
+            document.getElementById('sec-' + tab).classList.remove('hidden');
+            document.getElementById('tab-' + tab).classList.add('bg-white', 'text-slate-900', 'shadow');
+        }
+
+        function cambiaItinerario() {
+            const val = document.getElementById('select-itinerario').value;
+            const container = document.getElementById('punti-container');
+            container.innerHTML = '';
+
+            if(val === 'generico') {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 space-y-2">
+                        <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Isola di Dino</span>
+                        <h4 class="font-bold text-slate-800">Isola di Dino & Grotta Azzurra</h4>
+                        <p class="text-xs text-slate-600">Partenza dall'isola per esplorare la Grotta Azzurra e la Grotta del Leone con fondali adatti allo snorkeling.</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 space-y-2">
+                        <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">San Nicola Arcella</span>
+                        <h4 class="font-bold text-slate-800">Arco Magno</h4>
+                        <p class="text-xs text-slate-600">Arco naturale suggestivo situato a pochi minuti a sud dell'Isola di Dino.</p>
+                    </div>
+                `;
+            } else if(val === 'arcomagno') {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 space-y-2 border-l-4 border-l-cyan-600">
+                        <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Rotta Arco Magno</span>
+                        <h4 class="font-bold text-slate-800">1. Baia dell'Arco Magno</h4>
+                        <p class="text-xs text-slate-600">Naviga verso sud mantenendo la distanza di sicurezza dalla costa. Fermati all'esterno del passaggio di roccia per scattare foto al tramonto o fare il bagno.</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 space-y-2">
+                        <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Sosta 2</span>
+                        <h4 class="font-bold text-slate-800">2. Scoglio del Prete</h4>
+                        <p class="text-xs text-slate-600">Formazione rocciosa ideale per gettare l'ancora su sabbia e godersi le acque limpide.</p>
+                    </div>
+                `;
+            } else if(val === 'maratea') {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 space-y-2 border-l-4 border-l-cyan-600">
+                        <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Rotta Maratea</span>
+                        <h4 class="font-bold text-slate-800">1. Secca della Giada & Castrocucco</h4>
+                        <p class="text-xs text-slate-600">Prosegui verso Nord. La costa di Maratea offre insenature rocciose e calette isolate ideali per la mezza giornata o giornata intera.</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 space-y-2">
+                        <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Sosta 2</span>
+                        <h4 class="font-bold text-slate-800">2. Calafuria & Spiaggia della Secca</h4>
+                        <p class="text-xs text-slate-600">Acque trasparenti circondate dalla vegetazione mediterranea.</p>
+                    </div>
+                `;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', cambiaItinerario);
+    </script>
+</body>
+</html>
