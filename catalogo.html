@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAUTICOVI - Flotta & Prezzi Noleggio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans pb-16">
+
+    <!-- Header Brand con Logo -->
+    <header class="bg-slate-900 text-white py-5 px-4 text-center shadow-xl border-b-4 border-cyan-500 sticky top-0 z-50">
+        <div class="flex flex-col items-center justify-center">
+            <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-water text-cyan-400 text-2xl"></i>
+                <h1 class="text-2xl font-black tracking-widest text-white">NAUTICOVI</h1>
+            </div>
+            <p class="text-[9px] tracking-widest text-cyan-400 font-bold uppercase">NOLEGGIO BARCHE & SUP • PRAIA A MARE</p>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 space-y-6">
+
+        <!-- Banner Benvenuto Vetrina -->
+        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-900 rounded-2xl p-5 text-white shadow-lg border border-cyan-500/30 text-center">
+            <span class="bg-emerald-500/20 text-emerald-300 text-xs px-3 py-1 rounded-full font-bold border border-emerald-400/30 uppercase">100% Guida Senza Patente</span>
+            <h2 class="text-xl font-black mt-2">Noleggio Barche a Praia a Mare</h2>
+            <p class="text-xs text-slate-300 mt-1">Scopri l'Isola di Dino, la Grotta Azzurra e l'Arco Magno in totale autonomia.</p>
+            <a href="https://wa.me/393000000000?text=Ciao%20Nauticovi!%20Vorrei%20informazioni%20sulla%20disponibilit%C3%A0" target="_blank" class="mt-4 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-lg transition">
+                <i class="fa-brands fa-whatsapp text-base"></i> Contattaci su WhatsApp
+            </a>
+        </div>
+
+        <!-- CONDOTTE DI PRENOTAZIONE E CAPARRA -->
+        <div class="bg-amber-50 p-4 rounded-2xl border border-amber-200 text-xs space-y-1.5 shadow-sm">
+            <div class="font-bold text-amber-900 flex items-center gap-1.5 text-sm">
+                <i class="fa-solid fa-circle-info text-amber-600"></i> Informazioni e Caparra
+            </div>
+            <p class="text-amber-800 leading-relaxed text-[11px]">
+                • <b>Caparra richiesta:</b> 50% del totale entro il giorno prima (Bonifico Istantaneo, PayPal o Contanti in sede).<br>
+                • <b>Dotazione di bordo:</b> Forniamo su richiesta <b>Frigo rigido con ghiaccio incluso</b>.<br>
+                • <b>Carburante:</b> Escluso dal prezzo di listino (si salda al rientro in base al consumo).
+            </p>
+        </div>
+
+        <!-- LISTA FLOTTA E LISTINO PREZZI -->
+        <div class="space-y-4">
+            <h3 class="font-black text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-ship text-cyan-600"></i> Le Nostre Imbarcazioni
+            </h3>
+
+            <!-- Card Gommoni 40 CV -->
+            <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
+                <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" alt="Gommone 40 CV" class="w-full h-44 object-cover">
+                <div class="p-4 space-y-2">
+                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Gommone • Max 6 Persone</span>
+                    <h4 class="font-extrabold text-slate-800 text-base">Gommoni Marlin 40 CV (Senza Patente)</h4>
+                    
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Bassa Stagione (Giu/Set):</span>
+                            <span class="font-bold">Mezza €120 | Intera €200</span>
+                        </div>
+                        <div class="flex justify-between border-t pt-1">
+                            <span class="text-slate-500">Alta Stagione (Lug/Ago):</span>
+                            <span class="font-bold text-emerald-600">Mezza €150 | Intera €220</span>
+                        </div>
+                    </div>
+
+                    <a href="https://wa.me/393000000000?text=Ciao!%20Vorrei%20richiedere%20disponibilit%C3%A0%20per%20un%20Gommone%2040%20CV" target="_blank" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
+                        <i class="fa-brands fa-whatsapp text-base text-emerald-400"></i> Richiedi Disponibilità
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card Scafi Open 40 CV -->
+            <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" alt="Scafo Open 40 CV" class="w-full h-44 object-cover">
+                <div class="p-4 space-y-2">
+                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Scafo Rigido • Max 5 Persone</span>
+                    <h4 class="font-extrabold text-slate-800 text-base">Scafi Open Poseidon 40 CV (Senza Patente)</h4>
+                    
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Bassa Stagione (Giu/Set):</span>
+                            <span class="font-bold">Mezza €120 | Intera €200</span>
+                        </div>
+                        <div class="flex justify-between border-t pt-1">
+                            <span class="text-slate-500">Alta Stagione (Lug/Ago):</span>
+                            <span class="font-bold text-emerald-600">Mezza €150 | Intera €220</span>
+                        </div>
+                    </div>
+
+                    <a href="https://wa.me/393000000000?text=Ciao!%20Vorrei%20richiedere%20disponibilit%C3%A0%20per%20uno%20Scafo%20Open%2040%20CV" target="_blank" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
+                        <i class="fa-brands fa-whatsapp text-base text-emerald-400"></i> Richiedi Disponibilità
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card Lancia 30 CV -->
+            <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
+                <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" alt="Lancia Tradizionale" class="w-full h-44 object-cover">
+                <div class="p-4 space-y-2">
+                    <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Lancia Tradizionale • Max 4 Persone</span>
+                    <h4 class="font-extrabold text-slate-800 text-base">Lancia Tradizionale 30 CV (Senza Patente)</h4>
+                    
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Bassa Stagione (Giu/Set):</span>
+                            <span class="font-bold">Mezza €80 | Intera €150</span>
+                        </div>
+                        <div class="flex justify-between border-t pt-1">
+                            <span class="text-slate-500">Alta Stagione (Lug/Ago):</span>
+                            <span class="font-bold text-emerald-600">Mezza €100 | Intera €180</span>
+                        </div>
+                    </div>
+
+                    <a href="https://wa.me/393000000000?text=Ciao!%20Vorrei%20richiedere%20disponibilit%C3%A0%20per%20la%20Lancia%20Tradizionale" target="_blank" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
+                        <i class="fa-brands fa-whatsapp text-base text-emerald-400"></i> Richiedi Disponibilità
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEZIONE NOLEGGIO SUP -->
+        <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200 p-5 space-y-3">
+            <div class="flex justify-between items-start">
+                <div>
+                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Attività oraria</span>
+                    <h3 class="text-lg font-bold text-slate-800 mt-1">Noleggio Stand Up Paddle (SUP)</h3>
+                </div>
+                <div class="text-right">
+                    <span class="text-xl font-black text-emerald-600">€10</span>
+                    <span class="text-xs text-slate-400 block">/ ora</span>
+                </div>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+                Noleggio indipendente ad ore per esplorare la costa in totale relax.
+            </p>
+            <a href="https://wa.me/393000000000?text=Ciao!%20Vorrei%20informazioni%20sul%20noleggio%20SUP" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
+                <i class="fa-brands fa-whatsapp text-base"></i> Prenota SUP su WhatsApp
+            </a>
+        </div>
+
+        <!-- PUNTI DI INTERESSE GENERICI DI PRAIA A MARE -->
+        <div class="space-y-3">
+            <h3 class="font-black text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-map-location-dot text-cyan-600"></i> Punti d'Interesse Raggiungibili
+            </h3>
+
+            <div class="grid grid-cols-1 gap-3 text-xs">
+                <div class="p-3 bg-white rounded-xl shadow-sm border border-slate-200">
+                    <b class="text-slate-800 text-sm block">Isola di Dino & Grotta Azzurra</b>
+                    <p class="text-slate-500 mt-0.5">La perla di Praia a Mare, famosa per le pareti rocciose e i fondali trasparenti.</p>
+                </div>
+                <div class="p-3 bg-white rounded-xl shadow-sm border border-slate-200">
+                    <b class="text-slate-800 text-sm block">Grotta del Leone</b>
+                    <p class="text-slate-500 mt-0.5">Scogliera caratteristica a forma di leone, ideale per tuffi e snorkeling.</p>
+                </div>
+                <div class="p-3 bg-white rounded-xl shadow-sm border border-slate-200">
+                    <b class="text-slate-800 text-sm block">Arco Magno (San Nicola Arcella)</b>
+                    <p class="text-slate-500 mt-0.5">Spettacolare apertura naturale nella roccia che racchiude una baia incantata.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>
