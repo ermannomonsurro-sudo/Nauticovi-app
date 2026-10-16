@@ -3,105 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NAUTICOVI - CRM & Gestionale Noleggio</title>
+    <title>NAUTICOVI - Gestionale CRM & CMS Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans">
+<body class="bg-slate-100 text-slate-800 font-sans">
 
-    <!-- Header / Navbar -->
+    <!-- Navbar Admin -->
     <nav class="bg-slate-900 text-white p-4 shadow-lg flex justify-between items-center">
         <div class="flex items-center space-x-3">
-            <span class="text-xl font-bold tracking-wider text-cyan-400">NAUTICOVI</span>
-            <span class="text-xs bg-cyan-900 text-cyan-200 px-2 py-1 rounded">CRM Admin</span>
+            <span class="text-xl font-black tracking-widest text-cyan-400">NAUTICOVI</span>
+            <span class="text-xs bg-cyan-900 text-cyan-200 px-2 py-0.5 rounded font-bold">PANNELLO ADMIN</span>
         </div>
-        <div class="text-sm text-gray-300">Praia a Mare (CS)</div>
+        <div class="text-xs text-slate-400">Praia a Mare (CS)</div>
     </nav>
 
-    <div class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
 
-        <!-- Form Inserimento Cliente & Noleggio -->
-        <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-md border border-gray-200">
-            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-user-plus text-cyan-600"></i> Nuovo Noleggio
-            </h2>
+        <!-- SEZIONE CRM CLIENTE -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            <form id="crmForm" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 uppercase">Nome e Cognome / Ragione Sociale</label>
-                    <input type="text" id="nome" required class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-cyan-500 outline-none">
-                </div>
+            <!-- Form Inserimento Cliente -->
+            <div class="lg:col-span-1 bg-white p-5 rounded-2xl shadow-md border border-slate-200">
+                <h2 class="text-md font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-2">
+                    <i class="fa-solid fa-user-plus text-cyan-600"></i> Nuovo Noleggio / Cliente
+                </h2>
 
-                <div class="grid grid-cols-2 gap-2">
+                <form id="crmForm" class="space-y-3">
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 uppercase">Cod. Fiscale / P.IVA</label>
-                        <input type="text" id="cf_piva" required class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-cyan-500 outline-none">
+                        <label class="block text-xs font-bold text-slate-600 uppercase">Nome / Ragione Sociale</label>
+                        <input type="text" id="nome" required placeholder="es. Mario Rossi" class="w-full mt-1 p-2 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
                     </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase">CF / P.IVA</label>
+                            <input type="text" id="cf_piva" required placeholder="RSSMRA80A01H501U" class="w-full mt-1 p-2 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase">Telefono</label>
+                            <input type="tel" id="telefono" required placeholder="333 1234567" class="w-full mt-1 p-2 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                        </div>
+                    </div>
+
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 uppercase">Telefono / WhatsApp</label>
-                        <input type="tel" id="telefono" required class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-cyan-500 outline-none">
+                        <label class="block text-xs font-bold text-slate-600 uppercase">Email (per Fattura)</label>
+                        <input type="email" id="email" required placeholder="mario@email.it" class="w-full mt-1 p-2 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
                     </div>
-                </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 uppercase">Email (per Fattura)</label>
-                    <input type="email" id="email" required class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-cyan-500 outline-none">
-                </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase">Barca</label>
+                            <select id="barca" class="w-full mt-1 p-2 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none bg-white">
+                                <option>Gozzo Marlin 1</option>
+                                <option>Gozzo Marlin 2</option>
+                                <option>Manta 500 (40 CV)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase">Importo (€)</label>
+                            <input type="number" id="importo" required placeholder="150" class="w-full mt-1 p-2 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                        </div>
+                    </div>
 
-                <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 uppercase">Barca Assegnata</label>
-                        <select id="barca" class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-cyan-500 outline-none bg-white">
-                            <option>Marlin 1 (Senza Patente)</option>
-                            <option>Marlin 2 (Senza Patente)</option>
-                            <option>Poseidon 3 (Con Skipper)</option>
-                        </select>
+                        <label class="block text-xs font-bold text-slate-600 uppercase">Data Noleggio</label>
+                        <input type="date" id="data_noleggio" required class="w-full mt-1 p-2 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 uppercase">Importo (€)</label>
-                        <input type="number" id="importo" required class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-cyan-500 outline-none">
-                    </div>
+
+                    <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2.5 rounded-lg shadow transition flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-save"></i> Salva Noleggio
+                    </button>
+                </form>
+            </div>
+
+            <!-- Tabella Registro Clienti -->
+            <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-md border border-slate-200">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 border-b pb-2">
+                    <h2 class="text-md font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-users text-cyan-600"></i> Registro Clienti CRM
+                    </h2>
+                    <button onclick="exportCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold flex items-center gap-1 shadow">
+                        <i class="fa-solid fa-file-excel"></i> Scarica CSV Fatture in Cloud
+                    </button>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 uppercase">Data Noleggio</label>
-                    <input type="date" id="data_noleggio" required class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-cyan-500 outline-none">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 border-b">
+                                <th class="p-2.5">Cliente</th>
+                                <th class="p-2.5">CF / P.IVA</th>
+                                <th class="p-2.5">Barca</th>
+                                <th class="p-2.5">Data</th>
+                                <th class="p-2.5">Importo</th>
+                                <th class="p-2.5">Azione</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientiTable" class="divide-y divide-slate-100">
+                            <!-- Popolato da JS -->
+                        </tbody>
+                    </table>
                 </div>
+            </div>
 
-                <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2.5 rounded shadow transition flex justify-center items-center gap-2">
-                    <i class="fa-solid fa-file-csv"></i> Salva ed Esporta per Fatture in Cloud
-                </button>
-            </form>
         </div>
 
-        <!-- Registro Clienti e Prenotazioni -->
-        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md border border-gray-200">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-list-check text-cyan-600"></i> Registro Clienti
-                </h2>
-                <button onclick="exportCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded font-semibold flex items-center gap-1 shadow">
-                    <i class="fa-solid fa-file-excel"></i> Scarica CSV Fatture in Cloud
-                </button>
-            </div>
+        <!-- SEZIONE CMS PUNTI DI INTERESSE -->
+        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
+            <h2 class="text-md font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+                <i class="fa-solid fa-map-pin text-cyan-600"></i> Gestore Punti di Interesse per i Clienti (CMS)
+            </h2>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm">
-                    <thead>
-                        <tr class="bg-slate-100 text-slate-700 border-b">
-                            <th class="p-3">Cliente</th>
-                            <th class="p-3">CF / P.IVA</th>
-                            <th class="p-3">Barca</th>
-                            <th class="p-3">Data</th>
-                            <th class="p-3">Importo</th>
-                            <th class="p-3">Azienda/Fattura</th>
-                        </tr>
-                    </thead>
-                    <tbody id="clientiTable" class="divide-y divide-gray-100">
-                        <!-- Popolato via JavaScript -->
-                    </tbody>
-                </table>
-            </div>
+            <form id="poiForm" class="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                <input type="text" id="poi_nome" placeholder="Nome Luogo (es. Grotta Azzurra)" required class="p-2 text-xs border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                <input type="text" id="poi_desc" placeholder="Breve descrizione" required class="p-2 text-xs border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                <input type="number" step="any" id="poi_lat" placeholder="Latitudine (es. 39.8731)" required class="p-2 text-xs border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                <input type="number" step="any" id="poi_lng" placeholder="Longitudine (es. 15.7735)" required class="p-2 text-xs border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-2 rounded-lg shadow transition">
+                    + Aggiungi a Mappa
+                </button>
+            </form>
         </div>
 
     </div>
@@ -112,16 +134,20 @@
         function renderTable() {
             const tbody = document.getElementById('clientiTable');
             tbody.innerHTML = '';
+            if(clienti.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Nessun cliente registrato. Inseriscine uno dal form a sinistra!</td></tr>`;
+                return;
+            }
             clienti.forEach((c, index) => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50">
-                        <td class="p-3 font-semibold">${c.nome}<br><span class="text-xs font-normal text-gray-500">${c.email}</span></td>
-                        <td class="p-3 text-xs font-mono">${c.cf_piva}</td>
-                        <td class="p-3 text-xs">${c.barca}</td>
-                        <td class="p-3 text-xs">${c.data_noleggio}</td>
-                        <td class="p-3 font-bold text-emerald-600">€${c.importo}</td>
-                        <td class="p-3">
-                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Pronto Import</span>
+                        <td class="p-2.5 font-bold">${c.nome}<br><span class="font-normal text-slate-400">${c.email}</span></td>
+                        <td class="p-2.5 font-mono">${c.cf_piva}</td>
+                        <td class="p-2.5">${c.barca}</td>
+                        <td class="p-2.5">${c.data_noleggio}</td>
+                        <td class="p-2.5 font-bold text-emerald-600">€${c.importo}</td>
+                        <td class="p-2.5">
+                            <button onclick="eliminaCliente(${index})" class="text-red-500 hover:text-red-700 font-bold"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
@@ -145,7 +171,17 @@
             this.reset();
         });
 
+        function eliminaCliente(index) {
+            clienti.splice(index, 1);
+            localStorage.setItem('nauticovi_clienti', JSON.stringify(clienti));
+            renderTable();
+        }
+
         function exportCSV() {
+            if(clienti.length === 0) {
+                alert("Nessun dato da esportare!");
+                return;
+            }
             let csv = "Nome,CodiceFiscale_PIVA,Email,Telefono,Descrizione,Importo,Data\n";
             clienti.forEach(c => {
                 csv += `"${c.nome}","${c.cf_piva}","${c.email}","${c.telefono}","Noleggio barca ${c.barca}",${c.importo},"${c.data_noleggio}"\n`;
