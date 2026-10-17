@@ -12,9 +12,6 @@
             background-size: cover;
             background-position: center;
         }
-        .review-card-slide {
-            transition: opacity 0.5s ease-in-out;
-        }
         .flag-btn {
             cursor: pointer;
             filter: grayscale(40%);
@@ -31,7 +28,7 @@
 
     <!-- HERO SECTION SCENOGRAFICA CON LOGO & COVER MARE -->
     <header class="hero-bg text-white pt-6 pb-16 px-4 text-center shadow-2xl border-b-4 border-cyan-500 relative overflow-hidden">
-        
+
         <!-- SELETTORE LINGUA CON BANDIERE -->
         <div class="max-w-md mx-auto flex justify-end gap-3 mb-6 relative z-30">
             <button onclick="setLanguage('it')" id="flag-it" class="flag-btn active bg-slate-800/80 p-1.5 rounded-full border-2 border-slate-600 shadow" title="Italiano">
@@ -46,12 +43,12 @@
         </div>
 
         <div class="max-w-md mx-auto space-y-4 relative z-10">
-            
+
             <!-- Logo & Brand Header -->
             <div class="flex flex-col items-center justify-center gap-2">
                 <img src="logo.png" alt="Nauticovi Logo" class="h-20 sm:h-24 w-auto object-contain drop-shadow-lg">
             </div>
-            
+
             <p class="text-[10px] tracking-widest text-cyan-300 font-extrabold uppercase bg-cyan-950/80 inline-block px-3.5 py-1 rounded-full border border-cyan-400/30 shadow-md" data-i18n="tagline">
                 NOLEGGIO BARCHE & SUP • PRAIA A MARE
             </p>
@@ -60,7 +57,7 @@
             <h2 class="text-2xl font-black text-white leading-tight pt-2" data-i18n="hero_title">
                 Il Tuo Mare, la Tua Barca, Zero Pensieri.
             </h2>
-            
+
             <p class="text-xs text-slate-200 max-w-xs mx-auto leading-relaxed" data-i18n="hero_desc">
                 Noleggia gommoni e scafi nuovi <b>100% senza patente</b>. Vivi l'Isola di Dino, la Grotta Azzurra e l'Arco Magno in totale autonomia.
             </p>
@@ -126,13 +123,10 @@
             </div>
         </div>
 
-                        <!-- SOCIAL PROOF & RECENSIONI REALI GOOGLE (ELFSIGHT WIDGET) -->
-        <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200 space-y-2 text-center overflow-hidden">
+        <!-- SOCIAL PROOF & RECENSIONI REALI GOOGLE (ELFSIGHT WIDGET) -->
+        <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200 space-y-3 text-center overflow-hidden">
             <script src="https://elfsightcdn.com/platform.js" async></script>
             <div class="elfsight-app-a7d2ad04-84e6-4138-bf19-05221c510fb4" data-elfsight-app-lazy></div>
-        </div>
-
-            <div class="flex justify-center items-center gap-1.5 pt-1" id="carousel-dots"></div>
 
             <div class="pt-2 border-t border-slate-100 flex justify-center items-center gap-2">
                 <a href="https://share.google/x81whRHwldPZQKUrw" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-700 hover:text-cyan-800 bg-cyan-50 px-3.5 py-2 rounded-xl border border-cyan-100 shadow-sm transition">
@@ -159,7 +153,7 @@
             </div>
         </div>
 
-            <!-- SEZIONE CONTATTI E SOCIAL (WHATSAPP, INSTAGRAM, GOOGLE) -->
+        <!-- SEZIONE CONTATTI E SOCIAL (WHATSAPP, INSTAGRAM, GOOGLE) -->
         <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3 text-center">
             <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider border-b pb-2 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-comments text-cyan-600"></i> <span data-i18n="social_section_title">Seguici & Contattaci</span>
@@ -212,13 +206,13 @@
                 dest_dino_sub: "A soli 5 minuti di navigazione dalla costa",
                 dest_arcomagno_title: "Arco Magno (San Nicola Arcella)",
                 dest_arcomagno_sub: "Un parco naturale unico incastonato nella roccia",
-                review_verified: "• Recensione verificata su Google",
                 btn_read_reviews: "Leggi tutte le Recensioni Ufficiali",
                 faq_title: "Hai Domande prima di Noleggiare?",
                 faq_q1: "E se non ho mai guidato una barca?",
                 faq_a1: "Nessun problema! Prima di salpare faremo un briefing di 5 minuti dove ti spiegheremo comandi, ancora e sicurezza.",
                 faq_q2: "Come funziona in caso di brutto tempo?",
                 faq_a2: "In caso di mare mosso o allerta meteo, la caparra del 50% viene rimborsata al 100% o la data spostata gratuitamente.",
+                social_section_title: "Seguici & Contattaci",
                 footer_sub: "Noleggio Barche & SUP senza patente",
                 admin_access: "Area Riservata Gestore"
             },
@@ -238,13 +232,13 @@
                 dest_dino_sub: "Just 5 minutes navigation from the beach",
                 dest_arcomagno_title: "Arco Magno (San Nicola Arcella)",
                 dest_arcomagno_sub: "A unique natural lagoon set into the cliffs",
-                review_verified: "• Verified review on Google",
                 btn_read_reviews: "Read all Official Reviews",
                 faq_title: "Questions before Renting?",
                 faq_q1: "What if I have never driven a boat?",
                 faq_a1: "No problem! Before sailing we will do a 5-minute briefing explaining controls, anchor and safety rules.",
                 faq_q2: "What happens in case of bad weather?",
                 faq_a2: "In case of rough sea or weather warning, your 50% deposit is 100% refunded or rescheduled for free.",
+                social_section_title: "Follow & Contact Us",
                 footer_sub: "Boat & SUP rental without license",
                 admin_access: "Manager Private Area"
             },
@@ -264,38 +258,19 @@
                 dest_dino_sub: "A solo 5 minutos de navegación",
                 dest_arcomagno_title: "Arco Magno (San Nicola Arcella)",
                 dest_arcomagno_sub: "Un parque natural único entre acantilados",
-                review_verified: "• Reseña verificada en Google",
                 btn_read_reviews: "Leer todas las Reseñas Oficiales",
                 faq_title: "¿Preguntas antes de Alquilar?",
                 faq_q1: "¿Y si nunca he conducido un barco?",
                 faq_a1: "¡Sin problema! Antes de salir te daremos una instrucción de 5 minutos sobre mandos, ancla y seguridad.",
                 faq_q2: "¿Qué pasa si hay mal tiempo?",
                 faq_a2: "En caso de mar picado o aviso meteorológico, se reembolsa el 100% de la señal o se cambia de fecha gratis.",
+                social_section_title: "Síguenos y Contáctanos",
                 footer_sub: "Alquiler de barcos y SUP sin titulación",
                 admin_access: "Área Privada Gestión"
             }
         };
 
-        const googleReviewsMultilang = {
-            it: [
-                { testo: '"Gommoni nuovi e pulitissimi, facilità unica di guida. Un tour fantastico tra Grotta Azzurra e Arco Magno!"', autore: 'Marco V.' },
-                { testo: '"Accoglienza super professionale! Ci hanno spiegato tutto prima di partire. L'Isola di Dino vista in gommone è uno spettacolo!"', autore: 'Giulia R.' },
-                { testo: '"Barche perfette, scafi in ottimo stato e frigo con ghiaccio comodissimo per le bevande al fresco. Consigliatissimo!"', autore: 'Antonio M.' }
-            ],
-            en: [
-                { testo: '"Brand new and super clean RIBs, very easy to drive. Fantastic tour around Blue Grotto and Arco Magno!"', autore: 'Mark V.' },
-                { testo: '"Super professional welcome! They explained everything before departure. Dino Island by boat is breathtaking!"', autore: 'Julia R.' },
-                { testo: '"Perfect boats, great condition and the ice cooler was very convenient for cold drinks. Highly recommended!"', autore: 'Anthony M.' }
-            ],
-            es: [
-                { testo: '"Neumáticas nuevas y muy limpias, facilísimas de llevar. ¡Un tour fantástico por la Cueva Azul y Arco Magno!"', autore: 'Marco V.' },
-                { testo: '"¡Atención superprofesional! Nos explicaron todo antes de salir. ¡La Isla de Dino vista desde la lancha es espectacular!"', autore: 'Julia R.' },
-                { testo: '"Barcos perfectos y la nevera con hielo superpráctica para llevar bebida fresca. ¡Muy recomendable!"', autore: 'Antonio M.' }
-            ]
-        };
-
         let currentLang = 'it';
-        let reviewIndex = 0;
 
         function setLanguage(lang) {
             currentLang = lang;
@@ -312,35 +287,7 @@
                     el.innerHTML = translations[lang][key];
                 }
             });
-
-            // Aggiorna carousel recensioni nella lingua selezionata
-            reviewIndex = 0;
-            updateReviewCarousel();
         }
-
-        function updateReviewCarousel() {
-            const list = googleReviewsMultilang[currentLang] || googleReviewsMultilang['it'];
-            const reviewTextEl = document.getElementById('review-text');
-            const reviewAuthorEl = document.getElementById('review-author');
-            const dotsContainer = document.getElementById('carousel-dots');
-
-            reviewTextEl.style.opacity = 0;
-            setTimeout(() => {
-                reviewTextEl.innerText = list[reviewIndex].testo;
-                reviewAuthorEl.innerText = list[reviewIndex].autore;
-                reviewTextEl.style.opacity = 1;
-
-                dotsContainer.innerHTML = list.map((_, idx) => `
-                    <span class="${idx === reviewIndex ? 'w-2.5 h-2.5 bg-cyan-600' : 'w-1.5 h-1.5 bg-slate-300'} rounded-full transition-all"></span>
-                `).join('');
-            }, 250);
-        }
-
-        setInterval(() => {
-            const list = googleReviewsMultilang[currentLang] || googleReviewsMultilang['it'];
-            reviewIndex = (reviewIndex + 1) % list.length;
-            updateReviewCarousel();
-        }, 4000);
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedLang = localStorage.getItem('nauticovi_lang') || 'it';
