@@ -13,7 +13,7 @@
     
     <style>
         #nav-map {
-            height: 380px !important;
+            height: 400px !important;
             width: 100% !important;
             border-radius: 1rem;
             z-index: 10;
@@ -22,7 +22,7 @@
             transition: transform 0.4s ease-out;
             display: flex;
             align-items: center;
-            justify-center: center;
+            justify-content: center;
         }
         .flag-btn {
             cursor: pointer;
@@ -111,22 +111,26 @@
             <div id="punti-esatti-lista" class="space-y-3 pt-1"></div>
         </div>
 
-        <!-- SEZIONE 2: NAVIGATORE GPS SMART CON ASSISTENTE GUIDA SOTTO -->
+        <!-- SEZIONE 2: NAVIGATORE GPS SMART CON ASSISTENTE GUIDA -->
         <div id="sec-navigatore" class="tab-content hidden space-y-3">
             
-            <!-- Telemetria GPS Base -->
-            <div class="bg-slate-900 text-white p-3 rounded-2xl shadow-md border border-cyan-500/30 flex justify-between items-center text-center font-mono text-xs">
+            <!-- Telemetria GPS Base con Tempo Arrivo Stimato (ETA) -->
+            <div class="bg-slate-900 text-white p-3 rounded-2xl shadow-md border border-cyan-500/30 grid grid-cols-4 gap-1 text-center font-mono text-xs">
                 <div>
                     <span class="text-[9px] text-slate-400 block uppercase" data-i18n="telemetry_speed">Velocità</span>
-                    <b class="text-cyan-400 text-base" id="live-speed">0.0 Nodi</b>
+                    <b class="text-cyan-400 text-sm" id="live-speed">0.0 Kts</b>
                 </div>
-                <div class="border-x border-slate-700 px-3">
+                <div class="border-l border-slate-700">
                     <span class="text-[9px] text-slate-400 block uppercase" data-i18n="telemetry_dist">Distanza</span>
-                    <b class="text-emerald-400 text-base" id="live-dist">---</b>
+                    <b class="text-emerald-400 text-sm" id="live-dist">---</b>
                 </div>
-                <div>
-                    <span class="text-[9px] text-slate-400 block uppercase" data-i18n="telemetry_target">Destinazione</span>
-                    <b class="text-amber-400 text-xs truncate max-w-[100px] block" id="target-poi-name" data-i18n="target_none">Nessuna</b>
+                <div class="border-l border-slate-700">
+                    <span class="text-[9px] text-slate-400 block uppercase" data-i18n="telemetry_eta">Tempo</span>
+                    <b class="text-cyan-300 text-sm" id="live-eta">--- min</b>
+                </div>
+                <div class="border-l border-slate-700">
+                    <span class="text-[9px] text-slate-400 block uppercase" data-i18n="telemetry_target">Meta</span>
+                    <b class="text-amber-400 text-[10px] truncate block" id="target-poi-name" data-i18n="target_none">Nessuna</b>
                 </div>
             </div>
 
@@ -269,6 +273,7 @@
                 btn_start_gps: "Avvia Navigatore GPS",
                 telemetry_speed: "Velocità",
                 telemetry_dist: "Distanza",
+                telemetry_eta: "Tempo",
                 telemetry_target: "Destinazione",
                 target_none: "Nessuna",
                 assistant_label: "Assistente di Rotta",
@@ -292,6 +297,7 @@
                 msg_keep_course: "Sei sulla rotta giusta! Prosegui diritto.",
                 msg_turn_right: "Gira a DESTRA per rimetterti in rotta!",
                 msg_turn_left: "Gira a SINISTRA per rimetterti in rotta!",
+                msg_near_100m: "Attenzione: Sei a meno di 100m! Riduci la velocità a motore al minimo.",
                 msg_arrived: "Sei arrivato a destinazione!"
             },
             en: {
@@ -307,6 +313,7 @@
                 btn_start_gps: "Start GPS Navigation",
                 telemetry_speed: "Speed",
                 telemetry_dist: "Distance",
+                telemetry_eta: "Time",
                 telemetry_target: "Destination",
                 target_none: "None",
                 assistant_label: "Route Assistant",
@@ -330,6 +337,7 @@
                 msg_keep_course: "On course! Keep straight ahead.",
                 msg_turn_right: "Turn RIGHT to get back on track!",
                 msg_turn_left: "Turn LEFT to get back on track!",
+                msg_near_100m: "Warning: Less than 100m away! Reduce speed to idle.",
                 msg_arrived: "You have arrived at your destination!"
             },
             es: {
@@ -345,6 +353,7 @@
                 btn_start_gps: "Iniciar Navegador GPS",
                 telemetry_speed: "Velocidad",
                 telemetry_dist: "Distancia",
+                telemetry_eta: "Tiempo",
                 telemetry_target: "Destino",
                 target_none: "Ninguno",
                 assistant_label: "Asistente de Ruta",
@@ -368,6 +377,7 @@
                 msg_keep_course: "¡Vas bien! Continúa recto.",
                 msg_turn_right: "¡Gira a la DERECHA para corregir rumbo!",
                 msg_turn_left: "¡Gira a la IZQUIERDA para corregir rumbo!",
+                msg_near_100m: "Atención: ¡A menos de 100m! Reduce la velocidad al mínimo.",
                 msg_arrived: "¡Has llegado a tu destino!"
             }
         };
@@ -403,11 +413,10 @@
         
         let lastLat = null;
         let lastLng = null;
-        let currentMovementHeading = 0; // Prua calcolata SOLO dallo spostamento reale GPS
+        let currentMovementHeading = 0;
 
-        // Calcolo della distanza in metri tra due coordinate GPS (Haversine formula)
         function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
-            const R = 6371000; // raggio terra in metri
+            const R = 6371000;
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -417,7 +426,6 @@
             return R * c;
         }
 
-        // Calcolo dell'angolo di rotta / rilevamento tra due punti in gradi (0° - 360°)
         function calculateBearing(lat1, lon1, lat2, lon2) {
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const y = Math.sin(dLon) * Math.cos(lat2 * Math.PI / 180);
@@ -512,9 +520,9 @@
             destinazioneAttiva = null;
             document.getElementById('target-poi-name').innerText = translations[currentLang].target_none;
             document.getElementById('live-dist').innerText = "---";
+            document.getElementById('live-eta').innerText = "--- min";
             document.getElementById('btn-stop-nav-top').classList.add('hidden');
             
-            // Ripristina banner guida
             document.getElementById('guidance-icon-bg').className = "w-11 h-11 bg-cyan-600/30 border border-cyan-400 rounded-xl flex items-center justify-center text-cyan-400 text-xl font-bold";
             document.getElementById('guidance-icon').className = "fa-solid fa-location-dot";
             document.getElementById('guidance-msg').innerText = translations[currentLang].assistant_select_prompt;
@@ -544,32 +552,41 @@
                 });
             });
 
+            // ICONA PERSONALIZZATA CON LA VERA FORMA DELLA BARCA (SCAFO REALISTICO STILIZZATO IN SVG)
             const boatIcon = L.divIcon({
                 className: 'boat-marker-container',
                 html: `<div id="boat-icon-inner" class="boat-marker-icon" style="transform: rotate(0deg);">
-                          <div class="bg-slate-900 text-cyan-400 p-2.5 rounded-full border-2 border-cyan-400 shadow-2xl flex items-center justify-center">
-                              <i class="fa-solid fa-location-arrow text-lg"></i>
+                          <div class="drop-shadow-2xl">
+                              <svg width="34" height="48" viewBox="0 0 34 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <!-- Scafo della Barca -->
+                                  <path d="M17 2C10 12 4 22 4 36C4 42 8 45 17 45C26 45 30 42 30 36C30 22 24 12 17 2Z" fill="#0f172a" stroke="#06b6d4" stroke-width="2.5"/>
+                                  <!-- Prendisole & Coperta -->
+                                  <path d="M17 8C13 15 9 22 9 32C9 38 12 40 17 40C22 40 25 38 25 32C25 22 21 15 17 8Z" fill="#06b6d4" opacity="0.8"/>
+                                  <!-- Parabrezza / Plancia -->
+                                  <path d="M12 24H22V27H12V24Z" fill="#ffffff"/>
+                                  <!-- Freccia Indicatrice di Prua -->
+                                  <path d="M17 11L20 18H14L17 11Z" fill="#ffffff"/>
+                              </svg>
                           </div>
                        </div>`,
-                iconSize: [36, 36],
-                iconAnchor: [18, 18]
+                iconSize: [34, 48],
+                iconAnchor: [17, 24]
             });
 
-            // GEOLOCALIZZAZIONE ED ELABORAZIONE INTELLIGENTE DELLA ROTTA
             if ("geolocation" in navigator) {
                 navigator.geolocation.watchPosition(
                     pos => {
                         const lat = pos.coords.latitude;
                         const lng = pos.coords.longitude;
-                        const speedKts = pos.coords.speed ? (pos.coords.speed * 1.94384).toFixed(1) : "0.0";
+                        const rawSpeed = pos.coords.speed || 0; // m/s
+                        const speedKts = (rawSpeed * 1.94384).toFixed(1);
 
-                        const speedUnit = currentLang === 'en' ? 'Knots' : (currentLang === 'es' ? 'Nudos' : 'Nodi');
+                        const speedUnit = currentLang === 'en' ? 'Kts' : (currentLang === 'es' ? 'Nudos' : 'Nodi');
                         document.getElementById('live-speed').innerText = `${speedKts} ${speedUnit}`;
 
-                        // 1. PRUA CALCOLATA ESCLUSIVAMENTE DAL MOVIMENTO REALE DELLA BARCA (NON DALLA BUSSOLA/CELLULARE)
+                        // Prua calcolata dallo spostamento reale GPS
                         if (lastLat !== null && lastLng !== null) {
                             const distMoved = calculateDistanceMeters(lastLat, lastLng, lat, lng);
-                            // Se la barca si è spostata di almeno 2 metri, ricalcola la vera rotta della barca
                             if (distMoved > 2) {
                                 currentMovementHeading = calculateBearing(lastLat, lastLng, lat, lng);
                                 lastLat = lat;
@@ -580,59 +597,65 @@
                             lastLng = lng;
                         }
 
-                        // Aggiorna la posizione della barca
                         if (!userMarker) {
                             userMarker = L.marker([lat, lng], { icon: boatIcon }).addTo(map);
                         } else {
                             userMarker.setLatLng([lat, lng]);
                         }
 
-                        // Ruota l'icona della barca solo secondo la prua di movimento reale
                         const boatEl = document.getElementById('boat-icon-inner');
                         if(boatEl) {
                             boatEl.style.transform = `rotate(${currentMovementHeading}deg)`;
                         }
 
-                        // 2. ASSISTENTE GUIDA INTELLIGENTE SE LA NAVIGAZIONE È ATTIVA
                         if (destinazioneAttiva) {
                             const distToTarget = calculateDistanceMeters(lat, lng, destinazioneAttiva.lat, destinazioneAttiva.lng);
                             
-                            // Mostra distanza residua in M / Km
+                            // 1. Calcolo Distanza residua
                             if (distToTarget > 1000) {
                                 document.getElementById('live-dist').innerText = (distToTarget / 1000).toFixed(1) + " Km";
                             } else {
                                 document.getElementById('live-dist').innerText = Math.round(distToTarget) + " m";
                             }
 
-                            // Rilevamento angolare verso il punto di destinazione
+                            // 2. Calcolo Tempo Stimato di Arrivo (ETA)
+                            const currentSpeedMs = rawSpeed > 0.5 ? rawSpeed : 3.5; // Se ferma, calcola su velocità crociera media (3.5 m/s ~ 7 nodi)
+                            const etaSeconds = distToTarget / currentSpeedMs;
+                            const etaMinutes = Math.ceil(etaSeconds / 60);
+                            document.getElementById('live-eta').innerText = `~${etaMinutes} min`;
+
+                            // 3. Assistente Guida e Allarme Prossimità (< 100 metri)
                             const targetBearing = calculateBearing(lat, lng, destinazioneAttiva.lat, destinazioneAttiva.lng);
-                            
-                            // Differenza d'angolo tra la direzione in cui stiamo andando e la destinazione
                             let angleDiff = (targetBearing - currentMovementHeading + 360) % 360;
-                            if (angleDiff > 180) angleDiff -= 360; // Risultato tra -180° e +180°
+                            if (angleDiff > 180) angleDiff -= 360;
 
                             const guidanceBg = document.getElementById('guidance-icon-bg');
                             const guidanceIcon = document.getElementById('guidance-icon');
                             const guidanceMsg = document.getElementById('guidance-msg');
 
-                            if (distToTarget < 50) {
-                                // ARRIVATI A DESTINAZIONE
+                            if (distToTarget < 40) {
+                                // Arrivati
                                 guidanceBg.className = "w-11 h-11 bg-emerald-500/30 border border-emerald-400 rounded-xl flex items-center justify-center text-emerald-400 text-xl font-bold animate-bounce";
                                 guidanceIcon.className = "fa-solid fa-flag-checkered";
                                 guidanceMsg.innerText = translations[currentLang].msg_arrived;
+                            } else if (distToTarget < 100) {
+                                // Allarme Prossimità 100m
+                                guidanceBg.className = "w-11 h-11 bg-amber-500/40 border border-amber-400 rounded-xl flex items-center justify-center text-amber-300 text-xl font-bold animate-pulse";
+                                guidanceIcon.className = "fa-solid fa-triangle-exclamation";
+                                guidanceMsg.innerText = translations[currentLang].msg_near_100m;
                             } else if (Math.abs(angleDiff) <= 25) {
-                                // IN ROTTA CORRETTA (DRITTO)
+                                // Rotta corretta
                                 guidanceBg.className = "w-11 h-11 bg-emerald-500/30 border border-emerald-400 rounded-xl flex items-center justify-center text-emerald-400 text-xl font-bold";
                                 guidanceIcon.className = "fa-solid fa-arrow-up";
                                 guidanceMsg.innerText = translations[currentLang].msg_keep_course;
                             } else if (angleDiff > 25) {
-                                // DESTINAZIONE A DESTRA -> GIRA A DESTRA
-                                guidanceBg.className = "w-11 h-11 bg-amber-500/30 border border-amber-400 rounded-xl flex items-center justify-center text-amber-400 text-xl font-bold animate-pulse";
+                                // Gira a Destra
+                                guidanceBg.className = "w-11 h-11 bg-cyan-600/30 border border-cyan-400 rounded-xl flex items-center justify-center text-cyan-400 text-xl font-bold animate-pulse";
                                 guidanceIcon.className = "fa-solid fa-turn-right";
                                 guidanceMsg.innerText = translations[currentLang].msg_turn_right;
                             } else if (angleDiff < -25) {
-                                // DESTINAZIONE A SINISTRA -> GIRA A SINISTRA
-                                guidanceBg.className = "w-11 h-11 bg-amber-500/30 border border-amber-400 rounded-xl flex items-center justify-center text-amber-400 text-xl font-bold animate-pulse";
+                                // Gira a Sinistra
+                                guidanceBg.className = "w-11 h-11 bg-cyan-600/30 border border-cyan-400 rounded-xl flex items-center justify-center text-cyan-400 text-xl font-bold animate-pulse";
                                 guidanceIcon.className = "fa-solid fa-turn-left";
                                 guidanceMsg.innerText = translations[currentLang].msg_turn_left;
                             }
