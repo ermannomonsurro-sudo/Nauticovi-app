@@ -22,6 +22,11 @@
             transform: scale(1.15);
             border-color: #06b6d4;
         }
+        /* Nasconde il titolo inglese predefinito del widget Elfsight */
+        .elfsight-app-a7d2ad04-84e6-4138-bf19-05221c510fb4 [class*="Header__Title"],
+        .elfsight-app-a7d2ad04-84e6-4138-bf19-05221c510fb4 [class*="Title-sc"] {
+            display: none !important;
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans pb-16">
@@ -95,42 +100,96 @@
             </div>
         </div>
 
-        <!-- ANTEPRIMA DESTINAZIONI CON IMMAGINI MOZZAFIATO -->
+        <!-- DESTINAZIONI ESPANDIBILI (ACCORDION AD 3 SLOT) -->
         <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
             <div class="flex justify-between items-center border-b pb-2">
                 <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2">
                     <i class="fa-solid fa-map-marked-alt text-cyan-600"></i> <span data-i18n="destinations_title">Le Meraviglie da Esplorare</span>
                 </h3>
-                <span class="text-[10px] text-cyan-600 font-bold">Praia a Mare</span>
+                <span class="text-[10px] text-cyan-600 font-bold" data-i18n="destinations_subtitle">Clicca per scoprire</span>
             </div>
 
-            <!-- Card Foto Destinazione 1: Isola di Dino -->
-            <div class="relative rounded-xl overflow-hidden shadow-sm h-28 group">
-                <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" alt="Isola di Dino" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent p-3 flex flex-col justify-end text-white">
-                    <b class="text-sm font-bold" data-i18n="dest_dino_title">Isola di Dino & Grotta Azzurra</b>
-                    <span class="text-[10px] text-cyan-300" data-i18n="dest_dino_sub">A soli 5 minuti di navigazione dalla costa</span>
+            <!-- SLOT 1: Isola di Dino & Grotte (Azzurra e Leone) -->
+            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm transition">
+                <button onclick="toggleSlot('slot-dino')" class="w-full text-left relative h-28 block group focus:outline-none">
+                    <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" alt="Isola di Dino" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent p-3 flex justify-between items-end text-white">
+                        <div>
+                            <b class="text-sm font-bold block" data-i18n="dest_dino_title">Isola di Dino, Grotta Azzurra & Leone</b>
+                            <span class="text-[10px] text-cyan-300" data-i18n="dest_dino_sub">A soli 5 minuti di navigazione dalla costa</span>
+                        </div>
+                        <i id="icon-slot-dino" class="fa-solid fa-chevron-down text-cyan-400 text-xs transition-transform duration-300"></i>
+                    </div>
+                </button>
+                <div id="slot-dino" class="hidden p-4 bg-slate-50 border-t border-slate-200 text-xs text-slate-600 space-y-2">
+                    <p data-i18n="dest_dino_desc">
+                        L'Isola di Dino è il simbolo di Praia a Mare. Circumnavigandola potrai entrare nella maestosa <b>Grotta Azzurra</b> per fare il bagno in acque cristalline ed esplorare la spettacolare <b>Grotta del Leone</b>, famosa per la roccia naturale a forma di leone ruggente.
+                    </p>
+                    <div class="flex items-center gap-2 text-[10px] text-cyan-700 font-bold bg-cyan-100/60 p-2 rounded-lg">
+                        <i class="fa-solid fa-compass"></i> <span data-i18n="dest_dino_time">Distanza: 5 Minuti • Ideale per Snorkeling & Tuffi</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Card Foto Destinazione 2: Arco Magno -->
-            <div class="relative rounded-xl overflow-hidden shadow-sm h-28 group">
-                <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" alt="Arco Magno" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent p-3 flex flex-col justify-end text-white">
-                    <b class="text-sm font-bold" data-i18n="dest_arcomagno_title">Arco Magno (San Nicola Arcella)</b>
-                    <span class="text-[10px] text-cyan-300" data-i18n="dest_arcomagno_sub">Un parco naturale unico incastonato nella roccia</span>
+            <!-- SLOT 2: Arco Magno & San Nicola Arcella -->
+            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm transition">
+                <button onclick="toggleSlot('slot-arcomagno')" class="w-full text-left relative h-28 block group focus:outline-none">
+                    <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" alt="Arco Magno" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent p-3 flex justify-between items-end text-white">
+                        <div>
+                            <b class="text-sm font-bold block" data-i18n="dest_arcomagno_title">Arco Magno & Grotta del Saraceno</b>
+                            <span class="text-[10px] text-cyan-300" data-i18n="dest_arcomagno_sub">San Nicola Arcella • Laguna naturale incastonato nella roccia</span>
+                        </div>
+                        <i id="icon-slot-arcomagno" class="fa-solid fa-chevron-down text-cyan-400 text-xs transition-transform duration-300"></i>
+                    </div>
+                </button>
+                <div id="slot-arcomagno" class="hidden p-4 bg-slate-50 border-t border-slate-200 text-xs text-slate-600 space-y-2">
+                    <p data-i18n="dest_arcomagno_desc">
+                        L'<b>Arco Magno</b> è un maestoso arco di roccia naturale che racchiude un'incantevole caletta segreta accessibile via mare. Proseguendo scorgerai la suggestiva <b>Grotta del Saraceno</b> e la bellissima insenatura di San Nicola Arcella.
+                    </p>
+                    <div class="flex items-center gap-2 text-[10px] text-cyan-700 font-bold bg-cyan-100/60 p-2 rounded-lg">
+                        <i class="fa-solid fa-camera"></i> <span data-i18n="dest_arcomagno_time">Distanza: 12 Minuti • Scorcio Fotografico Unico</span>
+                    </div>
                 </div>
             </div>
+
+            <!-- SLOT 3: Maratea & Costa Lucana -->
+            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm transition">
+                <button onclick="toggleSlot('slot-maratea')" class="w-full text-left relative h-28 block group focus:outline-none">
+                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" alt="Costa di Maratea" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent p-3 flex justify-between items-end text-white">
+                        <div>
+                            <b class="text-sm font-bold block" data-i18n="dest_maratea_title">Costa di Maratea & Secca della Sciabella</b>
+                            <span class="text-[10px] text-cyan-300" data-i18n="dest_maratea_sub">Calette incontaminate, insenature selvagge e Cristo Redentore</span>
+                        </div>
+                        <i id="icon-slot-maratea" class="fa-solid fa-chevron-down text-cyan-400 text-xs transition-transform duration-300"></i>
+                    </div>
+                </button>
+                <div id="slot-maratea" class="hidden p-4 bg-slate-50 border-t border-slate-200 text-xs text-slate-600 space-y-2">
+                    <p data-i18n="dest_maratea_desc">
+                        Navigando verso nord raggiungi la splendida <b>Costa Tirrenica Lucana di Maratea</b>. Scoprirai la Secca della Sciabella, le spiagge nere di Castrocucco e la vista mozzafiato sul gigantesco <b>Cristo Redentore</b> che domina il mare dall'alto.
+                    </p>
+                    <div class="flex items-center gap-2 text-[10px] text-cyan-700 font-bold bg-cyan-100/60 p-2 rounded-lg">
+                        <i class="fa-solid fa-anchor"></i> <span data-i18n="dest_maratea_time">Distanza: 20 Minuti • Relax & Acque Incontaminate</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <!-- SOCIAL PROOF & RECENSIONI REALI GOOGLE (ELFSIGHT WIDGET) -->
+        <!-- SOCIAL PROOF & RECENSIONI REALI GOOGLE (ELFSIGHT WIDGET CON TITOLO ITALIANO) -->
         <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200 space-y-3 text-center overflow-hidden">
+            <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider border-b pb-2 flex items-center justify-center gap-2">
+                <i class="fa-brands fa-google text-red-500 text-sm"></i> <span data-i18n="reviews_section_title">Cosa Dicono i Nostri Clienti</span>
+            </h3>
+
+            <!-- Elfsight Google Reviews Widget -->
             <script src="https://elfsightcdn.com/platform.js" async></script>
             <div class="elfsight-app-a7d2ad04-84e6-4138-bf19-05221c510fb4" data-elfsight-app-lazy></div>
 
             <div class="pt-2 border-t border-slate-100 flex justify-center items-center gap-2">
                 <a href="https://share.google/x81whRHwldPZQKUrw" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-700 hover:text-cyan-800 bg-cyan-50 px-3.5 py-2 rounded-xl border border-cyan-100 shadow-sm transition">
-                    <i class="fa-brands fa-google text-red-500"></i> <span data-i18n="btn_read_reviews">Leggi tutte le Recensioni Ufficiali</span>
+                    <i class="fa-brands fa-google text-red-500"></i> <span data-i18n="btn_read_reviews">Leggi tutte le Recensioni Ufficiali su Google</span>
                 </a>
             </div>
         </div>
@@ -187,7 +246,7 @@
         </div>
     </footer>
 
-    <!-- DIZIONARIO DI TRADUZIONE IT / EN / ES -->
+    <!-- DIZIONARIO DI TRADUZIONE IT / EN / ES & LOGICA ACCORDION -->
     <script>
         const translations = {
             it: {
@@ -202,11 +261,21 @@
                 stat_fridge_title: "Frigo + Ghiaccio",
                 stat_fridge_sub: "Su richiesta (15€)",
                 destinations_title: "Le Meraviglie da Esplorare",
-                dest_dino_title: "Isola di Dino & Grotta Azzurra",
+                destinations_subtitle: "Clicca per scoprire",
+                dest_dino_title: "Isola di Dino, Grotta Azzurra & Leone",
                 dest_dino_sub: "A soli 5 minuti di navigazione dalla costa",
-                dest_arcomagno_title: "Arco Magno (San Nicola Arcella)",
-                dest_arcomagno_sub: "Un parco naturale unico incastonato nella roccia",
-                btn_read_reviews: "Leggi tutte le Recensioni Ufficiali",
+                dest_dino_desc: "L'Isola di Dino è il simbolo di Praia a Mare. Circumnavigandola potrai entrare nella maestosa <b>Grotta Azzurra</b> per fare il bagno in acque cristalline ed esplorare la spettacolare <b>Grotta del Leone</b>, famosa per la roccia naturale a forma di leone ruggente.",
+                dest_dino_time: "Distanza: 5 Minuti • Ideale per Snorkeling & Tuffi",
+                dest_arcomagno_title: "Arco Magno & Grotta del Saraceno",
+                dest_arcomagno_sub: "San Nicola Arcella • Laguna naturale incastonato nella roccia",
+                dest_arcomagno_desc: "L'<b>Arco Magno</b> è un maestoso arco di roccia naturale che racchiude un'incantevole caletta segreta accessibile via mare. Proseguendo scorgerai la suggestiva <b>Grotta del Saraceno</b> e la bellissima insenatura di San Nicola Arcella.",
+                dest_arcomagno_time: "Distanza: 12 Minuti • Scorcio Fotografico Unico",
+                dest_maratea_title: "Costa di Maratea & Secca della Sciabella",
+                dest_maratea_sub: "Calette incontaminate, insenature selvagge e Cristo Redentore",
+                dest_maratea_desc: "Navigando verso nord raggiungi la splendida <b>Costa Tirrenica Lucana di Maratea</b>. Scoprirai la Secca della Sciabella, le spiagge nere di Castrocucco e la vista mozzafiato sul gigantesco <b>Cristo Redentore</b> che domina il mare dall'alto.",
+                dest_maratea_time: "Distanza: 20 Minuti • Relax & Acque Incontaminate",
+                reviews_section_title: "Cosa Dicono i Nostri Clienti",
+                btn_read_reviews: "Leggi tutte le Recensioni Ufficiali su Google",
                 faq_title: "Hai Domande prima di Noleggiare?",
                 faq_q1: "E se non ho mai guidato una barca?",
                 faq_a1: "Nessun problema! Prima di salpare faremo un briefing di 5 minuti dove ti spiegheremo comandi, ancora e sicurezza.",
@@ -228,11 +297,21 @@
                 stat_fridge_title: "Ice Cooler Box",
                 stat_fridge_sub: "On request (€15)",
                 destinations_title: "Wonders to Explore",
-                dest_dino_title: "Dino Island & Blue Grotto",
+                destinations_subtitle: "Click to reveal",
+                dest_dino_title: "Dino Island, Blue Grotto & Lion Cave",
                 dest_dino_sub: "Just 5 minutes navigation from the beach",
-                dest_arcomagno_title: "Arco Magno (San Nicola Arcella)",
-                dest_arcomagno_sub: "A unique natural lagoon set into the cliffs",
-                btn_read_reviews: "Read all Official Reviews",
+                dest_dino_desc: "Dino Island is the landmark of Praia a Mare. Sailing around it, you can enter the majestic <b>Blue Grotto</b> for a swim in crystal waters and explore the breathtaking <b>Lion's Cave</b>, famous for its lion-shaped rock formation.",
+                dest_dino_time: "Distance: 5 Minutes • Ideal for Snorkeling & Diving",
+                dest_arcomagno_title: "Arco Magno & Saracen Cave",
+                dest_arcomagno_sub: "San Nicola Arcella • Natural lagoon surrounded by cliffs",
+                dest_arcomagno_desc: "<b>Arco Magno</b> is a giant natural stone arch protecting a hidden beach accessible only by sea. Continuing along the coast, you'll see the <b>Saracen Cave</b> and the gorgeous bay of San Nicola Arcella.",
+                dest_arcomagno_time: "Distance: 12 Minutes • Unique Photo Spot",
+                dest_maratea_title: "Maratea Coast & Sciabella Shoal",
+                dest_maratea_sub: "Pristine coves, wild bays and the Christ the Redeemer Statue",
+                dest_maratea_desc: "Sailing north you'll reach the stunning <b>Lucanian Coast of Maratea</b>. Discover the Sciabella Shoal, Castrocucco black sand beaches, and the breathtaking view of the giant <b>Christ the Redeemer Statue</b> towering over the sea.",
+                dest_maratea_time: "Distance: 20 Minutes • Pure Relaxation & Pristine Sea",
+                reviews_section_title: "What Our Customers Say",
+                btn_read_reviews: "Read all Official Reviews on Google",
                 faq_title: "Questions before Renting?",
                 faq_q1: "What if I have never driven a boat?",
                 faq_a1: "No problem! Before sailing we will do a 5-minute briefing explaining controls, anchor and safety rules.",
@@ -254,11 +333,21 @@
                 stat_fridge_title: "Nevera con Hielo",
                 stat_fridge_sub: "Bajo petición (15€)",
                 destinations_title: "Maravillas por Explorar",
-                dest_dino_title: "Isla de Dino y Cueva Azul",
+                destinations_subtitle: "Haz clic para descubrir",
+                dest_dino_title: "Isla de Dino, Cueva Azul y Cueva del León",
                 dest_dino_sub: "A solo 5 minutos de navegación",
-                dest_arcomagno_title: "Arco Magno (San Nicola Arcella)",
-                dest_arcomagno_sub: "Un parque natural único entre acantilados",
-                btn_read_reviews: "Leer todas las Reseñas Oficiales",
+                dest_dino_desc: "La Isla de Dino es el símbolo de Praia a Mare. Al bordearla entrarás en la majestuosa <b>Cueva Azul</b> para nadar en aguas cristalinas y explorar la <b>Cueva del León</b>, famosa por su roca con forma de león.",
+                dest_dino_time: "Distancia: 5 Minutos • Ideal para Snorkel y Saltos",
+                dest_arcomagno_title: "Arco Magno y Cueva del Saraceno",
+                dest_arcomagno_sub: "San Nicola Arcella • Laguna natural entre acantilados",
+                dest_arcomagno_desc: "El <b>Arco Magno</b> es un gran arco de piedra natural que protege una cala secreta accesible por mar. Siguiendo la costa verás la <b>Cueva del Saraceno</b> y la cala de San Nicola Arcella.",
+                dest_arcomagno_time: "Distancia: 12 Minutos • Lugar Fotográfico Único",
+                dest_maratea_title: "Costa de Maratea y Secca della Sciabella",
+                dest_maratea_sub: "Calas vírgenes, acantilados salvajes y el Cristo Redentor",
+                dest_maratea_desc: "Navegando hacia el norte llegarás a la preciosa <b>Costa de Maratea</b>. Descubrirás la Secca della Sciabella, las playas de arena negra y las vistas del colosal <b>Cristo Redentor</b> sobre la montaña.",
+                dest_maratea_time: "Distancia: 20 Minutos • Relax y Aguas Inmaculadas",
+                reviews_section_title: "Lo Que Dicen Nuestros Clientes",
+                btn_read_reviews: "Leer todas las Reseñas Oficiales en Google",
                 faq_title: "¿Preguntas antes de Alquilar?",
                 faq_q1: "¿Y si nunca he conducido un barco?",
                 faq_a1: "¡Sin problema! Antes de salir te daremos una instrucción de 5 minutos sobre mandos, ancla y seguridad.",
@@ -285,6 +374,30 @@
                 const key = el.getAttribute('data-i18n');
                 if (translations[lang][key]) {
                     el.innerHTML = translations[lang][key];
+                }
+            });
+        }
+
+        // LOGICA ACCORDION PER LE DESTINAZIONI (SI CHIUDE L'ALTRO SE SI APRE UNO)
+        function toggleSlot(slotId) {
+            const slots = ['slot-dino', 'slot-arcomagno', 'slot-maratea'];
+            
+            slots.forEach(id => {
+                const contentEl = document.getElementById(id);
+                const iconEl = document.getElementById('icon-' + id);
+                
+                if (id === slotId) {
+                    if (contentEl.classList.contains('hidden')) {
+                        contentEl.classList.remove('hidden');
+                        if (iconEl) iconEl.style.transform = 'rotate(180deg)';
+                    } else {
+                        contentEl.classList.add('hidden');
+                        if (iconEl) iconEl.style.transform = 'rotate(0deg)';
+                    }
+                } else {
+                    // Chiude gli altri slot aperti
+                    contentEl.classList.add('hidden');
+                    if (iconEl) iconEl.style.transform = 'rotate(0deg)';
                 }
             });
         }
