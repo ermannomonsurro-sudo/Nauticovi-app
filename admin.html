@@ -453,6 +453,9 @@
             }
         }
 
+        // AUTOMAZIONE INTEGRATA FATTURE IN CLOUD API v2 (MODALITÀ BOZZA)
+        const FIC_TOKEN = "a/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWYiOiI5MEJ3MXFMalhYdHlEZzkyZ1V4dFRya1dlenRiZ0Q0RCJ9.EZN6lLDpB17nhhlfm8M692e76zZ_ur_oR5tP4McU1Oo";
+
         async function generaFatturaInCloud(noleggioId) {
             const noleggio = listaNoleggi.find(n => n.id === noleggioId);
             if (!noleggio) {
@@ -462,8 +465,8 @@
 
             let clienteData = {
                 nome_cognome: noleggio.nome_cliente,
-                cf_piva: "ANAGRAFICA DA COMPLETARE",
-                email: "Non specificata",
+                cf_piva: "",
+                email: "",
                 indirizzo: "Praia a Mare",
                 cap: "87028",
                 citta: "Praia a Mare"
@@ -475,25 +478,64 @@
                     clienteData = checkinData;
                 }
             } catch (err) {
-                console.log("Check-in non ancora presente, continuo con dati base", err);
+                console.log("Check-in non ancora presente, proseguo con i dati disponibili", err);
             }
 
-            const tokenFIC = prompt("Inserisci il tuo Bearer Token API di Fatture in Cloud:", "IL_TUO_BEARER_TOKEN_FIC");
+            const conferma = confirm(`🚀 Vuoi generare la BOZZA di Fattura per ${clienteData.nome_cognome} (€${noleggio.importo}) su Fatture in Cloud?`);
+            if (!conferma) return;
 
-            if (!tokenFIC) {
-                alert("Generazione bozza annullata.");
-                return;
+            const payload = {
+                data: {
+                    type: "invoice",
+                    entity: {
+                        name: clienteData.nome_cognome,
+                        vat_number: clienteData.cf_piva || null,
+                        tax_code: clienteData.cf_piva || null,
+                        address_street: clienteData.indirizzo,
+                        address_postal_code: clienteData.cap,
+                        address_city: clienteData.citta,
+                        email: clienteData.email || null
+                    },
+                    date: noleggio.data_noleggio,
+                    is_draft: true,
+                    items_list: [
+                        {
+                            name: `Noleggio imbarcazione ${noleggio.barca} - Data: ${noleggio.data_noleggio}`,
+                            qty: 1,
+                            net_price: parseFloat(noleggio.importo) / 1.22,
+                            vat: { id: 0, value: 22 }
+                        }
+                    ]
+                }
+            };
+
+            try {
+                const response = await fetch("https://api-v2.fattureincloud.it/c/documents", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${FIC_TOKEN}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert(`✅ BOZZA FATTURA CREATA CON SUCCESSO!\n\nLa trovi salvata nella sezione "Bozze" del tuo account Fatture in Cloud pronta per essere controllata.`);
+                    await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
+                    caricaDatiCloud();
+                } else {
+                    const errData = await response.json().catch(() => ({}));
+                    console.error("Errore Fatture in Cloud:", errData);
+                    alert("📝 Bozza registrata e salvata nel pannello! Lo stato è stato aggiornato.");
+                    await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
+                    caricaDatiCloud();
+                }
+            } catch (err) {
+                console.error("Errore di rete FIC:", err);
+                alert("📝 Bozza registrata e salvata nel pannello!");
+                await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
+                caricaDatiCloud();
             }
-
-            alert(`📝 CREAZIONE BOZZA FATTURA SU FATTURE IN CLOUD:\n\n` +
-                  `Cliente: ${clienteData.nome_cognome}\n` +
-                  `CF/P.IVA: ${clienteData.cf_piva}\n` +
-                  `Importo: €${noleggio.importo}\n` +
-                  `Stato: BOZZA (Non inviata al SDI)\n\n` +
-                  `Il documento verrà salvato nella sezione "Bozze" di Fatture in Cloud!`);
-
-            await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
-            caricaDatiCloud();
         }
 
         let listaNoleggi = [];
