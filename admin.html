@@ -413,7 +413,7 @@
             }
         }
 
-        // INTEGRATIVO FATTURE IN CLOUD PER REGIME FORFETTARIO (IVA 0% - ESENTE)
+        // INTEGRATIVO FATTURE IN CLOUD PER REGIME FORFETTARIO (IVA 0% - ESENTE E PAGAMENTO CONCILIATO)
         const FIC_TOKEN = "a/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWYiOiI5MEJ3MXFMalhYdHlEZzkyZ1V4dFRya1dlenRiZ0Q0RCJ9.EZN6lLDpB17nhhlfm8M692e76zZ_ur_oR5tP4McU1Oo";
         const COMPANY_ID = "944372";
 
@@ -440,7 +440,6 @@
             const conferma = confirm(`🚀 Vuoi generare la BOZZA di Fattura per ${clienteData.nome_cognome} (€${noleggio.importo}) su Fatture in Cloud?`);
             if (!conferma) return;
 
-            // Formattazione entità pulita per evitare "Invalid request" quando non c'è il check-in
             const entityData = {
                 name: clienteData.nome_cognome,
                 address_street: clienteData.indirizzo || "Praia a Mare",
@@ -449,18 +448,20 @@
             };
 
             if (clienteData.cf_piva && clienteData.cf_piva.trim() !== "") {
-                if (clienteData.cf_piva.length === 11 && !isNaN(clienteData.cf_piva)) {
-                    entityData.vat_number = clienteData.cf_piva;
+                if (clienteData.cf_piva.trim().length === 11 && !isNaN(clienteData.cf_piva.trim())) {
+                    entityData.vat_number = clienteData.cf_piva.trim();
                 } else {
-                    entityData.tax_code = clienteData.cf_piva;
+                    entityData.tax_code = clienteData.cf_piva.trim();
                 }
             }
 
             if (clienteData.email && clienteData.email.trim() !== "") {
-                entityData.email = clienteData.email;
+                entityData.email = clienteData.email.trim();
             }
 
-            // PAYLOAD REGIME FORFETTARIO (vat.id: 0, vat.value: 0 per esenzione IVA)
+            const importoTotale = parseFloat(noleggio.importo);
+
+            // PAYLOAD REGIME FORFETTARIO CON LISTA PAGAMENTI ESATTA E ALLINEATA
             const payload = {
                 data: {
                     type: "invoice",
@@ -471,8 +472,15 @@
                         {
                             name: `Noleggio imbarcazione ${noleggio.barca} - Data: ${noleggio.data_noleggio}`,
                             qty: 1,
-                            net_price: parseFloat(noleggio.importo),
+                            net_price: importoTotale,
                             vat: { id: 0, value: 0 }
+                        }
+                    ],
+                    payments_list: [
+                        {
+                            amount: importoTotale,
+                            due_date: noleggio.data_noleggio,
+                            status: "not_paid"
                         }
                     ]
                 }
