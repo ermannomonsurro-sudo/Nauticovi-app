@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // Consentiamo le chiamate dalla tua web app
+  // Gestione permessi CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -13,10 +13,6 @@ export default async function handler(req, res) {
   }
 
   const { token, companyId, payload } = req.body;
-
-  if (!token || !companyId || !payload) {
-    return res.status(400).json({ error: 'Parametri mancanti (token, companyId o payload)' });
-  }
 
   try {
     const response = await fetch(`https://api-v2.fattureincloud.it/c/${companyId}/issued_documents`, {
