@@ -65,8 +65,8 @@
 
     <main class="max-w-md mx-auto p-4 space-y-5">
 
-        <!-- Banner Benvenuto Personalizzato -->
-        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-900 rounded-2xl p-5 text-white shadow-lg border border-cyan-500/30">
+        <!-- Banner Benvenuto Personalizzato & Promemoria Rientro No-Stress -->
+        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-900 rounded-2xl p-5 text-white shadow-lg border border-cyan-500/30 space-y-3">
             <div class="flex justify-between items-start">
                 <div>
                     <span class="bg-cyan-500/20 text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-400/30" data-i18n="active_rental">Noleggio Attivo</span>
@@ -83,6 +83,15 @@
                         </a>
                     </div>
                 </div>
+            </div>
+
+            <!-- Promemoria Rientro No-Stress -->
+            <div class="bg-slate-950/60 border border-cyan-500/20 rounded-xl p-2.5 flex items-center justify-between text-xs mt-2">
+                <div class="flex items-center gap-2">
+                    <i class="fa-regular fa-clock text-cyan-400 text-sm"></i>
+                    <span class="text-[11px] text-slate-300" data-i18n="return_notice">Rientro consigliato in banchina:</span>
+                </div>
+                <b class="text-cyan-300 font-mono text-xs bg-slate-800 px-2 py-0.5 rounded border border-cyan-500/30">Ore 18:00</b>
             </div>
         </div>
 
@@ -135,8 +144,8 @@
                 </div>
             </div>
 
-            <!-- BOX GUIDA FACILE PER NON ESPERTI (MESSAGGI CHIARI) -->
-            <div id="guidance-box" class="bg-slate-900 border-2 border-cyan-500 p-3.5 rounded-2xl shadow-xl text-white flex items-center justify-between transition-all">
+            <!-- BOX GUIDA FACILE PER NON ESPERTI (CLICCABILE QUANDO NESSUNA DESTINAZIONE È ATTIVA) -->
+            <div id="guidance-box" onclick="gestisciClickAssistente()" class="bg-slate-900 border-2 border-cyan-500 p-3.5 rounded-2xl shadow-xl text-white flex items-center justify-between transition-all cursor-pointer">
                 <div class="flex items-center gap-3">
                     <div id="guidance-icon-bg" class="w-11 h-11 bg-cyan-600/30 border border-cyan-400 rounded-xl flex items-center justify-center text-cyan-400 text-xl font-bold">
                         <i id="guidance-icon" class="fa-solid fa-location-dot"></i>
@@ -146,7 +155,7 @@
                         <h4 class="text-sm font-extrabold text-white leading-tight" id="guidance-msg" data-i18n="assistant_select_prompt">Seleziona una destinazione per iniziare</h4>
                     </div>
                 </div>
-                <button id="btn-stop-nav-top" onclick="annullaNavigazione()" class="hidden bg-red-500/20 hover:bg-red-500/40 text-red-300 p-2 rounded-lg text-xs font-bold border border-red-500/30">
+                <button id="btn-stop-nav-top" onclick="event.stopPropagation(); annullaNavigazione();" class="hidden bg-red-500/20 hover:bg-red-500/40 text-red-300 p-2 rounded-lg text-xs font-bold border border-red-500/30">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -264,12 +273,14 @@
         const SUPABASE_ANON_KEY = "sb_publishable_V0B06YxZ1oW6tqg_6yx5og_OgbhxlUo";
         let _supabase;
         try { _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e){}
+
         const translations = {
             it: {
                 header_sub: "GUEST PORTAL • NAVIGATORE GPS",
                 active_rental: "Noleggio Attivo",
                 welcome_title: "Benvenuto a Bordo!",
                 boat_label: "Barca:",
+                return_notice: "Rientro consigliato in banchina:",
                 tab_dest: "Destinazioni",
                 tab_map: "Mappa GPS",
                 tab_rules: "Divieti",
@@ -310,6 +321,7 @@
                 active_rental: "Active Rental",
                 welcome_title: "Welcome Aboard!",
                 boat_label: "Boat:",
+                return_notice: "Recommended return time:",
                 tab_dest: "Destinations",
                 tab_map: "GPS Map",
                 tab_rules: "Rules",
@@ -350,6 +362,7 @@
                 active_rental: "Alquiler Activo",
                 welcome_title: "¡Bienvenido a Bordo!",
                 boat_label: "Barco:",
+                return_notice: "Regreso recomendado al muelle:",
                 tab_dest: "Destinos",
                 tab_map: "Mapa GPS",
                 tab_rules: "Reglas",
@@ -494,6 +507,12 @@
 
             if(tab === 'navigatore' && map) {
                 setTimeout(() => map.invalidateSize(), 200);
+            }
+        }
+
+        function gestisciClickAssistente() {
+            if (!destinazioneAttiva) {
+                switchTab('destinazioni');
             }
         }
 
@@ -701,17 +720,19 @@
             document.getElementById('poi-detail-card').classList.add('hidden');
         }
 
-        
-        
-        // VERIFICA VALIDITÀ E SCADENZA AUTOMATICA NOLEGGIO (SOLUZIONE B: SCADENZA ORE 22:00)
+        // VERIFICA VALIDITÀ E SCADENZA AUTOMATICA NOLEGGIO (ORE 22:00)
         function verificaScadenzaAccesso() {
             const urlParams = new URLSearchParams(window.location.search);
             const dataNoleggio = urlParams.get('date'); // Formato YYYY-MM-DD
-            const clienteNome = urlParams.get('cliente');
+            const clienteFullName = urlParams.get('cliente') || '';
             const barcaNome = urlParams.get('barca');
 
-            if (clienteNome) {
-                document.getElementById('welcome-nome').innerText = `Benvenuto ${clienteNome}!`;
+            if (clienteFullName) {
+                let primoNome = clienteFullName.trim().split(' ')[0];
+                if (primoNome) {
+                    primoNome = primoNome.charAt(0).toUpperCase() + primoNome.slice(1).toLowerCase();
+                    document.getElementById('welcome-nome').innerText = `Benvenuto ${primoNome}!`;
+                }
             }
             if (barcaNome) {
                 document.getElementById('welcome-barca').innerText = barcaNome;
@@ -723,18 +744,15 @@
             const giorno = String(oraAttuale.getDate()).padStart(2, '0');
             const dataOggiStr = `${anno}-${mese}-${giorno}`;
 
-            // Se è presente il parametro data nel link
             if (dataNoleggio) {
-                // 1. Se la data del noleggio è antecedente ad oggi, il noleggio è scaduto
                 if (dataNoleggio < dataOggiStr) {
                     mostraSchermataNoleggioScaduto(dataNoleggio, "giorno_passato");
                     return false;
                 }
 
-                // 2. Se è il giorno del noleggio, verifichiamo che l'ora attuale non abbia superato le 22:00
                 if (dataNoleggio === dataOggiStr) {
                     const oreCorrenti = oraAttuale.getHours();
-                    if (oreCorrenti >= 22) { // Dalle 22:00 in poi l'accesso viene bloccato
+                    if (oreCorrenti >= 22) {
                         mostraSchermataNoleggioScaduto(dataNoleggio, "ore_22");
                         return false;
                     }
@@ -777,8 +795,6 @@
             `;
         }
 
-
-        
         // CARICAMENTO DINAMICO DESTINAZIONI, TIPS E DIVIETI DAL CMS SUPABASE
         async function caricaCMSGuestDinamico() {
             if (typeof _supabase === 'undefined') return;
@@ -788,7 +804,6 @@
 
                 if (error || !data || data.length === 0) return;
 
-                // 1. Destinazioni dinamiche
                 const destinazioniCMS = data.filter(item => item.categoria === 'destinazioni');
                 if (destinazioniCMS.length > 0) {
                     const listContainer = document.getElementById('punti-esatti-lista');
