@@ -14,21 +14,21 @@
     <!-- SCHERMATA LOGIN ADMIN -->
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200 max-w-sm w-full space-y-4 text-center">
-            <div class="flex items-center justify-center gap-2">
-                <i class="fa-solid fa-water text-cyan-500 text-2xl"></i>
-                <h1 class="text-xl font-black text-slate-900 tracking-wider">NAUTICOVI ADMIN</h1>
+            <div class="flex flex-col items-center justify-center gap-2">
+                <img src="logo.png" alt="Nauticovi Logo" class="h-16 w-auto object-contain">
+                <h1 class="text-lg font-black text-slate-900 tracking-wider">NAUTICOVI ADMIN</h1>
             </div>
             <p class="text-xs text-slate-500">Inserisci la password riservata per accedere al gestionale cloud</p>
             <a href="index.html" class="inline-block text-xs text-cyan-600 font-bold hover:underline my-1">
                 <i class="fa-solid fa-arrow-left"></i> Torna alla Home
             </a>
             
-            <div class="space-y-3 pt-2">
-                <input type="password" id="admin-pass" placeholder="Password" onkeyup="if(event.key === 'Enter') eseguiLogin()" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
-                <button type="button" onclick="eseguiLogin()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-xs cursor-pointer active:scale-95">
+            <form onsubmit="checkLogin(event)" class="space-y-3">
+                <input type="password" id="admin-pass" placeholder="Password" required class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+                <button type="button" onclick="eseguiLogin()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl shadow transition text-xs">
                     Accedi al Gestionale
                 </button>
-            </div>
+            </form>
             <p id="login-error" class="text-xs text-red-500 hidden font-bold">Password errata!</p>
         </div>
     </div>
@@ -38,7 +38,7 @@
         <!-- Header Navbar -->
         <nav class="bg-slate-900 text-white p-4 shadow-xl border-b border-cyan-500/30 flex justify-between items-center sticky top-0 z-50">
             <div class="flex items-center space-x-3">
-                <span class="text-xl font-black tracking-widest text-cyan-400">NAUTICOVI</span>
+                <div class="flex items-center gap-2"><img src="logo.png" alt="Nauticovi" class="h-8 w-auto object-contain"><span class="text-lg font-black tracking-widest text-cyan-400">NAUTICOVI</span></div>
                 <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-bold uppercase flex items-center gap-1">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> SUPABASE CLOUD LIVE
                 </span>
@@ -208,12 +208,13 @@
             console.error("Supabase init error:", err);
         }
 
-        // TASTO ACCEDI INFALLIBILE
+        // TASTO ACCEDI / INVIO FORM INFFALLIBILE
         function eseguiLogin() {
             const passInput = document.getElementById('admin-pass');
             const passValue = passInput ? passInput.value.trim() : '';
 
             if (passValue === 'nauticovi2026') {
+                // Sblocco visivo immediato
                 const loginBox = document.getElementById('login-screen');
                 const adminBox = document.getElementById('admin-panel');
                 
@@ -226,8 +227,10 @@
                     adminBox.style.display = 'block';
                 }
 
+                // Salva lo stato di login nella sessione per evitare che si disconnetta al refresh
                 sessionStorage.setItem('nauticovi_admin_auth', 'true');
 
+                // Carica i dati in background
                 if (typeof caricaDatiCloud === 'function') {
                     caricaDatiCloud().catch(err => console.error(err));
                 }
@@ -237,6 +240,11 @@
                 if (errBox) errBox.classList.remove('hidden');
                 return false;
             }
+        }
+
+        function checkLogin(e) {
+            if (e && e.preventDefault) e.preventDefault();
+            return eseguiLogin();
         }
 
         function logout() {
@@ -256,6 +264,7 @@
             if (passInput) passInput.value = '';
         }
 
+        // Auto-login se già autenticato nella sessione
         window.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem('nauticovi_admin_auth') === 'true') {
                 const loginBox = document.getElementById('login-screen');
@@ -387,9 +396,11 @@
         }
 
         function esportaCSV() {
-            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin\n";
+            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin
+";
             listaNoleggi.forEach(n => {
-                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"\n`;
+                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"
+`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
