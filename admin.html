@@ -345,8 +345,8 @@
 
                 container.innerHTML = '';
                 data.forEach(item => {
-                    const badgeColor = item.categoria === 'destinazioni' ? 'bg-cyan-100 text-cyan-800'
-                                     : (item.categoria === 'flotta' ? 'bg-emerald-100 text-emerald-800'
+                    const badgeColor = item.categoria === 'destinazioni' ? 'bg-cyan-100 text-cyan-800' 
+                                     : (item.categoria === 'flotta' ? 'bg-emerald-100 text-emerald-800' 
                                      : (item.categoria === 'tips' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'));
 
                     container.innerHTML += `
@@ -420,7 +420,7 @@
         // ===================================================================
         // INTEGRAZIONE FATTURE IN CLOUD - REGIME FORFETTARIO
         // ===================================================================
-        const FIC_TOKEN = "a/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWYiOiJsOENHTG5XZTFhT0JjbnJHU0pZUVRmQ0JraTZqTDhzMyJ9.MhQjmdiX6GDtuDIXudpG-pQJKclpPLami2bucUFvjQ4";
+        const FIC_TOKEN = "a/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWYiOiJpbzdYb2k0SUdXQlBPREtld09yN0hmNXpYYmJUTGFMTSJ9.e7qNZkYKQ7ZpN1KlJ0dL_v9qawooluDLlKi-yF_HpdU";
         const COMPANY_ID = "944372";
         const VAT_ID_FORFETTARIO = 66;   // "Contribuenti forfettari"
         const GESTISCI_BOLLO = false;    // true = addebita 2 € di bollo sopra 77,47 € (totale pagamento +2)
