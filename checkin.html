@@ -10,27 +10,54 @@
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
     <!-- Supabase Client JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .flag-btn {
+            cursor: pointer;
+            filter: grayscale(40%);
+            transition: all 0.2s ease;
+        }
+        .flag-btn.active {
+            filter: grayscale(0%);
+            transform: scale(1.15);
+            border-color: #06b6d4;
+        }
+    </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans pb-16">
 
-    <!-- Header -->
-    <header class="bg-slate-900 text-white py-4 px-4 shadow-xl border-b-4 border-cyan-500 sticky top-0 z-50 text-center">
-        <div class="flex items-center justify-center gap-2">
-            <i class="fa-solid fa-water text-cyan-400 text-2xl"></i>
-            <h1 class="text-xl font-black tracking-widest text-white">NAUTICOVI</h1>
+    <!-- Header con Selettore Bandiere -->
+    <header class="bg-slate-900 text-white py-4 px-4 shadow-xl border-b-4 border-cyan-500 sticky top-0 z-50">
+        <div class="flex items-center justify-between max-w-md mx-auto w-full">
+            <a href="index.html" class="text-xs text-cyan-400 hover:text-white font-bold flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
+                <i class="fa-solid fa-house"></i> Home
+            </a>
+
+            <div class="text-center">
+                <div class="flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-water text-cyan-400 text-xl"></i>
+                    <h1 class="text-xl font-black tracking-widest text-white">NAUTICOVI</h1>
+                </div>
+                <p class="text-[8px] tracking-widest text-cyan-400 font-bold uppercase" data-i18n="header_sub">WEB CHECK-IN RAPIDO IMBARCO</p>
+            </div>
+
+            <!-- Bandiere Lingua -->
+            <div class="flex gap-1">
+                <button onclick="setLanguage('it')" id="flag-it" class="flag-btn active bg-slate-800 p-1 rounded-full border border-slate-600 text-xs">🇮🇹</button>
+                <button onclick="setLanguage('en')" id="flag-en" class="flag-btn bg-slate-800 p-1 rounded-full border border-slate-600 text-xs">🇬🇧</button>
+                <button onclick="setLanguage('es')" id="flag-es" class="flag-btn bg-slate-800 p-1 rounded-full border border-slate-600 text-xs">🇪🇸</button>
+            </div>
         </div>
-        <p class="text-[8px] tracking-widest text-cyan-400 font-bold uppercase">WEB CHECK-IN RAPIDO IMBARCO</p>
     </header>
 
     <main class="max-w-md mx-auto p-4 space-y-5">
 
         <!-- Banner Incoraggiante -->
         <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-900 rounded-2xl p-5 text-white shadow-lg border border-cyan-500/30 text-center space-y-2">
-            <span class="bg-emerald-500/20 text-emerald-300 text-[10px] px-3 py-1 rounded-full font-bold border border-emerald-400/30 uppercase">
+            <span class="bg-emerald-500/20 text-emerald-300 text-[10px] px-3 py-1 rounded-full font-bold border border-emerald-400/30 uppercase" data-i18n="banner_tag">
                 ⚡ Imbarco Prioritario
             </span>
-            <h2 class="text-lg font-black">Velocizza il tuo imbarco inserendo i dati!</h2>
-            <p class="text-xs text-slate-300 leading-relaxed">
+            <h2 class="text-lg font-black" data-i18n="banner_title">Velocizza il tuo imbarco inserendo i dati!</h2>
+            <p class="text-xs text-slate-300 leading-relaxed" data-i18n="banner_desc">
                 Compila i dati richiesti per il contratto di noleggio prima di arrivare in banchina. Salirai a bordo senza fare la fila!
             </p>
         </div>
@@ -39,95 +66,186 @@
         <form id="checkin-form" onsubmit="inviaCheckin(event)" class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4 text-xs">
             
             <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider border-b pb-2 flex items-center gap-2">
-                <i class="fa-solid fa-id-card text-cyan-600"></i> Dati Intestatario Contratto & Fattura
+                <i class="fa-solid fa-id-card text-cyan-600"></i> <span data-i18n="section_contract_info">Dati Intestatario Contratto & Fattura</span>
             </h3>
 
             <div>
-                <label class="block font-bold text-slate-700 uppercase">Nome e Cognome / Ragione Sociale *</label>
+                <label class="block font-bold text-slate-700 uppercase" data-i18n="label_nome">Nome e Cognome / Ragione Sociale *</label>
                 <input type="text" id="checkin-nome" required placeholder="Mario Rossi" class="w-full mt-1 p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-cyan-500">
             </div>
 
             <div class="grid grid-cols-2 gap-2">
                 <div>
-                    <label class="block font-bold text-slate-700 uppercase">Codice Fiscale / P.IVA *</label>
+                    <label class="block font-bold text-slate-700 uppercase" data-i18n="label_cf">Codice Fiscale / P.IVA *</label>
                     <input type="text" id="checkin-cf" required placeholder="RSSMRA..." class="w-full mt-1 p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-cyan-500 font-mono uppercase">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 uppercase">Telefono *</label>
+                    <label class="block font-bold text-slate-700 uppercase" data-i18n="label_tel">Telefono *</label>
                     <input type="tel" id="checkin-tel" required placeholder="+39 348..." class="w-full mt-1 p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-cyan-500">
                 </div>
             </div>
 
             <div>
-                <label class="block font-bold text-slate-700 uppercase">Email (per Invio Fattura/Ricevuta) *</label>
+                <label class="block font-bold text-slate-700 uppercase" data-i18n="label_email">Email (per Invio Fattura/Ricevuta) *</label>
                 <input type="email" id="checkin-email" required placeholder="mario.rossi@email.it" class="w-full mt-1 p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-cyan-500">
             </div>
 
             <div class="grid grid-cols-3 gap-2">
                 <div class="col-span-2">
-                    <label class="block font-bold text-slate-700 uppercase">Indirizzo di Residenza *</label>
+                    <label class="block font-bold text-slate-700 uppercase" data-i18n="label_address">Indirizzo di Residenza *</label>
                     <input type="text" id="checkin-indirizzo" required placeholder="Via Roma 12" class="w-full mt-1 p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-cyan-500">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 uppercase">CAP *</label>
+                    <label class="block font-bold text-slate-700 uppercase" data-i18n="label_zip">CAP *</label>
                     <input type="text" id="checkin-cap" required placeholder="87028" class="w-full mt-1 p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-cyan-500">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
                 <div>
-                    <label class="block font-bold text-slate-700 uppercase">Città *</label>
+                    <label class="block font-bold text-slate-700 uppercase" data-i18n="label_city">Città *</label>
                     <input type="text" id="checkin-citta" required placeholder="Praia a Mare" class="w-full mt-1 p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-cyan-500">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 uppercase">Num. Carta d'Identità / Patente *</label>
+                    <label class="block font-bold text-slate-700 uppercase" data-i18n="label_doc">Num. Carta d'Identità / Patente *</label>
                     <input type="text" id="checkin-doc" required placeholder="CA12345AA" class="w-full mt-1 p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-cyan-500 font-mono uppercase">
                 </div>
             </div>
 
             <!-- BOX FIRMA DIGITALE CON IL DITO -->
             <div class="space-y-2 pt-2 border-t">
-                <label class="block font-bold text-slate-700 uppercase">Firma Digitale per Accettazione Regole Bordo *</label>
-                <p class="text-[10px] text-slate-500">Firma all'interno del riquadro sottostante con il dito o lo stilo:</p>
+                <label class="block font-bold text-slate-700 uppercase" data-i18n="label_signature">Firma Digitale per Accettazione Regole Bordo *</label>
+                <p class="text-[10px] text-slate-500" data-i18n="signature_sub">Firma all'interno del riquadro sottostante con il dito o lo stilo:</p>
                 <div class="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 overflow-hidden relative">
                     <canvas id="signature-pad" class="w-full h-32 touch-none"></canvas>
                 </div>
                 <button type="button" onclick="clearSignature()" class="text-[10px] text-red-500 font-bold hover:underline flex items-center gap-1">
-                    <i class="fa-solid fa-eraser"></i> Cancella e Rifirma
+                    <i class="fa-solid fa-eraser"></i> <span data-i18n="btn_clear_signature">Cancella e Rifirma</span>
                 </button>
             </div>
 
             <button type="submit" id="btn-submit" class="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600 text-white font-black py-3 rounded-xl shadow-lg transition text-xs flex justify-center items-center gap-2">
-                <i class="fa-solid fa-check-circle text-base"></i> CONFERMA WEB CHECK-IN
+                <i class="fa-solid fa-check-circle text-base"></i> <span data-i18n="btn_confirm_checkin">CONFERMA WEB CHECK-IN</span>
             </button>
         </form>
 
         <div id="checkin-success" class="hidden bg-emerald-500 text-white p-6 rounded-2xl shadow-xl text-center space-y-3">
             <i class="fa-solid fa-circle-check text-4xl"></i>
-            <h3 class="text-lg font-extrabold">Web Check-in Completato!</h3>
-            <p class="text-xs opacity-90 leading-relaxed">
+            <h3 class="text-lg font-extrabold" data-i18n="success_title">Web Check-in Completato!</h3>
+            <p class="text-xs opacity-90 leading-relaxed" data-i18n="success_desc">
                 Grazie! I tuoi dati e il contratto sono stati registrati con successo nel sistema di Nauticovi. Al tuo arrivo potrai salire subito a bordo!
             </p>
-            <a href="index.html" class="inline-block bg-slate-900 text-white font-bold px-4 py-2 rounded-xl text-xs shadow">
+            <a href="index.html" class="inline-block bg-slate-900 text-white font-bold px-4 py-2 rounded-xl text-xs shadow" data-i18n="btn_back_home">
                 Torna alla Home
             </a>
         </div>
 
     </main>
 
+    <!-- DIZIONARIO MULTILINGUA CHECK-IN -->
     <script>
-        // CONFIGURAZIONE CREDENZIALI SUPABASE (Sostituire con la tua URL e ANON KEY)
         const SUPABASE_URL = "https://cbvpixcfhmedbapnvfmw.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_V0B06YxZ1oW6tqg_6yx5og_OgbhxlUo";
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        const translations = {
+            it: {
+                header_sub: "WEB CHECK-IN RAPIDO IMBARCO",
+                banner_tag: "⚡ Imbarco Prioritario",
+                banner_title: "Velocizza il tuo imbarco inserendo i dati!",
+                banner_desc: "Compila i dati richiesti per il contratto di noleggio prima di arrivare in banchina. Salirai a bordo senza fare la fila!",
+                section_contract_info: "Dati Intestatario Contratto & Fattura",
+                label_nome: "Nome e Cognome / Ragione Sociale *",
+                label_cf: "Codice Fiscale / P.IVA *",
+                label_tel: "Telefono *",
+                label_email: "Email (per Invio Fattura/Ricevuta) *",
+                label_address: "Indirizzo di Residenza *",
+                label_zip: "CAP *",
+                label_city: "Città *",
+                label_doc: "Num. Carta d'Identità / Patente *",
+                label_signature: "Firma Digitale per Accettazione Regole Bordo *",
+                signature_sub: "Firma all'interno del riquadro sottostante con il dito o lo stilo:",
+                btn_clear_signature: "Cancella e Rifirma",
+                btn_confirm_checkin: "CONFERMA WEB CHECK-IN",
+                success_title: "Web Check-in Completato!",
+                success_desc: "Grazie! I tuoi dati e il contratto sono stati registrati con successo nel sistema di Nauticovi. Al tuo arrivo potrai salire subito a bordo!",
+                btn_back_home: "Torna alla Home",
+                alert_signature_required: "Per favore, apponi la firma prima di inviare il check-in."
+            },
+            en: {
+                header_sub: "FAST BOARDING WEB CHECK-IN",
+                banner_tag: "⚡ Priority Boarding",
+                banner_title: "Speed up your boarding by entering your details!",
+                banner_desc: "Fill in the required information for the rental contract before arriving at the dock. You will board without waiting in line!",
+                section_contract_info: "Contract Holder & Invoice Details",
+                label_nome: "Full Name / Company Name *",
+                label_cf: "Tax Code / VAT Number *",
+                label_tel: "Phone Number *",
+                label_email: "Email (for Invoice/Receipt) *",
+                label_address: "Residential Address *",
+                label_zip: "Postal Code *",
+                label_city: "City *",
+                label_doc: "ID Card / Passport / Driving License *",
+                label_signature: "Digital Signature for Terms Acceptance *",
+                signature_sub: "Sign inside the box below with your finger or stylus:",
+                btn_clear_signature: "Clear & Re-sign",
+                btn_confirm_checkin: "CONFIRM WEB CHECK-IN",
+                success_title: "Web Check-in Completed!",
+                success_desc: "Thank you! Your details and contract have been successfully registered in the Nauticovi system. Upon arrival, you can board immediately!",
+                btn_back_home: "Back to Home",
+                alert_signature_required: "Please provide your signature before submitting check-in."
+            },
+            es: {
+                header_sub: "WEB CHECK-IN EMBARQUE RÁPIDO",
+                banner_tag: "⚡ Embarque Prioritario",
+                banner_title: "¡Agiliza tu embarque introduciendo tus datos!",
+                banner_desc: "Rellena los datos requeridos para el contrato de alquiler antes de llegar al muelle. ¡Embarcarás sin hacer cola!",
+                section_contract_info: "Datos del Titular del Contrato y Factura",
+                label_nome: "Nombre y Apellidos / Razón Social *",
+                label_cf: "DNI / NIF / CFF *",
+                label_tel: "Teléfono *",
+                label_email: "Correo Electrónico (para Factura) *",
+                label_address: "Dirección de Residencia *",
+                label_zip: "Código Postal *",
+                label_city: "Ciudad *",
+                label_doc: "Nº DNI / Pasaporte / Carnet de Conducir *",
+                label_signature: "Firma Digital para Aceptación de Normas *",
+                signature_sub: "Firma dentro del recuadro con el dedo o puntero:",
+                btn_clear_signature: "Borrar y Volver a Firmar",
+                btn_confirm_checkin: "CONFIRMAR WEB CHECK-IN",
+                success_title: "¡Web Check-in Completado!",
+                success_desc: "¡Gracias! Tus datos y el contrato se han registrado correctamente en el sistema de Nauticovi. A tu llegada podrás embarcar de inmediato.",
+                btn_back_home: "Volver a Inicio",
+                alert_signature_required: "Por favor, firma en el recuadro antes de enviar el check-in."
+            }
+        };
+
+        let currentLang = 'it';
         let signaturePad;
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('nauticovi_lang', lang);
+
+            document.querySelectorAll('.flag-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('flag-' + lang).classList.add('active');
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             const canvas = document.getElementById('signature-pad');
             signaturePad = new SignaturePad(canvas, {
                 backgroundColor: 'rgba(255, 255, 255, 0)'
             });
+
+            const savedLang = localStorage.getItem('nauticovi_lang') || 'it';
+            setLanguage(savedLang);
         });
 
         function clearSignature() {
@@ -138,13 +256,13 @@
             e.preventDefault();
 
             if (signaturePad.isEmpty()) {
-                alert("Per favore, apponi la firma prima di inviare il check-in.");
+                alert(translations[currentLang].alert_signature_required);
                 return;
             }
 
             const btn = document.getElementById('btn-submit');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Registrazione in corso...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> ...';
 
             const firmaData = signaturePad.toDataURL();
 
@@ -165,18 +283,16 @@
             };
 
             try {
-                // Inserimento dati nella tabella Supabase 'checkin'
                 const { data, error } = await _supabase.from('checkin').insert([payload]);
 
                 if (error) {
                     console.error("Errore Supabase:", error);
-                    alert("Errore durante il salvataggio: " + error.message);
+                    alert("Errore / Error: " + error.message);
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-check-circle text-base"></i> CONFERMA WEB CHECK-IN';
+                    btn.innerHTML = '<i class="fa-solid fa-check-circle text-base"></i> ' + translations[currentLang].btn_confirm_checkin;
                     return;
                 }
 
-                // Se c'era un noleggio associato, aggiorniamo lo stato in 'completato'
                 if (noleggioId) {
                     await _supabase.from('noleggi').update({ stato_checkin: 'completato' }).eq('id', noleggioId);
                 }
@@ -186,9 +302,9 @@
 
             } catch (err) {
                 console.error("Errore di rete:", err);
-                alert("Impossibile connettersi al database. Riprova tra un istante.");
+                alert("Errore di connessione / Connection error.");
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-check-circle text-base"></i> CONFERMA WEB CHECK-IN';
+                btn.innerHTML = '<i class="fa-solid fa-check-circle text-base"></i> ' + translations[currentLang].btn_confirm_checkin;
             }
         }
     </script>
