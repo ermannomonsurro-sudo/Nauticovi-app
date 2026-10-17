@@ -48,57 +48,7 @@
         </nav>
 
         <div class="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
-            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-3">
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-chart-line text-cyan-600"></i> Dashboard Monitoraggio Risultati
-                        </h2>
-                        <p class="text-xs text-slate-500">Statistiche e fatturato sincronizzati direttamente dal database cloud Supabase</p>
-                    </div>
-                    <select id="filtroPeriodo" onchange="caricaDatiCloud()" class="p-2 border rounded-lg bg-slate-50 font-bold text-xs text-slate-700 outline-none">
-                        <option value="tutto">Tutti i Noleggi</option>
-                        <option value="oggi">Oggi</option>
-                        <option value="mese">Mese Corrente</option>
-                    </select>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-cyan-500 flex justify-between items-center">
-                        <div>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase">Fatturato Incassato</p>
-                            <h3 class="text-2xl font-black text-cyan-400 mt-0.5" id="kpiFatturato">€0</h3>
-                        </div>
-                        <i class="fa-solid fa-euro-sign text-2xl text-slate-700"></i>
-                    </div>
-
-                    <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-emerald-500 flex justify-between items-center">
-                        <div>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase">Noleggi Registrati</p>
-                            <h3 class="text-2xl font-black text-emerald-400 mt-0.5" id="kpiNoleggi">0</h3>
-                        </div>
-                        <i class="fa-solid fa-ship text-2xl text-slate-700"></i>
-                    </div>
-
-                    <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-amber-500 flex justify-between items-center">
-                        <div>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase">Web Check-in</p>
-                            <h3 class="text-2xl font-black text-amber-400 mt-0.5" id="kpiCheckin">0 / 0</h3>
-                        </div>
-                        <i class="fa-solid fa-id-card text-2xl text-slate-700"></i>
-                    </div>
-
-                    <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-purple-500 flex justify-between items-center">
-                        <div>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase">Incasso Medio / Barca</p>
-                            <h3 class="text-2xl font-black text-purple-400 mt-0.5" id="kpiMedio">€0</h3>
-                        </div>
-                        <i class="fa-solid fa-calculator text-2xl text-slate-700"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200">
+            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 shadow-sm">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b pb-2 gap-2">
                     <h2 class="text-md font-bold text-slate-800 flex items-center gap-2">
                         <i class="fa-solid fa-users text-cyan-600"></i> Anagrafica Noleggi & Web Check-in
@@ -132,15 +82,11 @@
 
         try {
             _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } catch (err) {
-            console.error("Supabase init error:", err);
-        }
+        } catch (err) {}
 
         function eseguiLogin() {
             const passInput = document.getElementById('admin-pass');
-            const passValue = passInput ? passInput.value.trim() : '';
-
-            if (passValue === 'nauticovi2026') {
+            if (passInput && passInput.value.trim() === 'nauticovi2026') {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('admin-panel').classList.remove('hidden');
                 sessionStorage.setItem('nauticovi_admin_auth', 'true');
@@ -166,7 +112,9 @@
             }
         });
 
+        // DATI FISSI FATTURE IN CLOUD
         const FIC_TOKEN = "a/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWYiOiI5MEJ3MXFMalhYdHlEZzkyZ1V4dFRya1dlenRiZ0Q0RCJ9.EZN6lLDpB17nhhlfm8M692e76zZ_ur_oR5tP4McU1Oo";
+        const COMPANY_ID = "944372";
 
         async function generaFatturaInCloud(noleggioId) {
             const noleggio = listaNoleggi.find(n => n.id === noleggioId);
@@ -186,12 +134,8 @@
                 if (checkinData) clienteData = checkinData;
             } catch (err) {}
 
-            let companyId = localStorage.getItem("fic_company_id");
-            if (!companyId) {
-                companyId = prompt("Inserisci il tuo ID Azienda (Company ID) di Fatture in Cloud (es. 1234567):");
-                if (!companyId) return;
-                localStorage.setItem("fic_company_id", companyId.trim());
-            }
+            const conferma = confirm(`🚀 Vuoi generare la BOZZA di Fattura per ${clienteData.nome_cognome} (€${noleggio.importo}) su Fatture in Cloud?`);
+            if (!conferma) return;
 
             const payload = {
                 data: {
@@ -219,21 +163,22 @@
             };
 
             try {
-                // Chiamata alla nostra Serverless Function Vercel (senza problemi CORS)
+                // Invocazione della Serverless Function sicura
                 const res = await fetch("/api/fattura", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token: FIC_TOKEN, companyId, payload })
+                    body: JSON.stringify({ token: FIC_TOKEN, companyId: COMPANY_ID, payload })
                 });
 
                 const data = await res.json();
 
-                if (res.ok) {
-                    alert(`✅ BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${data.data.id}\nIl documento è stato salvato nelle Bozze!`);
+                if (res.ok && data.data) {
+                    alert(`✅ BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${data.data.id}\nIl documento è stato salvato nella sezione "Bozze" del tuo account Fatture in Cloud!`);
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
-                    alert(`❌ Errore Fatture in Cloud: ${data.error ? (data.error.message || JSON.stringify(data.error)) : 'Parametri non validi'}`);
+                    const msg = data.error ? (data.error.message || JSON.stringify(data.error)) : 'Parametri non validi';
+                    alert(`❌ Errore Fatture in Cloud:\n${msg}`);
                 }
             } catch (err) {
                 alert(`❌ Errore di rete: ${err.message}`);
