@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAUTICOVI - Guida alle Destinazioni & Mappa del Mare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .hero-dest {
+            background: linear-gradient(to bottom, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.95)), url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        .flag-btn {
+            cursor: pointer;
+            filter: grayscale(40%);
+            transition: all 0.2s ease;
+        }
+        .flag-btn.active {
+            filter: grayscale(0%);
+            transform: scale(1.15);
+            border-color: #06b6d4;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans pb-16">
+
+    <!-- HEADER CON BANDIERE & NAVIGAZIONE -->
+    <header class="hero-dest text-white pt-6 pb-12 px-4 shadow-xl border-b-4 border-cyan-500 relative">
+        <div class="max-w-md mx-auto flex justify-between items-center mb-6 relative z-30">
+            <a href="index.html" class="text-xs text-cyan-400 hover:text-white font-bold flex items-center gap-1.5 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700 shadow">
+                <i class="fa-solid fa-arrow-left"></i> Home
+            </a>
+
+            <!-- Bandiere Lingua -->
+            <div class="flex gap-2">
+                <button onclick="setLanguage('it')" id="flag-it" class="flag-btn active bg-slate-800/80 p-1.5 rounded-full border-2 border-slate-600 shadow" title="Italiano">🇮🇹</button>
+                <button onclick="setLanguage('en')" id="flag-en" class="flag-btn bg-slate-800/80 p-1.5 rounded-full border-2 border-slate-600 shadow" title="English">🇬🇧</button>
+                <button onclick="setLanguage('es')" id="flag-es" class="flag-btn bg-slate-800/80 p-1.5 rounded-full border-2 border-slate-600 shadow" title="Español">🇪🇸</button>
+            </div>
+        </div>
+
+        <div class="max-w-md mx-auto text-center space-y-3 relative z-10">
+            <img src="logo.png" alt="Nauticovi Logo" class="h-16 w-auto object-contain mx-auto drop-shadow-md">
+            <p class="text-[10px] tracking-widest text-cyan-300 font-extrabold uppercase bg-cyan-950/80 inline-block px-3.5 py-1 rounded-full border border-cyan-400/30 shadow" data-i18n="tagline">
+                GUIDA AL MARE • PRAIA A MARE & DINTORNI
+            </p>
+            <h1 class="text-2xl font-black text-white leading-tight" data-i18n="main_title">
+                Scopri le Meraviglie della Costa
+            </h1>
+            <p class="text-xs text-slate-300 max-w-xs mx-auto leading-relaxed" data-i18n="main_desc">
+                Cosa vedere, dove fare snorkeling e la storia dei posti più belli della Riviera dei Cedri e della Costa Lucana.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 space-y-6 -mt-6 relative z-20">
+
+        <!-- SCHEDA 1: ISOLA DI DINO -->
+        <article class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden space-y-3">
+            <div class="relative h-44">
+                <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80" alt="Isola di Dino" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent p-4 flex flex-col justify-end text-white">
+                    <span class="text-[9px] bg-cyan-500 text-slate-900 font-black uppercase px-2 py-0.5 rounded w-max mb-1">
+                        📍 Praia a Mare
+                    </span>
+                    <h2 class="text-lg font-extrabold" data-i18n="dino_card_title">Isola di Dino & Le Sue Grotte</h2>
+                </div>
+            </div>
+
+            <div class="p-4 space-y-3 text-xs leading-relaxed text-slate-600">
+                <div class="flex items-center gap-3 text-[11px] font-bold text-slate-800 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                    <div><i class="fa-solid fa-clock text-cyan-600"></i> 5 Min da Praia</div>
+                    <div>•</div>
+                    <div><i class="fa-solid fa-water text-emerald-600"></i> 6 Grotte Principali</div>
+                </div>
+
+                <p data-i18n="dino_history">
+                    L'<b>Isola di Dino</b> è una maestosa isola calcarea che sorge di fronte a Praia a Mare. Secondo antichi racconti fu teatro di scorrerie e tempeste, oltre ad ospitare in passato un tempio dedicato a Venere. Circumnavigarla in barca permette di esplorare insenature mozzafiato.
+                </p>
+
+                <div class="space-y-2 pt-1">
+                    <b class="text-slate-800 uppercase text-[10px] block tracking-wider" data-i18n="dino_highlights_title">Punti d'Interesse Imperdibili:</b>
+                    
+                    <div class="bg-cyan-50 p-2.5 rounded-xl border border-cyan-100">
+                        <b class="text-cyan-900 block" data-i18n="grotta_azzurra_title">1. Grotta Azzurra</b>
+                        <span data-i18n="grotta_azzurra_desc">La grotta più famosa dell'isola, nota per i giochi di luce dove il mare assume un colore cobalto brillante. Si può entrare lentamente con la barca o fare il bagno.</span>
+                    </div>
+
+                    <div class="bg-cyan-50 p-2.5 rounded-xl border border-cyan-100">
+                        <b class="text-cyan-900 block" data-i18n="grotta_leone_title">2. Grotta del Leone</b>
+                        <span data-i18n="grotta_leone_desc">Prende il nome da una roccia emersa dal mare che ricorda la figura di un leone ruggente sdraiato a guardia dell'isola.</span>
+                    </div>
+
+                    <div class="bg-cyan-50 p-2.5 rounded-xl border border-cyan-100">
+                        <b class="text-cyan-900 block" data-i18n="grotta_frontone_title">3. Grotta del Frontone & Monaci</b>
+                        <span data-i18n="grotta_frontone_desc">Insenature naturali perfette per fare snorkeling tra banchi di pesci e fondali ricchi di vegetazione marina.</span>
+                    </div>
+                </div>
+
+                <a href="catalogo.html" class="mt-2 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl shadow transition text-center flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-ship text-cyan-400"></i> <span data-i18n="btn_book_spot">Noleggia Barca per Isola di Dino</span>
+                </a>
+            </div>
+        </article>
+
+        <!-- SCHEDA 2: ARCO MAGNO -->
+        <article class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden space-y-3">
+            <div class="relative h-44">
+                <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=800&q=80" alt="Arco Magno" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent p-4 flex flex-col justify-end text-white">
+                    <span class="text-[9px] bg-emerald-500 text-slate-900 font-black uppercase px-2 py-0.5 rounded w-max mb-1">
+                        📍 San Nicola Arcella
+                    </span>
+                    <h2 class="text-lg font-extrabold" data-i18n="arcomagno_card_title">Arco Magno & Grotta del Saraceno</h2>
+                </div>
+            </div>
+
+            <div class="p-4 space-y-3 text-xs leading-relaxed text-slate-600">
+                <div class="flex items-center gap-3 text-[11px] font-bold text-slate-800 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                    <div><i class="fa-solid fa-clock text-cyan-600"></i> 12 Min da Praia</div>
+                    <div>•</div>
+                    <div><i class="fa-solid fa-camera text-emerald-600"></i> Laguna Naturale</div>
+                </div>
+
+                <p data-i18n="arcomagno_history">
+                    L'<b>Arco Magno</b> è un imponente arco naturale scavato nella roccia dalla forza del mare. Nel medioevo veniva utilizzato dalle navi saracene come approdo sicuro e nascosto per sbarcare sulla costa.
+                </p>
+
+                <div class="space-y-2 pt-1">
+                    <b class="text-slate-800 uppercase text-[10px] block tracking-wider" data-i18n="arcomagno_highlights_title">Cosa Rende Unico Questo Posto:</b>
+                    
+                    <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-100">
+                        <b class="text-emerald-900 block" data-i18n="laguna_arcomagno_title">Spiaggetta dell'Arco Magno</b>
+                        <span data-i18n="laguna_arcomagno_desc">Una mezza luna di ciottoli incastonata in una laguna naturale circondata da pareti rocciose alte oltre 20 metri.</span>
+                    </div>
+
+                    <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-100">
+                        <b class="text-emerald-900 block" data-i18n="grotta_saraceno_title">Grotta del Saraceno & Arco di Enea</b>
+                        <span data-i18n="grotta_saraceno_desc">Accanto all'Arco Magno troverai una sorgente di acqua dolce all'interno della grotta e l'iconico Scoglio del Saraceno.</span>
+                    </div>
+                </div>
+
+                <a href="catalogo.html" class="mt-2 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl shadow transition text-center flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-ship text-emerald-400"></i> <span data-i18n="btn_book_spot_arco">Noleggia Barca per Arco Magno</span>
+                </a>
+            </div>
+        </article>
+
+        <!-- SCHEDA 3: MARATEA -->
+        <article class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden space-y-3">
+            <div class="relative h-44">
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80" alt="Maratea" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent p-4 flex flex-col justify-end text-white">
+                    <span class="text-[9px] bg-purple-500 text-white font-black uppercase px-2 py-0.5 rounded w-max mb-1">
+                        📍 Costa Lucana
+                    </span>
+                    <h2 class="text-lg font-extrabold" data-i18n="maratea_card_title">Costa di Maratea & Cristo Redentore</h2>
+                </div>
+            </div>
+
+            <div class="p-4 space-y-3 text-xs leading-relaxed text-slate-600">
+                <div class="flex items-center gap-3 text-[11px] font-bold text-slate-800 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                    <div><i class="fa-solid fa-clock text-cyan-600"></i> 20 Min da Praia</div>
+                    <div>•</div>
+                    <div><i class="fa-solid fa-mountain-sun text-purple-600"></i> Vista Panoramica</div>
+                </div>
+
+                <p data-i18n="maratea_history">
+                    Proseguendo verso nord oltre il confine calabrese si estende la spettacolare <b>Costa di Maratea</b>, caratterizzata da scogliere a picco, insenature incontaminate e le rinomate spiagge di sabbia nera di Castrocucco.
+                </p>
+
+                <div class="space-y-2 pt-1">
+                    <b class="text-slate-800 uppercase text-[10px] block tracking-wider" data-i18n="maratea_highlights_title">Elementi di Incomparabile Bellezza:</b>
+                    
+                    <div class="bg-purple-50 p-2.5 rounded-xl border border-purple-100">
+                        <b class="text-purple-900 block" data-i18n="cristo_title">Vista sul Cristo Redentore</b>
+                        <span data-i18n="cristo_desc">Dalla barca potrai ammirare la monumentale statua del Cristo Redentore alta 21 metri che domina il Golfo di Policastro dalla cima del Monte San Biagio.</span>
+                    </div>
+
+                    <div class="bg-purple-50 p-2.5 rounded-xl border border-purple-100">
+                        <b class="text-purple-900 block" data-i18n="sciabella_title">Secca della Sciabella & Secche Incontaminate</b>
+                        <span data-i18n="sciabella_desc">Un vero paradiso subacqueo dove fare il bagno immersi in acque limpidissime tra pesci e fondali variopinti.</span>
+                    </div>
+                </div>
+
+                <a href="catalogo.html" class="mt-2 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl shadow transition text-center flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-ship text-purple-400"></i> <span data-i18n="btn_book_spot_maratea">Noleggia Barca per Maratea</span>
+                </a>
+            </div>
+        </article>
+
+    </main>
+
+    <footer class="mt-8 text-center pb-8 border-t border-slate-200 pt-6 bg-white">
+        <p class="text-xs font-bold text-slate-700">NAUTICOVI • Praia a Mare (CS)</p>
+        <p class="text-[10px] text-slate-400 mt-0.5">Noleggio Barche & SUP senza patente</p>
+    </footer>
+
+    <!-- TRADUZIONI MULTILINGUA -->
+    <script>
+        const translations = {
+            it: {
+                tagline: "GUIDA AL MARE • PRAIA A MARE & DINTORNI",
+                main_title: "Scopri le Meraviglie della Costa",
+                main_desc: "Cosa vedere, dove fare snorkeling e la storia dei posti più belli della Riviera dei Cedri e della Costa Lucana.",
+                dino_card_title: "Isola di Dino & Le Sue Grotte",
+                dino_history: "L'<b>Isola di Dino</b> è una maestosa isola calcarea che sorge di fronte a Praia a Mare. Secondo antichi racconti fu teatro di scorrerie e tempeste, oltre ad ospitare in passato un tempio dedicato a Venere. Circumnavigarla in barca permette di esplorare insenature mozzafiato.",
+                dino_highlights_title: "Punti d'Interesse Imperdibili:",
+                grotta_azzurra_title: "1. Grotta Azzurra",
+                grotta_azzurra_desc: "La grotta più famosa dell'isola, nota per i giochi di luce dove il mare assume un colore cobalto brillante. Si può entrare lentamente con la barca o fare il bagno.",
+                grotta_leone_title: "2. Grotta del Leone",
+                grotta_leone_desc: "Prende il nome da una roccia emersa dal mare che ricorda la figura di un leone ruggente sdraiato a guardia dell'isola.",
+                grotta_frontone_title: "3. Grotta del Frontone & Monaci",
+                grotta_frontone_desc: "Insenature naturali perfette per fare snorkeling tra banchi di pesci e fondali ricchi di vegetazione marina.",
+                btn_book_spot: "Noleggia Barca per Isola di Dino",
+                arcomagno_card_title: "Arco Magno & Grotta del Saraceno",
+                arcomagno_history: "L'<b>Arco Magno</b> è un imponente arco naturale scavato nella roccia dalla forza del mare. Nel medioevo veniva utilizzato dalle navi saracene come approdo sicuro e nascosto per sbarcare sulla costa.",
+                arcomagno_highlights_title: "Cosa Rende Unico Questo Posto:",
+                laguna_arcomagno_title: "Spiaggetta dell'Arco Magno",
+                laguna_arcomagno_desc: "Una mezza luna di ciottoli incastonata in una laguna naturale circondata da pareti rocciose alte oltre 20 metri.",
+                grotta_saraceno_title: "Grotta del Saraceno & Arco di Enea",
+                grotta_saraceno_desc: "Accanto all'Arco Magno troverai una sorgente di acqua dolce all'interno della grotta e l'iconico Scoglio del Saraceno.",
+                btn_book_spot_arco: "Noleggia Barca per Arco Magno",
+                maratea_card_title: "Costa di Maratea & Cristo Redentore",
+                maratea_history: "Proseguendo verso nord oltre il confine calabrese si estende la spettacolare <b>Costa di Maratea</b>, caratterizzata da scogliere a picco, insenature incontaminate e le rinomate spiagge di sabbia nera di Castrocucco.",
+                maratea_highlights_title: "Elementi di Incomparabile Bellezza:",
+                cristo_title: "Vista sul Cristo Redentore",
+                cristo_desc: "Dalla barca potrai ammirare la monumentale statua del Cristo Redentore alta 21 metri che domina il Golfo di Policastro dalla cima del Monte San Biagio.",
+                sciabella_title: "Secca della Sciabella & Secche Incontaminate",
+                sciabella_desc: "Un vero paradiso subacqueo dove fare il bagno immersi in acque limpidissime tra pesci e fondali variopinti.",
+                btn_book_spot_maratea: "Noleggia Barca per Maratea"
+            },
+            en: {
+                tagline: "SEA GUIDE • PRAIA A MARE & SURROUNDINGS",
+                main_title: "Discover the Wonders of the Coast",
+                main_desc: "What to see, where to snorkel and the history of the most beautiful spots along the coast.",
+                dino_card_title: "Dino Island & Its Caves",
+                dino_history: "<b>Dino Island</b> is a majestic limestone island located in front of Praia a Mare. Sailing around it allows you to explore breathtaking sea caves and crystal clear waters.",
+                dino_highlights_title: "Unmissable Highlights:",
+                grotta_azzurra_title: "1. Blue Grotto",
+                grotta_azzurra_desc: "The most famous cave, known for light reflections creating a bright cobalt blue sea inside. You can enter slowly by boat or swim inside.",
+                grotta_leone_title: "2. Lion's Cave",
+                grotta_leone_desc: "Named after a lion-shaped rock guarding the entrance of the island.",
+                grotta_frontone_title: "3. Frontone & Monks Caves",
+                grotta_frontone_desc: "Natural coves perfect for snorkeling among fish schools.",
+                btn_book_spot: "Rent Boat for Dino Island",
+                arcomagno_card_title: "Arco Magno & Saracen Cave",
+                arcomagno_history: "<b>Arco Magno</b> is a giant stone arch carved by the sea, historically used by Saracen ships as a secret harbor.",
+                arcomagno_highlights_title: "What Makes it Unique:",
+                laguna_arcomagno_title: "Arco Magno Hidden Beach",
+                laguna_arcomagno_desc: "A pebble beach protected inside a natural lagoon with 20-meter cliff walls.",
+                grotta_saraceno_title: "Saracen Cave & Enea Arch",
+                grotta_saraceno_desc: "Freshwater spring inside the cave and iconic rock formations.",
+                btn_book_spot_arco: "Rent Boat for Arco Magno",
+                maratea_card_title: "Maratea Coast & Christ Statue",
+                maratea_history: "Heading north you'll reach the stunning <b>Coast of Maratea</b>, with wild cliffs and black sand beaches.",
+                maratea_highlights_title: "Breathtaking Views:",
+                cristo_title: "Christ the Redeemer View",
+                cristo_desc: "A 21-meter tall statue towering over the gulf from San Biagio mountain top.",
+                sciabella_title: "Sciabella Shoal",
+                sciabella_desc: "A underwater paradise ideal for swimming in pristine clear waters.",
+                btn_book_spot_maratea: "Rent Boat for Maratea"
+            },
+            es: {
+                tagline: "GUÍA DEL MAR • PRAIA A MARE Y ALREDEDORES",
+                main_title: "Descubre las Maravillas de la Costa",
+                main_desc: "Qué ver, dónde hacer snorkel y la historia de las mejores calas de la costa.",
+                dino_card_title: "Isla de Dino y Sus Cuevas",
+                dino_history: "La <b>Isla de Dino</b> es una isla caliza frente a Praia a Mare ideal para navegar y explorar cuevas marinas.",
+                dino_highlights_title: "Lugares Imprescindibles:",
+                grotta_azzurra_title: "1. Cueva Azul",
+                grotta_azzurra_desc: "Famosa por el color cobalto brillante de sus aguas.",
+                grotta_leone_title: "2. Cueva del León",
+                grotta_leone_desc: "Llamada así por la roca con forma de león que guarda la cueva.",
+                grotta_frontone_title: "3. Cuevas de Frontone",
+                grotta_frontone_desc: "Zonas ideales para snorkel con abundante vida marina.",
+                btn_book_spot: "Alquilar Barco para Isla de Dino",
+                arcomagno_card_title: "Arco Magno y Cueva del Saraceno",
+                arcomagno_history: "Un impresionante arco de piedra natural con una laguna secreta.",
+                arcomagno_highlights_title: "Lo Que lo Hace Único:",
+                laguna_arcomagno_title: "Playa del Arco Magno",
+                laguna_arcomagno_desc: "Una cala virgen rodeada de acantilados de más de 20 metros.",
+                grotta_saraceno_title: "Cueva del Saraceno",
+                grotta_saraceno_desc: "Fuente de agua dulce en su interior.",
+                btn_book_spot_arco: "Alquilar Barco para Arco Magno",
+                maratea_card_title: "Costa de Maratea y Cristo Redentor",
+                maratea_history: "Impresionantes acantilados y playas de arena negra en la costa de Maratea.",
+                maratea_highlights_title: "Vistas Increíbles:",
+                cristo_title: "Vista del Cristo Redentor",
+                cristo_desc: "Estatua monumental de 21 metros en la cima del monte.",
+                sciabella_title: "Bajo de Sciabella",
+                sciabella_desc: "Aguas totalmente cristalinas para bañarse.",
+                btn_book_spot_maratea: "Alquilar Barco para Maratea"
+            }
+        };
+
+        function setLanguage(lang) {
+            localStorage.setItem('nauticovi_lang', lang);
+            document.querySelectorAll('.flag-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('flag-' + lang).classList.add('active');
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('nauticovi_lang') || 'it';
+            setLanguage(savedLang);
+        });
+    </script>
+</body>
+</html>
