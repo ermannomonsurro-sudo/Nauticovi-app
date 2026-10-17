@@ -1,14 +1,13 @@
-// /api/fattura.js  (Vercel Serverless Function)
+// /api/fattura.js (Vercel Serverless Function)
 //
 // Variabili d'ambiente da impostare su Vercel (Settings -> Environment Variables):
-//   FIC_TOKEN          token API di Fatture in Cloud (con scrittura su "Fatture emesse")
+//   FIC_TOKEN         token API di Fatture in Cloud
 //   FIC_COMPANY_ID     id azienda su Fatture in Cloud
 //   SUPABASE_URL       https://cbvpixcfhmedbapnvfmw.supabase.co
 //   SUPABASE_ANON_KEY  chiave pubblica (publishable) di Supabase
-//   ADMIN_EMAIL        email dell'utente admin creato su Supabase Auth
+//   ADMIN_EMAIL        email admin separate da virgola (es. admin1@nauticovi.it, admin2@nauticovi.it)
 
 export default async function handler(req, res) {
-  // Nessun CORS aperto: pagina admin e API stanno sullo stesso dominio.
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Metodo non consentito' });
@@ -40,7 +39,12 @@ export default async function handler(req, res) {
     }
 
     const user = await userRes.json();
-    if (!user.email || user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+
+    // Splitta la lista delle email e controlla se l'utente corrente è tra quelle autorizzate
+    const emailAutorizzate = ADMIN_EMAIL.split(',').map(e => e.trim().toLowerCase());
+    const userEmail = user.email ? user.email.toLowerCase() : '';
+
+    if (!userEmail || !emailAutorizzate.includes(userEmail)) {
       return res.status(403).json({ error: 'Utente non autorizzato' });
     }
 
