@@ -65,7 +65,7 @@
 
     <main class="max-w-md mx-auto p-4 space-y-5">
 
-        <!-- Banner Benvenuto Personalizzato & Promemoria Rientro No-Stress -->
+        <!-- Banner Benvenuto Personalizzato, Tasto Rientro Banchina & Promemoria -->
         <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-900 rounded-2xl p-5 text-white shadow-lg border border-cyan-500/30 space-y-3">
             <div class="flex justify-between items-start">
                 <div>
@@ -73,7 +73,7 @@
                     <h2 class="text-xl font-extrabold mt-2" id="welcome-nome" data-i18n="welcome_title">Benvenuto a Bordo!</h2>
                     <p class="text-xs text-slate-300 mt-0.5"><span data-i18n="boat_label">Barca:</span> <span class="font-bold text-cyan-300" id="welcome-barca">Marlin 1</span></p>
                 </div>
-                <div class="text-right">
+                <div class="text-right flex flex-col items-end gap-2">
                     <div class="flex items-center gap-1.5">
                         <a href="tel:+393484364498" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1.5 rounded-lg font-bold text-xs inline-flex items-center gap-1 shadow" title="Chiama Assistenza">
                             <i class="fa-solid fa-phone"></i> <span class="hidden sm:inline">Chiama</span>
@@ -82,17 +82,57 @@
                             <i class="fa-brands fa-whatsapp text-sm"></i> <span class="hidden sm:inline">WhatsApp</span>
                         </a>
                     </div>
+                    
+                    <!-- TASTO ROTTA RIENTRO BANCHINA DI PARTENZA -->
+                    <button onclick="rottaRientroBanchina()" class="bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-extrabold px-3 py-1.5 rounded-xl shadow flex items-center gap-1.5 text-xs transition active:scale-95">
+                        <i class="fa-solid fa-anchor"></i> <span data-i18n="btn_return_base">Torna in Banchina</span>
+                    </button>
                 </div>
             </div>
 
             <!-- Promemoria Rientro No-Stress -->
-            <div class="bg-slate-950/60 border border-cyan-500/20 rounded-xl p-2.5 flex items-center justify-between text-xs mt-2">
+            <div class="bg-slate-950/60 border border-cyan-500/20 rounded-xl p-2.5 flex items-center justify-between text-xs mt-1">
                 <div class="flex items-center gap-2">
                     <i class="fa-regular fa-clock text-cyan-400 text-sm"></i>
                     <span class="text-[11px] text-slate-300" data-i18n="return_notice">Rientro consigliato in banchina:</span>
                 </div>
                 <b class="text-cyan-300 font-mono text-xs bg-slate-800 px-2 py-0.5 rounded border border-cyan-500/30">Ore 18:00</b>
             </div>
+        </div>
+
+        <!-- WIDGET METEO & MARE LIVE -->
+        <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 space-y-2.5 text-xs">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-extrabold text-slate-800 flex items-center gap-1.5 uppercase text-[11px]">
+                    <i class="fa-solid fa-cloud-sun-rain text-cyan-600"></i> <span data-i18n="weather_title">Meteo & Condizioni Mare Live</span>
+                </h3>
+                <span class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full uppercase" data-i18n="weather_status">Favorevole</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 text-center pt-1">
+                <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
+                    <span class="text-[9px] text-slate-400 uppercase font-bold block" data-i18n="weather_sea">Stato Mare</span>
+                    <b class="text-slate-800 text-xs mt-0.5 block flex items-center justify-center gap-1">
+                        🌊 <span data-i18n="weather_sea_val">Calmo (0.2m)</span>
+                    </b>
+                </div>
+                <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
+                    <span class="text-[9px] text-slate-400 uppercase font-bold block" data-i18n="weather_wind">Vento</span>
+                    <b class="text-slate-800 text-xs mt-0.5 block flex items-center justify-center gap-1">
+                        💨 <span data-i18n="weather_wind_val">NW • 5 kts</span>
+                    </b>
+                </div>
+                <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
+                    <span class="text-[9px] text-slate-400 uppercase font-bold block" data-i18n="weather_temp">Temp. Acqua</span>
+                    <b class="text-slate-800 text-xs mt-0.5 block flex items-center justify-center gap-1">
+                        🌡️ <span>24°C</span>
+                    </b>
+                </div>
+            </div>
+
+            <p class="text-[10px] text-cyan-800 bg-cyan-50 p-2 rounded-lg border border-cyan-100 font-medium" data-i18n="weather_tip">
+                💡 <b>Consiglio di Bordo:</b> Mare calmo perfetto per l'Isola di Dino e l'Arco Magno. Nel pomeriggio brezza da Nord.
+            </p>
         </div>
 
         <!-- TAB NAVIGAZIONE INTERNA -->
@@ -243,6 +283,14 @@
             </div>
         </div>
 
+        <!-- PULSANTE SOS ASSISTENZA GPS (IN FONDO ALLA PAGINA) -->
+        <div class="pt-2">
+            <button onclick="inviaSOSPosizioneGPS()" class="w-full bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white font-extrabold p-4 rounded-2xl shadow-xl flex items-center justify-center gap-2.5 text-xs transition active:scale-95 border border-red-400/40">
+                <i class="fa-solid fa-circle-radiation text-base animate-pulse"></i>
+                <span data-i18n="btn_sos_gps">🆘 SOS - Invia Posizione GPS all'Assistenza</span>
+            </button>
+        </div>
+
     </main>
 
     <!-- MODALE DI CONFERMA AVVIO NAVIGATORE -->
@@ -274,13 +322,24 @@
         let _supabase;
         try { _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e){}
 
+        const BANCHINA_PARTENZA = { id: "banchina", nome: "Banchina Noleggio Nauticovi (Praia)", lat: 39.8820, lng: 15.7760 };
+
         const translations = {
             it: {
                 header_sub: "GUEST PORTAL • NAVIGATORE GPS",
                 active_rental: "Noleggio Attivo",
                 welcome_title: "Benvenuto a Bordo!",
                 boat_label: "Barca:",
+                btn_return_base: "Torna in Banchina",
                 return_notice: "Rientro consigliato in banchina:",
+                weather_title: "Meteo & Condizioni Mare Live",
+                weather_status: "Favorevole",
+                weather_sea: "Stato Mare",
+                weather_sea_val: "Calmo (0.2m)",
+                weather_wind: "Vento",
+                weather_wind_val: "NW • 5 kts",
+                weather_temp: "Temp. Acqua",
+                weather_tip: "💡 <b>Consiglio di Bordo:</b> Mare calmo perfetto per l'Isola di Dino e l'Arco Magno. Nel pomeriggio brezza da Nord.",
                 tab_dest: "Destinazioni",
                 tab_map: "Mappa GPS",
                 tab_rules: "Divieti",
@@ -306,6 +365,7 @@
                 rule1: "<b>Distanza Bagnanti:</b> VIETATO avvicinarsi a meno di 200 metri dalle spiagge con bagnanti.",
                 rule2: "<b>Velocità nelle Grotte:</b> VIETATO entrare veloci nelle grotte. Procedere solo a motore al minimo o a remi.",
                 rule3: "<b>Protezione Fondali:</b> VIETATO gettare l'ancora sulle praterie protette di Posidonia oceanica.",
+                btn_sos_gps: "🆘 SOS - Invia Posizione GPS all'Assistenza",
                 modal_title: "Avviare Navigatore GPS?",
                 modal_sub: "Confermi di voler avviare la navigazione in tempo reale verso:",
                 btn_cancel: "Annulla",
@@ -321,7 +381,16 @@
                 active_rental: "Active Rental",
                 welcome_title: "Welcome Aboard!",
                 boat_label: "Boat:",
+                btn_return_base: "Return to Base",
                 return_notice: "Recommended return time:",
+                weather_title: "Live Weather & Sea State",
+                weather_status: "Good",
+                weather_sea: "Sea State",
+                weather_sea_val: "Calm (0.2m)",
+                weather_wind: "Wind",
+                weather_wind_val: "NW • 5 kts",
+                weather_temp: "Water Temp.",
+                weather_tip: "💡 <b>Captain Tip:</b> Perfect calm sea for Dino Island & Arco Magno. Afternoon light breeze from North.",
                 tab_dest: "Destinations",
                 tab_map: "GPS Map",
                 tab_rules: "Rules",
@@ -347,6 +416,7 @@
                 rule1: "<b>Swimmers Distance:</b> PROHIBITED to approach within 200 meters of beaches with swimmers.",
                 rule2: "<b>Caves Speed:</b> PROHIBITED to enter caves at speed. Idle engine or row only.",
                 rule3: "<b>Seabed Protection:</b> PROHIBITED to anchor on protected Posidonia seagrass meadows.",
+                btn_sos_gps: "🆘 SOS - Send GPS Location to Assistance",
                 modal_title: "Start GPS Navigation?",
                 modal_sub: "Confirm starting real-time navigation to:",
                 btn_cancel: "Cancel",
@@ -362,7 +432,16 @@
                 active_rental: "Alquiler Activo",
                 welcome_title: "¡Bienvenido a Bordo!",
                 boat_label: "Barco:",
+                btn_return_base: "Volver a Base",
                 return_notice: "Regreso recomendado al muelle:",
+                weather_title: "Meteo y Mar en Tiempo Real",
+                weather_status: "Bueno",
+                weather_sea: "Estado del Mar",
+                weather_sea_val: "Calmo (0.2m)",
+                weather_wind: "Viento",
+                weather_wind_val: "NW • 5 kts",
+                weather_temp: "Temp. Agua",
+                weather_tip: "💡 <b>Consejo de Bordo:</b> Mar en calma ideal para la Isla de Dino y el Arco Magno.",
                 tab_dest: "Destinos",
                 tab_map: "Mapa GPS",
                 tab_rules: "Reglas",
@@ -388,6 +467,7 @@
                 rule1: "<b>Distancia a Bañistas:</b> PROHIBIDO acercarse a menos de 200 metros de playas con bañistas.",
                 rule2: "<b>Velocidad en Cuevas:</b> PROHIBIDO entrar rápido en las cuevas. Solo motor al mínimo o remos.",
                 rule3: "<b>Protección del Fondo:</b> PROHIBIDO fondear sobre praderas protegidas de Posidonia.",
+                btn_sos_gps: "🆘 SOS - Enviar Ubicación GPS a Asistencia",
                 modal_title: "¿Iniciar Navegador GPS?",
                 modal_sub: "Confirma iniciar navegación en tiempo real hacia:",
                 btn_cancel: "Cancelar",
@@ -403,24 +483,24 @@
         const puntiEsattiMultilang = {
             it: [
                 { id: "arcomagno", nome: "Arco Magno (San Nicola Arcella)", cat: "Baia Naturale", desc: "Famoso arco di roccia su baia incantata. Mantenere la distanza di sicurezza dalle spiagge.", lat: 39.8456, lng: 15.7889, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" },
-                { id: "grotta_leone", nome: "Grotta del Leone", cat: "Grotta & Snorkeling", desc: "Roccia immersa con sagoma a leone. Fondale sabbioso eccezionale per l'ancoraggio.", lat: 39.8695, lng: 15.7720, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
+                { id: "anchor_dino", nome: "⚓ Ancoraggio Sabbia - Isola di Dino", cat: "Fondale Sabbioso", desc: "Area di ancoraggio sicura su sabbia a 4m di profondità. Zero rischio incastro ancora.", lat: 39.8705, lng: 15.7710, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" },
+                { id: "grotta_leone", nome: "Grotta del Leone & Snorkeling", cat: "Grotta & Snorkeling", desc: "Roccia immersa con sagoma a leone. Fondale sabbioso eccezionale per l'ancoraggio e tuffi.", lat: 39.8695, lng: 15.7720, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
                 { id: "grotta_azzurra", nome: "Grotta Azzurra (Isola di Dino)", cat: "Grotta Marina", desc: "Grotta principale dell'Isola di Dino. Entrare esclusivamente a motore al minimo o a remi.", lat: 39.8731, lng: 15.7735, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" },
-                { id: "secca_castrocucco", nome: "Secca di Castrocucco (Maratea)", cat: "Secca & Fondali", desc: "Prima insenature della costa di Maratea verso nord. Acque trasparenti ricche di pesci.", lat: 39.9000, lng: 15.7500, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
-                { id: "secca_giumenta", nome: "Secca della Giumenta (Maratea)", cat: "Punto Immersione", desc: "Spettacolare secca rocciosa sommersa lungo la costa di Maratea. Attenzione ai segnali d'onda.", lat: 39.9150, lng: 15.7380, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" }
+                { id: "secca_castrocucco", nome: "Secca di Castrocucco (Maratea)", cat: "Secca & Fondali", desc: "Prima insenature della costa di Maratea verso nord. Acque trasparenti ricche di pesci.", lat: 39.9000, lng: 15.7500, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" }
             ],
             en: [
                 { id: "arcomagno", nome: "Arco Magno (San Nicola Arcella)", cat: "Natural Bay", desc: "Famous rock arch over an enchanted bay. Keep safe distance from beaches.", lat: 39.8456, lng: 15.7889, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" },
-                { id: "grotta_leone", nome: "Lion's Cave", cat: "Cave & Snorkeling", desc: "Submerged rock with a lion silhouette. Exceptional sandy bottom for anchoring.", lat: 39.8695, lng: 15.7720, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
+                { id: "anchor_dino", nome: "⚓ Safe Sand Anchor - Dino Island", cat: "Sandy Bottom", desc: "Safe anchoring area on clear sand at 4m depth. No risk of stuck anchor.", lat: 39.8705, lng: 15.7710, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" },
+                { id: "grotta_leone", nome: "Lion's Cave & Snorkeling", cat: "Cave & Snorkeling", desc: "Submerged rock with a lion silhouette. Exceptional sandy bottom for anchoring.", lat: 39.8695, lng: 15.7720, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
                 { id: "grotta_azzurra", nome: "Blue Grotto (Dino Island)", cat: "Sea Cave", desc: "Main sea cave on Dino Island. Enter strictly with engine at idle or rowing.", lat: 39.8731, lng: 15.7735, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" },
-                { id: "secca_castrocucco", nome: "Castrocucco Reef (Maratea)", cat: "Reef & Seabed", desc: "First cove of the Maratea coast facing north. Crystal clear waters full of fish.", lat: 39.9000, lng: 15.7500, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
-                { id: "secca_giumenta", nome: "Giumenta Reef (Maratea)", cat: "Diving Spot", desc: "Spectacular submerged rocky reef along the Maratea coast.", lat: 39.9150, lng: 15.7380, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" }
+                { id: "secca_castrocucco", nome: "Castrocucco Reef (Maratea)", cat: "Reef & Seabed", desc: "First cove of the Maratea coast facing north. Crystal clear waters full of fish.", lat: 39.9000, lng: 15.7500, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" }
             ],
             es: [
                 { id: "arcomagno", nome: "Arco Magno (San Nicola Arcella)", cat: "Bahía Natural", desc: "Famoso arco de roca sobre una bahía encantada. Mantener distancia de seguridad.", lat: 39.8456, lng: 15.7889, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" },
-                { id: "grotta_leone", nome: "Cueva del León", cat: "Cueva y Snorkel", desc: "Roca sumergida con silueta de león. Fondo de arena excelente para fondear.", lat: 39.8695, lng: 15.7720, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
+                { id: "anchor_dino", nome: "⚓ Fondeo de Arena - Isla de Dino", cat: "Fondo de Arena", desc: "Zona segura para fondear sobre arena a 4m de profundidad.", lat: 39.8705, lng: 15.7710, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" },
+                { id: "grotta_leone", nome: "Cueva del León y Snorkel", cat: "Cueva y Snorkel", desc: "Roca sumergida con silueta de león. Fondo de arena excelente para fondear.", lat: 39.8695, lng: 15.7720, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
                 { id: "grotta_azzurra", nome: "Cueva Azul (Isla de Dino)", cat: "Cueva Marina", desc: "Cueva principal de la Isla de Dino. Entrar únicamente con motor al mínimo o a remos.", lat: 39.8731, lng: 15.7735, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" },
-                { id: "secca_castrocucco", nome: "Bajo de Castrocucco (Maratea)", cat: "Bajo y Fondos", desc: "Primera cala de la costa de Maratea hacia el norte. Aguas cristalinas.", lat: 39.9000, lng: 15.7500, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
-                { id: "secca_giumenta", nome: "Bajo de la Giumenta (Maratea)", cat: "Punto de Buceo", desc: "Espectacular bajo rocoso sumergido a lo largo de la costa de Maratea.", lat: 39.9150, lng: 15.7380, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" }
+                { id: "secca_castrocucco", nome: "Bajo de Castrocucco (Maratea)", cat: "Bajo y Fondos", desc: "Primera cala de la costa de Maratea hacia el norte. Aguas cristalinas.", lat: 39.9000, lng: 15.7500, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" }
             ]
         };
 
@@ -516,6 +596,25 @@
             }
         }
 
+        function rottaRientroBanchina() {
+            destinazioneSelezionata = BANCHINA_PARTENZA;
+            confermaAvvioNavigazione();
+        }
+
+        function inviaSOSPosizioneGPS() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const barcaNome = urlParams.get('barca') || 'Barca Nauticovi';
+            const clienteNome = urlParams.get('cliente') || 'Cliente';
+
+            let msg = `SOS Assistenza in mare! Ho bisogno di supporto a bordo della barca ${barcaNome} (${clienteNome}).`;
+            if (lastLat && lastLng) {
+                msg += ` Mia Posizione GPS Attuale: https://maps.google.com/?q=${lastLat},${lastLng}`;
+            }
+
+            const urlWa = `https://wa.me/393484364498?text=${encodeURIComponent(msg)}`;
+            window.open(urlWa, '_blank');
+        }
+
         function chiediConfermaNavigazione(idPoi) {
             const list = puntiEsattiMultilang[currentLang] || puntiEsattiMultilang['it'];
             destinazioneSelezionata = list.find(p => p.id === idPoi);
@@ -576,19 +675,15 @@
                 });
             });
 
-            // ICONA PERSONALIZZATA CON LA VERA FORMA DELLA BARCA (SCAFO REALISTICO STILIZZATO IN SVG)
+            // ICONA PERSONALIZZATA CON LA VERA FORMA DELLA BARCA
             const boatIcon = L.divIcon({
                 className: 'boat-marker-container',
                 html: `<div id="boat-icon-inner" class="boat-marker-icon" style="transform: rotate(0deg);">
                           <div class="drop-shadow-2xl">
                               <svg width="34" height="48" viewBox="0 0 34 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <!-- Scafo della Barca -->
                                   <path d="M17 2C10 12 4 22 4 36C4 42 8 45 17 45C26 45 30 42 30 36C30 22 24 12 17 2Z" fill="#0f172a" stroke="#06b6d4" stroke-width="2.5"/>
-                                  <!-- Prendisole & Coperta -->
                                   <path d="M17 8C13 15 9 22 9 32C9 38 12 40 17 40C22 40 25 38 25 32C25 22 21 15 17 8Z" fill="#06b6d4" opacity="0.8"/>
-                                  <!-- Parabrezza / Plancia -->
                                   <path d="M12 24H22V27H12V24Z" fill="#ffffff"/>
-                                  <!-- Freccia Indicatrice di Prua -->
                                   <path d="M17 11L20 18H14L17 11Z" fill="#ffffff"/>
                               </svg>
                           </div>
@@ -608,7 +703,6 @@
                         const speedUnit = currentLang === 'en' ? 'Kts' : (currentLang === 'es' ? 'Nudos' : 'Nodi');
                         document.getElementById('live-speed').innerText = `${speedKts} ${speedUnit}`;
 
-                        // Prua calcolata dallo spostamento reale GPS
                         if (lastLat !== null && lastLng !== null) {
                             const distMoved = calculateDistanceMeters(lastLat, lastLng, lat, lng);
                             if (distMoved > 2) {
@@ -635,20 +729,17 @@
                         if (destinazioneAttiva) {
                             const distToTarget = calculateDistanceMeters(lat, lng, destinazioneAttiva.lat, destinazioneAttiva.lng);
                             
-                            // 1. Calcolo Distanza residua
                             if (distToTarget > 1000) {
                                 document.getElementById('live-dist').innerText = (distToTarget / 1000).toFixed(1) + " Km";
                             } else {
                                 document.getElementById('live-dist').innerText = Math.round(distToTarget) + " m";
                             }
 
-                            // 2. Calcolo Tempo Stimato di Arrivo (ETA)
-                            const currentSpeedMs = rawSpeed > 0.5 ? rawSpeed : 3.5; // Se ferma, calcola su velocità crociera media (3.5 m/s ~ 7 nodi)
+                            const currentSpeedMs = rawSpeed > 0.5 ? rawSpeed : 3.5;
                             const etaSeconds = distToTarget / currentSpeedMs;
                             const etaMinutes = Math.ceil(etaSeconds / 60);
                             document.getElementById('live-eta').innerText = `~${etaMinutes} min`;
 
-                            // 3. Assistente Guida e Allarme Prossimità (< 100 metri)
                             const targetBearing = calculateBearing(lat, lng, destinazioneAttiva.lat, destinazioneAttiva.lng);
                             let angleDiff = (targetBearing - currentMovementHeading + 360) % 360;
                             if (angleDiff > 180) angleDiff -= 360;
@@ -658,27 +749,22 @@
                             const guidanceMsg = document.getElementById('guidance-msg');
 
                             if (distToTarget < 40) {
-                                // Arrivati
                                 guidanceBg.className = "w-11 h-11 bg-emerald-500/30 border border-emerald-400 rounded-xl flex items-center justify-center text-emerald-400 text-xl font-bold animate-bounce";
                                 guidanceIcon.className = "fa-solid fa-flag-checkered";
                                 guidanceMsg.innerText = translations[currentLang].msg_arrived;
                             } else if (distToTarget < 100) {
-                                // Allarme Prossimità 100m
                                 guidanceBg.className = "w-11 h-11 bg-amber-500/40 border border-amber-400 rounded-xl flex items-center justify-center text-amber-300 text-xl font-bold animate-pulse";
                                 guidanceIcon.className = "fa-solid fa-triangle-exclamation";
                                 guidanceMsg.innerText = translations[currentLang].msg_near_100m;
                             } else if (Math.abs(angleDiff) <= 25) {
-                                // Rotta corretta
                                 guidanceBg.className = "w-11 h-11 bg-emerald-500/30 border border-emerald-400 rounded-xl flex items-center justify-center text-emerald-400 text-xl font-bold";
                                 guidanceIcon.className = "fa-solid fa-arrow-up";
                                 guidanceMsg.innerText = translations[currentLang].msg_keep_course;
                             } else if (angleDiff > 25) {
-                                // Gira a Destra
                                 guidanceBg.className = "w-11 h-11 bg-cyan-600/30 border border-cyan-400 rounded-xl flex items-center justify-center text-cyan-400 text-xl font-bold animate-pulse";
                                 guidanceIcon.className = "fa-solid fa-turn-right";
                                 guidanceMsg.innerText = translations[currentLang].msg_turn_right;
                             } else if (angleDiff < -25) {
-                                // Gira a Sinistra
                                 guidanceBg.className = "w-11 h-11 bg-cyan-600/30 border border-cyan-400 rounded-xl flex items-center justify-center text-cyan-400 text-xl font-bold animate-pulse";
                                 guidanceIcon.className = "fa-solid fa-turn-left";
                                 guidanceMsg.innerText = translations[currentLang].msg_turn_left;
@@ -720,10 +806,9 @@
             document.getElementById('poi-detail-card').classList.add('hidden');
         }
 
-        // VERIFICA VALIDITÀ E SCADENZA AUTOMATICA NOLEGGIO (ORE 22:00)
         function verificaScadenzaAccesso() {
             const urlParams = new URLSearchParams(window.location.search);
-            const dataNoleggio = urlParams.get('date'); // Formato YYYY-MM-DD
+            const dataNoleggio = urlParams.get('date');
             const clienteFullName = urlParams.get('cliente') || '';
             const barcaNome = urlParams.get('barca');
 
@@ -795,7 +880,6 @@
             `;
         }
 
-        // CARICAMENTO DINAMICO DESTINAZIONI, TIPS E DIVIETI DAL CMS SUPABASE
         async function caricaCMSGuestDinamico() {
             if (typeof _supabase === 'undefined') return;
 
