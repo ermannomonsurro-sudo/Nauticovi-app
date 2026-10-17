@@ -22,7 +22,7 @@
             <a href="index.html" class="inline-block text-xs text-cyan-600 font-bold hover:underline my-1">
                 <i class="fa-solid fa-arrow-left"></i> Torna alla Home
             </a>
-            
+
             <form onsubmit="return eseguiLogin(event)" class="space-y-3 pt-2">
                 <input type="password" id="admin-pass" placeholder="Password" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none" required>
                 <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-xs cursor-pointer active:scale-95">
@@ -345,8 +345,8 @@
 
                 container.innerHTML = '';
                 data.forEach(item => {
-                    const badgeColor = item.categoria === 'destinazioni' ? 'bg-cyan-100 text-cyan-800' 
-                                     : (item.categoria === 'flotta' ? 'bg-emerald-100 text-emerald-800' 
+                    const badgeColor = item.categoria === 'destinazioni' ? 'bg-cyan-100 text-cyan-800'
+                                     : (item.categoria === 'flotta' ? 'bg-emerald-100 text-emerald-800'
                                      : (item.categoria === 'tips' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'));
 
                     container.innerHTML += `
@@ -417,13 +417,20 @@
             }
         }
 
-        // INTEGRATIVO FATTURE IN CLOUD PER REGIME FORFETTARIO (NETTO = LORDO = PAGAMENTO)
-        const FIC_TOKEN = "a/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWYiOiI5MEJ3MXFMalhYdHlEZzkyZ1V4dFRya1dlenRiZ0Q0RCJ9.EZN6lLDpB17nhhlfm8M692e76zZ_ur_oR5tP4McU1Oo";
+        // ===================================================================
+        // INTEGRAZIONE FATTURE IN CLOUD - REGIME FORFETTARIO
+        // ===================================================================
+        const FIC_TOKEN = "a/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWYiOiJsOENHTG5XZTFhT0JjbnJHU0pZUVRmQ0JraTZqTDhzMyJ9.MhQjmdiX6GDtuDIXudpG-pQJKclpPLami2bucUFvjQ4";
         const COMPANY_ID = "944372";
+        const VAT_ID_FORFETTARIO = 66;   // "Contribuenti forfettari"
+        const GESTISCI_BOLLO = false;    // true = addebita 2 € di bollo sopra 77,47 € (totale pagamento +2)
 
         async function generaFatturaInCloud(noleggioId) {
-            const noleggio = listaNoleggi.find(n => n.id === noleggioId);
-            if (!noleggio) return;
+            const noleggio = listaNoleggi.find(n => String(n.id) === String(noleggioId));
+            if (!noleggio) {
+                alert("Noleggio non trovato. Ricarica la pagina e riprova.");
+                return;
+            }
 
             let clienteData = {
                 nome_cognome: noleggio.nome_cliente,
@@ -435,62 +442,80 @@
             };
 
             try {
-                const { data: checkinData } = await _supabase.from('checkin').select('*').eq('noleggio_id', noleggioId).maybeSingle();
+                const { data: checkinData } = await _supabase
+                    .from('checkin').select('*').eq('noleggio_id', noleggioId).maybeSingle();
                 if (checkinData && checkinData.nome_cognome) {
-                    clienteData = checkinData;
+                    clienteData = { ...clienteData, ...checkinData };
                 }
             } catch (err) {}
 
-            const conferma = confirm(`🚀 Vuoi generare la BOZZA di Fattura per ${clienteData.nome_cognome} (€${noleggio.importo}) su Fatture in Cloud?`);
+            const importoTotale = Math.round(parseFloat(noleggio.importo) * 100) / 100;
+            if (!importoTotale || importoTotale <= 0) {
+                alert("Importo non valido per questo noleggio.");
+                return;
+            }
+
+            const conferma = confirm(`Vuoi generare la BOZZA di fattura per ${clienteData.nome_cognome} (€${importoTotale}) su Fatture in Cloud?`);
             if (!conferma) return;
 
+            // Anagrafica cliente
             const entityData = {
-                name: clienteData.nome_cognome,
-                address_street: clienteData.indirizzo || "Praia a Mare",
-                address_postal_code: clienteData.cap || "87028",
-                address_city: clienteData.citta || "Praia a Mare"
+                name: (clienteData.nome_cognome || noleggio.nome_cliente).trim(),
+                country: "Italia"
             };
 
-            if (clienteData.cf_piva && clienteData.cf_piva.trim() !== "") {
-                const cfClean = clienteData.cf_piva.trim();
-                if (cfClean.length === 11 && !isNaN(cfClean)) {
+            if (clienteData.indirizzo && String(clienteData.indirizzo).trim() !== "") {
+                entityData.address_street = String(clienteData.indirizzo).trim();
+            }
+            if (clienteData.cap && String(clienteData.cap).trim() !== "") {
+                entityData.address_postal_code = String(clienteData.cap).trim();
+            }
+            if (clienteData.citta && String(clienteData.citta).trim() !== "") {
+                entityData.address_city = String(clienteData.citta).trim();
+            }
+
+            if (clienteData.cf_piva && String(clienteData.cf_piva).trim() !== "") {
+                const cfClean = String(clienteData.cf_piva).trim();
+                if (cfClean.length === 11 && /^\d+$/.test(cfClean)) {
                     entityData.vat_number = cfClean;
-                } else {
+                } else if (cfClean.length >= 11) {
                     entityData.tax_code = cfClean;
                 }
             }
 
-            if (clienteData.email && clienteData.email.trim() !== "") {
-                entityData.email = clienteData.email.trim();
+            if (clienteData.email && String(clienteData.email).trim() !== "") {
+                entityData.email = String(clienteData.email).trim();
             }
 
-            // Per Forfettario: Prezzo Netto = Prezzo Lordo = Totale Pagamento
-            const importoTotale = Number(parseFloat(noleggio.importo).toFixed(2));
+            // Bollo (opzionale) e totale da pagare
+            const bollo = (GESTISCI_BOLLO && importoTotale > 77.47) ? 2 : 0;
+            const totaleDaPagare = Math.round((importoTotale + bollo) * 100) / 100;
 
-            // PAYLOAD DEFINITIVO REGIME FORFETTARIO
-            const payload = {
-                data: {
-                    type: "invoice",
-                    entity: entityData,
-                    date: noleggio.data_noleggio,
-                    is_draft: true,
-                    items_list: [
-                        {
-                            name: `Noleggio imbarcazione ${noleggio.barca} - Data: ${noleggio.data_noleggio}`,
-                            qty: 1,
-                            net_price: importoTotale,
-                            gross_price: importoTotale,
-                            vat: { id: 0, value: 0 }
-                        }
-                    ],
-                    payments_list: [
-                        {
-                            amount: importoTotale,
-                            status: "not_paid"
-                        }
-                    ]
-                }
+            const documento = {
+                type: "invoice",
+                entity: entityData,
+                date: noleggio.data_noleggio,
+                is_draft: true,
+                use_gross_prices: false,
+                items_list: [
+                    {
+                        name: `Noleggio imbarcazione ${noleggio.barca} - Data: ${noleggio.data_noleggio}`,
+                        qty: 1,
+                        net_price: importoTotale,
+                        vat: { id: VAT_ID_FORFETTARIO }
+                    }
+                ],
+                payments_list: [
+                    {
+                        amount: totaleDaPagare,
+                        due_date: noleggio.data_noleggio,
+                        status: "not_paid"
+                    }
+                ]
             };
+            if (bollo > 0) documento.stamp_duty = bollo;
+
+            const payload = { data: documento };
 
             try {
                 const res = await fetch("/api/fattura", {
@@ -502,18 +527,21 @@
                 const data = await res.json();
 
                 if (res.ok && data.data) {
-                    alert(`✅ BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${data.data.id}\nIl documento è stato salvato nella sezione "Bozze" del tuo account Fatture in Cloud!`);
+                    alert(`BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${data.data.id}\nIl documento è nella sezione "Bozze" del tuo account.`);
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
-                    const msg = data.error ? (data.error.message || JSON.stringify(data.error)) : 'Parametri non validi';
-                    alert(`❌ Errore Fatture in Cloud:\n${msg}`);
+                    console.error("Dettaglio errore risposta FIC:", data);
+                    alert("Errore Fatture in Cloud:\n" + JSON.stringify(data.error || data, null, 2));
                 }
             } catch (err) {
-                alert(`❌ Errore di rete: ${err.message}`);
+                alert("Errore di rete: " + err.message);
             }
         }
 
+        // ===================================================================
+        // DATI NOLEGGI & DASHBOARD
+        // ===================================================================
         let listaNoleggi = [];
 
         async function caricaDatiCloud() {
@@ -523,9 +551,17 @@
             try {
                 let query = _supabase.from('noleggi').select('*').order('data_noleggio', { ascending: false });
 
-                const oggi = new Date().toISOString().split('T')[0];
+                const adesso = new Date();
+                const oggi = adesso.toISOString().split('T')[0];
+
                 if (filtro === 'oggi') {
                     query = query.eq('data_noleggio', oggi);
+                } else if (filtro === 'mese') {
+                    const anno = adesso.getFullYear();
+                    const mese = String(adesso.getMonth() + 1).padStart(2, '0');
+                    const primoGiorno = `${anno}-${mese}-01`;
+                    const ultimoGiorno = new Date(anno, adesso.getMonth() + 1, 0).toISOString().split('T')[0];
+                    query = query.gte('data_noleggio', primoGiorno).lte('data_noleggio', ultimoGiorno);
                 }
 
                 const { data, error } = await query;
@@ -533,6 +569,8 @@
                     listaNoleggi = data || [];
                     aggiornaDashboardKPI(listaNoleggi);
                     renderTable(listaNoleggi);
+                } else {
+                    console.error("Errore Supabase:", error);
                 }
             } catch(err) {
                 console.error("Errore di rete:", err);
@@ -570,10 +608,10 @@
             noleggi.forEach((n) => {
                 const checkinLink = `${window.location.origin}/checkin.html?id=${n.id}`;
                 const guestLink = `${window.location.origin}/guest.html?cliente=${encodeURIComponent(n.nome_cliente)}&barca=${encodeURIComponent(n.barca)}&date=${n.data_noleggio}`;
-                
+
                 const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).\n\n⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}\n\n🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
 
-                const badgeCheckin = n.stato_checkin === 'completato' 
+                const badgeCheckin = n.stato_checkin === 'completato'
                     ? `<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">✓ Completato</span>`
                     : `<span class="bg-amber-100 text-amber-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">⌛ In Attesa</span>`;
 
