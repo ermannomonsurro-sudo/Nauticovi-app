@@ -283,8 +283,24 @@
             </div>
         </div>
 
+        <!-- BOX SCATTA & CONDIVIDI (INSTAGRAM & RECENSIONI GOOGLE) -->
+        <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200 text-center space-y-2 text-xs">
+            <b class="text-slate-800 font-extrabold flex items-center justify-center gap-1.5 uppercase text-[11px]">
+                <i class="fa-solid fa-camera-retro text-rose-500"></i> <span data-i18n="share_title">Scatta & Condividi i Tuoi Momenti</span>
+            </b>
+            <p class="text-[11px] text-slate-500" data-i18n="share_desc">Taggaci nelle tue Storie Instagram o lasciaci una recensione al rientro!</p>
+            <div class="grid grid-cols-2 gap-2 pt-1">
+                <a href="https://www.instagram.com/noleggio_barche_praia?srtk=MWxxMmp1azFvbWl5Zg==" target="_blank" class="bg-gradient-to-r from-purple-600 via-rose-500 to-amber-500 text-white font-bold py-2 px-3 rounded-xl shadow flex items-center justify-center gap-1.5 text-[11px]">
+                    <i class="fa-brands fa-instagram text-sm"></i> @nauticovi
+                </a>
+                <a href="https://share.google/x81whRHwldPZQKUrw" target="_blank" class="bg-slate-900 text-white font-bold py-2 px-3 rounded-xl shadow flex items-center justify-center gap-1.5 text-[11px]">
+                    <i class="fa-brands fa-google text-red-400 text-sm"></i> Recensione
+                </a>
+            </div>
+        </div>
+
         <!-- PULSANTE SOS ASSISTENZA GPS (IN FONDO ALLA PAGINA) -->
-        <div class="pt-2">
+        <div class="pt-1">
             <button onclick="inviaSOSPosizioneGPS()" class="w-full bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white font-extrabold p-4 rounded-2xl shadow-xl flex items-center justify-center gap-2.5 text-xs transition active:scale-95 border border-red-400/40">
                 <i class="fa-solid fa-circle-radiation text-base animate-pulse"></i>
                 <span data-i18n="btn_sos_gps">🆘 SOS - Invia Posizione GPS all'Assistenza</span>
@@ -365,11 +381,14 @@
                 rule1: "<b>Distanza Bagnanti:</b> VIETATO avvicinarsi a meno di 200 metri dalle spiagge con bagnanti.",
                 rule2: "<b>Velocità nelle Grotte:</b> VIETATO entrare veloci nelle grotte. Procedere solo a motore al minimo o a remi.",
                 rule3: "<b>Protezione Fondali:</b> VIETATO gettare l'ancora sulle praterie protette di Posidonia oceanica.",
+                share_title: "Scatta & Condividi i Tuoi Momenti",
+                share_desc: "Taggaci nelle tue Storie Instagram o lasciaci una recensione al rientro!",
                 btn_sos_gps: "🆘 SOS - Invia Posizione GPS all'Assistenza",
                 modal_title: "Avviare Navigatore GPS?",
                 modal_sub: "Confermi di voler avviare la navigazione in tempo reale verso:",
                 btn_cancel: "Annulla",
                 btn_start_confirm: "Sì, Avvia!",
+                msg_photo_spot: "📸 Sei vicino all'Arco Magno! Momento perfetto per una foto ricordo!",
                 msg_keep_course: "Sei sulla rotta giusta! Prosegui diritto.",
                 msg_turn_right: "Gira a DESTRA per rimetterti in rotta!",
                 msg_turn_left: "Gira a SINISTRA per rimetterti in rotta!",
@@ -416,11 +435,14 @@
                 rule1: "<b>Swimmers Distance:</b> PROHIBITED to approach within 200 meters of beaches with swimmers.",
                 rule2: "<b>Caves Speed:</b> PROHIBITED to enter caves at speed. Idle engine or row only.",
                 rule3: "<b>Seabed Protection:</b> PROHIBITED to anchor on protected Posidonia seagrass meadows.",
+                share_title: "Snap & Share Your Moments",
+                share_desc: "Tag us on Instagram stories or leave us a review when back!",
                 btn_sos_gps: "🆘 SOS - Send GPS Location to Assistance",
                 modal_title: "Start GPS Navigation?",
                 modal_sub: "Confirm starting real-time navigation to:",
                 btn_cancel: "Cancel",
                 btn_start_confirm: "Yes, Start!",
+                msg_photo_spot: "📸 You're near Arco Magno! Perfect spot for a photo!",
                 msg_keep_course: "On course! Keep straight ahead.",
                 msg_turn_right: "Turn RIGHT to get back on track!",
                 msg_turn_left: "Turn LEFT to get back on track!",
@@ -467,11 +489,14 @@
                 rule1: "<b>Distancia a Bañistas:</b> PROHIBIDO acercarse a menos de 200 metros de playas con bañistas.",
                 rule2: "<b>Velocidad en Cuevas:</b> PROHIBIDO entrar rápido en las cuevas. Solo motor al mínimo o remos.",
                 rule3: "<b>Protección del Fondo:</b> PROHIBIDO fondear sobre praderas protegidas de Posidonia.",
+                share_title: "Captura y Comparte Tus Fotos",
+                share_desc: "¡Etiquétanos en Instagram o déjanos una reseña al volver!",
                 btn_sos_gps: "🆘 SOS - Enviar Ubicación GPS a Asistencia",
                 modal_title: "¿Iniciar Navegador GPS?",
                 modal_sub: "Confirma iniciar navegación en tiempo real hacia:",
                 btn_cancel: "Cancelar",
                 btn_start_confirm: "¡Sí, Iniciar!",
+                msg_photo_spot: "📸 ¡Cerca del Arco Magno! Momento ideal para una foto.",
                 msg_keep_course: "¡Vas bien! Continúa recto.",
                 msg_turn_right: "¡Gira a la DERECHA para corregir rumbo!",
                 msg_turn_left: "¡Gira a la IZQUIERDA para corregir rumbo!",
@@ -748,7 +773,12 @@
                             const guidanceIcon = document.getElementById('guidance-icon');
                             const guidanceMsg = document.getElementById('guidance-msg');
 
-                            if (distToTarget < 40) {
+                            // NOTIFICA FOTO SPOT VICINO AD ARCO MAGNO O GROTTA AZZURRA (< 150m)
+                            if (destinazioneAttiva.id === 'arcomagno' && distToTarget < 150 && distToTarget >= 40) {
+                                guidanceBg.className = "w-11 h-11 bg-purple-500/30 border border-purple-400 rounded-xl flex items-center justify-center text-purple-300 text-xl font-bold animate-pulse";
+                                guidanceIcon.className = "fa-solid fa-camera-retro";
+                                guidanceMsg.innerText = translations[currentLang].msg_photo_spot;
+                            } else if (distToTarget < 40) {
                                 guidanceBg.className = "w-11 h-11 bg-emerald-500/30 border border-emerald-400 rounded-xl flex items-center justify-center text-emerald-400 text-xl font-bold animate-bounce";
                                 guidanceIcon.className = "fa-solid fa-flag-checkered";
                                 guidanceMsg.innerText = translations[currentLang].msg_arrived;
