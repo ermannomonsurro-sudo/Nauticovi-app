@@ -696,7 +696,85 @@
             document.getElementById('poi-detail-card').classList.add('hidden');
         }
 
+        
+        
+        // VERIFICA VALIDITÀ E SCADENZA AUTOMATICA NOLEGGIO (SOLUZIONE B: SCADENZA ORE 22:00)
+        function verificaScadenzaAccesso() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const dataNoleggio = urlParams.get('date'); // Formato YYYY-MM-DD
+            const clienteNome = urlParams.get('cliente');
+            const barcaNome = urlParams.get('barca');
+
+            if (clienteNome) {
+                document.getElementById('welcome-nome').innerText = `Benvenuto ${clienteNome}!`;
+            }
+            if (barcaNome) {
+                document.getElementById('welcome-barca').innerText = barcaNome;
+            }
+
+            const oraAttuale = new Date();
+            const anno = oraAttuale.getFullYear();
+            const mese = String(oraAttuale.getMonth() + 1).padStart(2, '0');
+            const giorno = String(oraAttuale.getDate()).padStart(2, '0');
+            const dataOggiStr = `${anno}-${mese}-${giorno}`;
+
+            // Se è presente il parametro data nel link
+            if (dataNoleggio) {
+                // 1. Se la data del noleggio è antecedente ad oggi, il noleggio è scaduto
+                if (dataNoleggio < dataOggiStr) {
+                    mostraSchermataNoleggioScaduto(dataNoleggio, "giorno_passato");
+                    return false;
+                }
+
+                // 2. Se è il giorno del noleggio, verifichiamo che l'ora attuale non abbia superato le 22:00
+                if (dataNoleggio === dataOggiStr) {
+                    const oreCorrenti = oraAttuale.getHours();
+                    if (oreCorrenti >= 22) { // Dalle 22:00 in poi l'accesso viene bloccato
+                        mostraSchermataNoleggioScaduto(dataNoleggio, "ore_22");
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        function mostraSchermataNoleggioScaduto(dataPassata, motivo) {
+            let messaggioDettaglio = `L'accesso al <b>Guest Portal</b> e al <b>Navigatore GPS</b> per questa imbarcazione era valido fino alle ore 22:00 del giorno <b>${dataPassata}</b>.`;
+            
+            if (motivo === "ore_22") {
+                messaggioDettaglio = `Il noleggio per la giornata di oggi (<b>${dataPassata}</b>) è giunto al termine con la chiusura delle attività alle ore 22:00.`;
+            }
+
+            document.body.innerHTML = `
+                <div class="min-h-screen bg-slate-900 text-white flex items-center justify-center p-4 font-sans text-center">
+                    <div class="bg-slate-800 p-6 rounded-3xl border border-red-500/40 shadow-2xl max-w-sm w-full space-y-4">
+                        <div class="w-16 h-16 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center mx-auto text-2xl border border-red-500/30">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <h2 class="text-xl font-black text-white">Noleggio Terminato</h2>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            ${messaggioDettaglio}
+                        </p>
+                        <div class="p-3 bg-slate-900/80 rounded-2xl border border-slate-700 text-xs text-slate-300 space-y-2">
+                            <p class="font-bold text-cyan-400">Ti è piaciuta l'esperienza con Nauticovi?</p>
+                            <p class="text-[11px] text-slate-400">Lasciaci una recensione ufficiale su Google per aiutarci a crescere!</p>
+                            <a href="https://share.google/x81whRHwldPZQKUrw" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-cyan-500 to-emerald-500 px-4 py-2 rounded-xl shadow-md hover:opacity-90 transition mt-1">
+                                <i class="fa-brands fa-google text-red-400"></i> Lascia una Recensione Google
+                            </a>
+                        </div>
+                        <div class="pt-1">
+                            <a href="index.html" class="inline-block w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 rounded-xl transition text-xs">
+                                Torna alla Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+
         window.addEventListener('DOMContentLoaded', () => {
+            if(!verificaScadenzaAccesso()) return;
             const savedLang = localStorage.getItem('nauticovi_lang') || 'it';
             initMapNav();
             setLanguage(savedLang);
