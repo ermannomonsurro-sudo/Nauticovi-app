@@ -453,7 +453,7 @@
             }
         }
 
-        // AUTOMAZIONE INTEGRATA FATTURE IN CLOUD API v2 (MODALITÀ BOZZA CON COMPANY ID)
+        // AUTOMAZIONE INTEGRATA FATTURE IN CLOUD API v2 (DIAGNOSTICA AVANZATA)
         const FIC_TOKEN = "a/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWYiOiI5MEJ3MXFMalhYdHlEZzkyZ1V4dFRya1dlenRiZ0Q0RCJ9.EZN6lLDpB17nhhlfm8M692e76zZ_ur_oR5tP4McU1Oo";
 
         async function generaFatturaInCloud(noleggioId) {
@@ -485,7 +485,8 @@
             if (!conferma) return;
 
             try {
-                // STEP 1: Recuperiamo l'ID Azienda (company_id)
+                // STEP 1: Recupero Azienda (company_id)
+                console.log("Inizio chiamata a Fatture in Cloud...");
                 const userCompaniesRes = await fetch("https://api-v2.fattureincloud.it/user/companies", {
                     method: "GET",
                     headers: {
@@ -494,16 +495,22 @@
                     }
                 });
 
-                const userCompaniesData = await userCompaniesRes.json();
+                if (!userCompaniesRes.ok) {
+                    const errRes = await userCompaniesRes.json().catch(() => ({}));
+                    alert(`⚠️ Errore autorizzazione FIC (HTTP ${userCompaniesRes.status}): ${errRes.error ? errRes.error.message : 'Token non valido o permessi insufficienti'}`);
+                    return;
+                }
 
-                if (!userCompaniesRes.ok || !userCompaniesData.data || !userCompaniesData.data.companies || userCompaniesData.data.companies.length === 0) {
-                    alert("⚠️ Errore nel recupero dell'azienda associata al Token. Controlla le impostazioni di Fatture in Cloud.");
+                const userCompaniesData = await userCompaniesRes.json();
+                if (!userCompaniesData.data || !userCompaniesData.data.companies || userCompaniesData.data.companies.length === 0) {
+                    alert("⚠️ Nessuna azienda trovata associata a questo Token in Fatture in Cloud.");
                     return;
                 }
 
                 const companyId = userCompaniesData.data.companies[0].id;
+                console.log("Company ID individuato:", companyId);
 
-                // STEP 2: Costruiamo il payload
+                // STEP 2: Costruzione Payload Documento
                 const payload = {
                     data: {
                         type: "invoice",
@@ -517,7 +524,7 @@
                             email: clienteData.email || null
                         },
                         date: noleggio.data_noleggio,
-                        is_draft: true, // BOZZA!
+                        is_draft: true, // SALVA COME BOZZA!
                         items_list: [
                             {
                                 name: `Noleggio imbarcazione ${noleggio.barca} - Data: ${noleggio.data_noleggio}`,
@@ -529,7 +536,7 @@
                     }
                 };
 
-                // STEP 3: Invio API
+                // STEP 3: Creazione Bozza Documento
                 const docRes = await fetch(`https://api-v2.fattureincloud.it/c/${companyId}/issued_documents`, {
                     method: "POST",
                     headers: {
@@ -542,17 +549,17 @@
                 const docData = await docRes.json();
 
                 if (docRes.ok) {
-                    alert(`✅ BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${docData.data.id}\nIl documento è stato salvato nella sezione "Bozze" del tuo account!`);
+                    alert(`✅ BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${docData.data.id}\nIl documento è salvato nelle Bozze del tuo account!`);
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
-                    console.error("Errore risposta FIC:", docData);
-                    alert(`❌ Impossibile creare la bozza su Fatture in Cloud.\nMotivo: ${docData.error ? docData.error.message : 'Verificare le opzioni'}`);
+                    console.error("Dettaglio Errore FIC:", docData);
+                    alert(`❌ Errore Fatture in Cloud:\n${docData.error ? docData.error.message : 'Parametri non validi'}`);
                 }
 
             } catch (err) {
-                console.error("Errore di rete FIC:", err);
-                alert("❌ Errore di connessione a Fatture in Cloud.");
+                console.error("Errore di rete / CORS catch completo:", err);
+                alert(`❌ Errore di Connessione o CORS:\n${err.name}: ${err.message}\n\nSe vedi 'TypeError: Failed to fetch', il browser sta bloccando la chiamata diretta client-side da Vercel.`);
             }
         }
 
