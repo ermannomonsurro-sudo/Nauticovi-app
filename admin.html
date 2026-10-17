@@ -417,7 +417,7 @@
             }
         }
 
-        // INTEGRATIVO FATTURE IN CLOUD PER REGIME FORFETTARIO
+        // INTEGRATIVO FATTURE IN CLOUD PER REGIME FORFETTARIO (PAYLOAD STANDARDIZZATO)
         const FIC_TOKEN = "a/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWYiOiI5MEJ3MXFMalhYdHlEZzkyZ1V4dFRya1dlenRiZ0Q0RCJ9.EZN6lLDpB17nhhlfm8M692e76zZ_ur_oR5tP4McU1Oo";
         const COMPANY_ID = "944372";
 
@@ -452,10 +452,11 @@
             };
 
             if (clienteData.cf_piva && clienteData.cf_piva.trim() !== "") {
-                if (clienteData.cf_piva.trim().length === 11 && !isNaN(clienteData.cf_piva.trim())) {
-                    entityData.vat_number = clienteData.cf_piva.trim();
+                const cfClean = clienteData.cf_piva.trim();
+                if (cfClean.length === 11 && !isNaN(cfClean)) {
+                    entityData.vat_number = cfClean;
                 } else {
-                    entityData.tax_code = clienteData.cf_piva.trim();
+                    entityData.tax_code = cfClean;
                 }
             }
 
@@ -465,7 +466,7 @@
 
             const importoTotale = Number(parseFloat(noleggio.importo).toFixed(2));
 
-            // PAYLOAD OPTIMIZED PER FATTURE IN CLOUD V2 (SENZA PAYMENTS_LIST PER EVITARE ERRORE CONVALIDA BOZZA)
+            // PAYLOAD UFFICIALE API V2 (NET_PRICE ESCLUSIVO, SENZA PAYMENTS_LIST MANUALI PER EVITARE RICALCOLI AUTO)
             const payload = {
                 data: {
                     type: "invoice",
@@ -476,9 +477,7 @@
                         {
                             name: `Noleggio imbarcazione ${noleggio.barca} - Data: ${noleggio.data_noleggio}`,
                             qty: 1,
-                            net_price: importoTotale,
-                            gross_price: importoTotale,
-                            vat: { id: 0, value: 0 }
+                            net_price: importoTotale
                         }
                     ]
                 }
