@@ -23,18 +23,18 @@
                 <i class="fa-solid fa-arrow-left"></i> Torna alla Home
             </a>
             
-            <div class="space-y-3 pt-2">
-                <input type="password" id="admin-pass" placeholder="Password" onkeyup="if(event.key === 'Enter') eseguiLogin()" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
-                <button type="button" onclick="eseguiLogin()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-xs cursor-pointer active:scale-95">
+            <form onsubmit="return eseguiLogin(event)" class="space-y-3 pt-2">
+                <input type="password" id="admin-pass" placeholder="Password" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none" required>
+                <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-xs cursor-pointer active:scale-95">
                     Accedi al Gestionale
                 </button>
-            </div>
+            </form>
             <p id="login-error" class="text-xs text-red-500 hidden font-bold">Password errata!</p>
         </div>
     </div>
 
     <!-- PANNELLO DOCK ADMIN -->
-    <div id="admin-panel" class="hidden">
+    <div id="admin-panel" style="display: none;">
         <!-- Header Navbar -->
         <nav class="bg-slate-900 text-white p-4 shadow-xl border-b border-cyan-500/30 flex justify-between items-center sticky top-0 z-50">
             <div class="flex items-center space-x-3">
@@ -297,11 +297,12 @@
             console.error("Supabase init error:", err);
         }
 
-        function eseguiLogin() {
+        function eseguiLogin(e) {
+            if (e) e.preventDefault();
             const passInput = document.getElementById('admin-pass');
             if (passInput && passInput.value.trim() === 'nauticovi2026') {
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('admin-panel').classList.remove('hidden');
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
                 sessionStorage.setItem('nauticovi_admin_auth', 'true');
                 caricaDatiCloud();
                 caricaContenutiCMS();
@@ -314,16 +315,19 @@
 
         function logout() {
             sessionStorage.removeItem('nauticovi_admin_auth');
-            document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('admin-panel').classList.add('hidden');
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('admin-panel').style.display = 'none';
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem('nauticovi_admin_auth') === 'true') {
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('admin-panel').classList.remove('hidden');
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
                 caricaDatiCloud();
                 caricaContenutiCMS();
+            } else {
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('admin-panel').style.display = 'none';
             }
         });
 
