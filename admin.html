@@ -201,17 +201,23 @@
         const SUPABASE_ANON_KEY = "sb_publishable_V0B06YxZ1oW6tqg_6yx5og_OgbhxlUo";
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        
+        // GESTIONE LOGIN ADMIN
         function checkLogin(e) {
-            e.preventDefault();
-            const pass = document.getElementById('admin-pass').value;
+            if(e) e.preventDefault();
+            const passInput = document.getElementById('admin-pass');
+            const pass = passInput ? passInput.value.trim() : '';
             if(pass === 'nauticovi2026') {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('admin-panel').classList.remove('hidden');
                 caricaDatiCloud();
             } else {
-                document.getElementById('login-error').classList.remove('hidden');
+                const errEl = document.getElementById('login-error');
+                if(errEl) errEl.classList.remove('hidden');
             }
+            return false;
         }
+
 
         function logout() {
             document.getElementById('login-screen').classList.remove('hidden');
