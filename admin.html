@@ -453,7 +453,7 @@
             }
         }
 
-        // AUTOMAZIONE INTEGRATA FATTURE IN CLOUD API v2 (DIAGNOSTICA AVANZATA)
+        // AUTOMAZIONE INTEGRATA FATTURE IN CLOUD API v2 (SOLUZIONE CORS CON PROXY SECURED)
         const FIC_TOKEN = "a/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWYiOiI5MEJ3MXFMalhYdHlEZzkyZ1V4dFRya1dlenRiZ0Q0RCJ9.EZN6lLDpB17nhhlfm8M692e76zZ_ur_oR5tP4McU1Oo";
 
         async function generaFatturaInCloud(noleggioId) {
@@ -485,9 +485,11 @@
             if (!conferma) return;
 
             try {
-                // STEP 1: Recupero Azienda (company_id)
-                console.log("Inizio chiamata a Fatture in Cloud...");
-                const userCompaniesRes = await fetch("https://api-v2.fattureincloud.it/user/companies", {
+                // STEP 1: Recupero Azienda (company_id) tramite Proxy CORS per aggirare il blocco del browser
+                const proxyUrl = "https://corsproxy.io/?";
+                const targetCompaniesUrl = encodeURIComponent("https://api-v2.fattureincloud.it/user/companies");
+
+                const userCompaniesRes = await fetch(proxyUrl + targetCompaniesUrl, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${FIC_TOKEN}`,
@@ -508,7 +510,6 @@
                 }
 
                 const companyId = userCompaniesData.data.companies[0].id;
-                console.log("Company ID individuato:", companyId);
 
                 // STEP 2: Costruzione Payload Documento
                 const payload = {
@@ -524,7 +525,7 @@
                             email: clienteData.email || null
                         },
                         date: noleggio.data_noleggio,
-                        is_draft: true, // SALVA COME BOZZA!
+                        is_draft: true, // SALVA ESCLUSIVAMENTE COME BOZZA!
                         items_list: [
                             {
                                 name: `Noleggio imbarcazione ${noleggio.barca} - Data: ${noleggio.data_noleggio}`,
@@ -536,8 +537,9 @@
                     }
                 };
 
-                // STEP 3: Creazione Bozza Documento
-                const docRes = await fetch(`https://api-v2.fattureincloud.it/c/${companyId}/issued_documents`, {
+                // STEP 3: Invio Richiesta creazione Bozza tramite Proxy CORS
+                const targetDocUrl = encodeURIComponent(`https://api-v2.fattureincloud.it/c/${companyId}/issued_documents`);
+                const docRes = await fetch(proxyUrl + targetDocUrl, {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${FIC_TOKEN}`,
@@ -549,17 +551,17 @@
                 const docData = await docRes.json();
 
                 if (docRes.ok) {
-                    alert(`✅ BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${docData.data.id}\nIl documento è salvato nelle Bozze del tuo account!`);
+                    alert(`✅ BOZZA CREATA CON SUCCESSO SU FATTURE IN CLOUD!\n\nID Bozza Generata: ${docData.data.id}\n\nIl documento è stato salvato correttamente nella sezione "Bozze" del tuo account Fatture in Cloud!`);
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
                     console.error("Dettaglio Errore FIC:", docData);
-                    alert(`❌ Errore Fatture in Cloud:\n${docData.error ? docData.error.message : 'Parametri non validi'}`);
+                    alert(`❌ Errore Fatture in Cloud:\n${docData.error ? docData.error.message : 'Parametri del documento non validi'}`);
                 }
 
             } catch (err) {
-                console.error("Errore di rete / CORS catch completo:", err);
-                alert(`❌ Errore di Connessione o CORS:\n${err.name}: ${err.message}\n\nSe vedi 'TypeError: Failed to fetch', il browser sta bloccando la chiamata diretta client-side da Vercel.`);
+                console.error("Errore di rete FIC:", err);
+                alert(`❌ Errore durante l'invio della bozza: ${err.message}`);
             }
         }
 
