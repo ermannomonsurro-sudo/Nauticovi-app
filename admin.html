@@ -413,7 +413,7 @@
             }
         }
 
-        // INTEGRATIVO FATTURE IN CLOUD PER REGIME FORFETTARIO (IVA 0% - ESENTE E PAGAMENTO CONCILIATO)
+        // INTEGRATIVO FATTURE IN CLOUD PER REGIME FORFETTARIO (FIX PAGAMENTI & TOTALE)
         const FIC_TOKEN = "a/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWYiOiI5MEJ3MXFMalhYdHlEZzkyZ1V4dFRya1dlenRiZ0Q0RCJ9.EZN6lLDpB17nhhlfm8M692e76zZ_ur_oR5tP4McU1Oo";
         const COMPANY_ID = "944372";
 
@@ -459,9 +459,9 @@
                 entityData.email = clienteData.email.trim();
             }
 
-            const importoTotale = parseFloat(noleggio.importo);
+            const importoTotale = Number(parseFloat(noleggio.importo).toFixed(2));
 
-            // PAYLOAD REGIME FORFETTARIO CON LISTA PAGAMENTI ESATTA E ALLINEATA
+            // PAYLOAD OPTIMIZED PER FATTURE IN CLOUD V2 FORFETTARIO
             const payload = {
                 data: {
                     type: "invoice",
@@ -473,6 +473,7 @@
                             name: `Noleggio imbarcazione ${noleggio.barca} - Data: ${noleggio.data_noleggio}`,
                             qty: 1,
                             net_price: importoTotale,
+                            gross_price: importoTotale,
                             vat: { id: 0, value: 0 }
                         }
                     ],
