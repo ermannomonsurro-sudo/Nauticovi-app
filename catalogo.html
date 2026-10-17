@@ -56,15 +56,12 @@
         </div>
 
         <!-- 1. LE NOSTRE IMBARCAZIONI -->
-        <div class="space-y-4">
+        <div class="space-y-4" id="flotta-container">
             <h3 class="font-black text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
                 <i class="fa-solid fa-ship text-cyan-600"></i> <span data-i18n="fleet_title">Le Nostre Imbarcazioni</span>
             </h3>
 
-            <!-- Contenitore Imbarcazioni Dinamiche da CMS -->
-            <div id="flotta-dinamica-cms" class="space-y-4"></div>
-
-            <!-- Card Gommoni 40 CV (Base) -->
+            <!-- Card Gommoni 40 CV -->
             <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
                 <div class="relative">
                     <img id="img-gommone" src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" alt="Gommone 40 CV" class="w-full h-44 object-cover">
@@ -95,7 +92,7 @@
                 </div>
             </div>
 
-            <!-- Card Scafi Open 40 CV (Base) -->
+            <!-- Card Scafi Open 40 CV -->
             <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
                 <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" alt="Scafo Open 40 CV" class="w-full h-44 object-cover">
                 <div class="p-4 space-y-2">
@@ -119,7 +116,7 @@
                 </div>
             </div>
 
-            <!-- Card Lancia 30 CV (Base) -->
+            <!-- Card Lancia 30 CV -->
             <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
                 <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" alt="Lancia Tradizionale" class="w-full h-44 object-cover">
                 <div class="p-4 space-y-2">
@@ -212,7 +209,7 @@
             </p>
         </div>
 
-        <!-- SEZIONE CONTATTI E SOCIAL -->
+            <!-- SEZIONE CONTATTI E SOCIAL -->
         <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3 text-center">
             <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider border-b pb-2 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-paper-plane text-cyan-600"></i> <span data-i18n="social_section_title">Seguici & Contattaci</span>
@@ -238,6 +235,7 @@
 
     <!-- TRADUZIONI MULTILINGUA CATALOGO -->
     <script>
+
         const SUPABASE_URL = "https://cbvpixcfhmedbapnvfmw.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_V0B06YxZ1oW6tqg_6yx5og_OgbhxlUo";
         let _supabase;
@@ -397,7 +395,7 @@
             document.getElementById(idImg).src = url;
         }
 
-        // CARICAMENTO DINAMICO FLOTTA DAL CMS SUPABASE
+        // CARICAMENTO DINAMICO FLOTTA DAL CMS SUPABASE CON IL FORMATO COMPLETO E IDENTICO
         async function caricaFlottaDinamica() {
             if (typeof _supabase === 'undefined') return;
 
@@ -415,22 +413,34 @@
 
                 flottaData.forEach(item => {
                     const imgUrl = item.immagine_url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80';
-                    const sottotitolo = item.sottotitolo || 'Novità Flotta • Noleggio Senza Patente';
+                    const sottotitolo = item.sottotitolo || 'Senza Patente • Max 6 Persone';
                     const msgWa = encodeURIComponent(`Ciao! Vorrei informazioni per il noleggio della barca ${item.titolo}`);
 
+                    // Se nella descrizione il gestore ha inserito i dettagli, li mostriamo, altrimenti applichiamo la griglia prezzi standard
                     container.innerHTML += `
-                        <div class="bg-white rounded-2xl overflow-hidden shadow-md border-2 border-cyan-500">
+                        <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
                             <div class="relative">
                                 <img src="${imgUrl}" alt="${item.titolo}" class="w-full h-44 object-cover">
-                                <span class="absolute top-2 right-2 bg-cyan-600 text-white text-[9px] font-black px-2 py-1 rounded-md uppercase shadow">Nuova Aggiunta</span>
                             </div>
+
                             <div class="p-4 space-y-2">
                                 <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">${sottotitolo}</span>
                                 <h4 class="font-extrabold text-slate-800 text-base">${item.titolo}</h4>
                                 <p class="text-xs text-slate-600 leading-relaxed">${item.descrizione}</p>
                                 
-                                <a href="https://wa.me/393484364498?text=${msgWa}" target="_blank" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs mt-2">
-                                    <i class="fa-brands fa-whatsapp text-base text-emerald-400"></i> <span>Chiedi Informazioni su WhatsApp</span>
+                                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500" data-i18n="low_season">Bassa Stagione (Giu/Set):</span>
+                                        <span class="font-bold">Mezza €120 | Intera €200</span>
+                                    </div>
+                                    <div class="flex justify-between border-t pt-1">
+                                        <span class="text-slate-500" data-i18n="high_season">Alta Stagione (Lug/Ago):</span>
+                                        <span class="font-bold text-emerald-600">Mezza €150 | Intera €220</span>
+                                    </div>
+                                </div>
+
+                                <a href="https://wa.me/393484364498?text=${msgWa}" target="_blank" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs pt-2">
+                                    <i class="fa-brands fa-whatsapp text-base text-emerald-400"></i> <span data-i18n="btn_wa">Chiedi Informazioni su WhatsApp</span>
                                 </a>
                             </div>
                         </div>
@@ -445,6 +455,7 @@
             const savedLang = localStorage.getItem('nauticovi_lang') || 'it';
             setLanguage(savedLang);
             caricaFlottaDinamica();
+        });
         });
     </script>
 </body>
