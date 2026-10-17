@@ -18,18 +18,19 @@
                 <img src="logo.png" alt="Nauticovi Logo" class="h-16 w-auto object-contain">
                 <h1 class="text-lg font-black text-slate-900 tracking-wider">NAUTICOVI ADMIN</h1>
             </div>
-            <p class="text-xs text-slate-500">Inserisci la password riservata per accedere al gestionale cloud</p>
+            <p class="text-xs text-slate-500">Accedi con le credenziali riservate per aprire il gestionale cloud</p>
             <a href="index.html" class="inline-block text-xs text-cyan-600 font-bold hover:underline my-1">
                 <i class="fa-solid fa-arrow-left"></i> Torna alla Home
             </a>
 
-            <form onsubmit="return eseguiLogin(event)" class="space-y-3 pt-2">
-                <input type="password" id="admin-pass" placeholder="Password" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none" required>
-                <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-xs cursor-pointer active:scale-95">
+            <form onsubmit="eseguiLogin(event); return false;" class="space-y-3 pt-2">
+                <input type="email" id="admin-email" placeholder="Email" autocomplete="username" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none" required>
+                <input type="password" id="admin-pass" placeholder="Password" autocomplete="current-password" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none" required>
+                <button type="submit" id="btn-login" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-xs cursor-pointer active:scale-95">
                     Accedi al Gestionale
                 </button>
             </form>
-            <p id="login-error" class="text-xs text-red-500 hidden font-bold">Password errata!</p>
+            <p id="login-error" class="text-xs text-red-500 hidden font-bold">Credenziali errate!</p>
         </div>
     </div>
 
@@ -297,40 +298,63 @@
             console.error("Supabase init error:", err);
         }
 
-        function eseguiLogin(e) {
-            if (e) e.preventDefault();
-            const passInput = document.getElementById('admin-pass');
-            if (passInput && passInput.value.trim() === 'nauticovi2026') {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('admin-panel').style.display = 'block';
-                sessionStorage.setItem('nauticovi_admin_auth', 'true');
-                caricaDatiCloud();
-                caricaContenutiCMS();
-                return false;
-            } else {
-                document.getElementById('login-error').classList.remove('hidden');
-                return false;
-            }
+        // ===================================================================
+        // LOGIN / SESSIONE (Supabase Auth)
+        // ===================================================================
+        function mostraPannello() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'block';
+            caricaDatiCloud();
+            caricaContenutiCMS();
         }
 
-        function logout() {
-            sessionStorage.removeItem('nauticovi_admin_auth');
+        function mostraLogin() {
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('admin-panel').style.display = 'none';
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            if (sessionStorage.getItem('nauticovi_admin_auth') === 'true') {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('admin-panel').style.display = 'block';
-                caricaDatiCloud();
-                caricaContenutiCMS();
-            } else {
-                document.getElementById('login-screen').style.display = 'flex';
-                document.getElementById('admin-panel').style.display = 'none';
+        async function eseguiLogin(e) {
+            if (e) e.preventDefault();
+            const btn = document.getElementById('btn-login');
+            const errorEl = document.getElementById('login-error');
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-pass').value;
+
+            btn.disabled = true;
+            const { error } = await _supabase.auth.signInWithPassword({ email, password });
+            btn.disabled = false;
+
+            if (error) {
+                errorEl.classList.remove('hidden');
+                return;
             }
+
+            errorEl.classList.add('hidden');
+            document.getElementById('admin-pass').value = '';
+            mostraPannello();
+        }
+
+        async function logout() {
+            await _supabase.auth.signOut();
+            mostraLogin();
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (session) {
+                mostraPannello();
+            } else {
+                mostraLogin();
+            }
+
+            _supabase.auth.onAuthStateChange((event, sessione) => {
+                if (!sessione) mostraLogin();
+            });
         });
 
+        // ===================================================================
+        // CMS
+        // ===================================================================
         async function caricaContenutiCMS() {
             const container = document.getElementById('cmsListaContenuti');
             if(!container || !_supabase) return;
@@ -345,8 +369,8 @@
 
                 container.innerHTML = '';
                 data.forEach(item => {
-                    const badgeColor = item.categoria === 'destinazioni' ? 'bg-cyan-100 text-cyan-800' 
-                                     : (item.categoria === 'flotta' ? 'bg-emerald-100 text-emerald-800' 
+                    const badgeColor = item.categoria === 'destinazioni' ? 'bg-cyan-100 text-cyan-800'
+                                     : (item.categoria === 'flotta' ? 'bg-emerald-100 text-emerald-800'
                                      : (item.categoria === 'tips' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'));
 
                     container.innerHTML += `
@@ -419,9 +443,8 @@
 
         // ===================================================================
         // INTEGRAZIONE FATTURE IN CLOUD - REGIME FORFETTARIO
+        // Il token di FIC NON è più qui: sta solo sul server (/api/fattura).
         // ===================================================================
-        const FIC_TOKEN = "a/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWYiOiJWTjVadEVRTnFiT2FxZnZPa3BQb3NmNGtvYWx5WE85QiJ9.CLIC4Xn9EqBB4RUd1Bx8wpnin4ifOHoeXivGHKw9xQs";
-        const COMPANY_ID = "944372";
         const VAT_ID_FORFETTARIO = 66;   // "Contribuenti forfettari"
         const GESTISCI_BOLLO = false;    // true = addebita 2 € di bollo sopra 77,47 € (totale pagamento +2)
 
@@ -429,6 +452,13 @@
             const noleggio = listaNoleggi.find(n => String(n.id) === String(noleggioId));
             if (!noleggio) {
                 alert("Noleggio non trovato. Ricarica la pagina e riprova.");
+                return;
+            }
+
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (!session) {
+                alert("Sessione scaduta. Effettua di nuovo l'accesso.");
+                mostraLogin();
                 return;
             }
 
@@ -520,8 +550,11 @@
             try {
                 const res = await fetch("/api/fattura", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token: FIC_TOKEN, companyId: COMPANY_ID, payload })
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${session.access_token}`
+                    },
+                    body: JSON.stringify({ payload })
                 });
 
                 const data = await res.json();
@@ -608,6 +641,8 @@
             noleggi.forEach((n) => {
                 const checkinLink = `${window.location.origin}/checkin.html?id=${n.id}`;
                 const guestLink = `${window.location.origin}/guest.html?cliente=${encodeURIComponent(n.nome_cliente)}&barca=${encodeURIComponent(n.barca)}&date=${n.data_noleggio}`;
+                // wa.me accetta solo cifre (niente +, spazi o trattini)
+                const telefonoWa = String(n.telefono || '').replace(/\D/g, '');
 
                 const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).\n\n⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}\n\n🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
 
@@ -627,7 +662,7 @@
                         <td class="p-2 font-bold text-emerald-600">€${n.importo}</td>
                         <td class="p-2">${badgeCheckin}</td>
                         <td class="p-2 flex gap-2 items-center">
-                            <a href="https://wa.me/${n.telefono}?text=${msgWhatsApp}" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] flex items-center gap-1 shadow" title="Invia Link WhatsApp">
+                            <a href="https://wa.me/${telefonoWa}?text=${msgWhatsApp}" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] flex items-center gap-1 shadow" title="Invia Link WhatsApp">
                                 <i class="fa-brands fa-whatsapp text-xs"></i> Invia Link
                             </a>
                             ${btnFattura}
