@@ -35,6 +35,8 @@
             border-color: #06b6d4;
         }
     </style>
+    <!-- Supabase Client JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 pb-20 font-sans">
 
@@ -258,6 +260,10 @@
 
     <!-- DIZIONARIO MULTILINGUA GUEST -->
     <script>
+        const SUPABASE_URL = "https://cbvpixcfhmedbapnvfmw.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_V0B06YxZ1oW6tqg_6yx5og_OgbhxlUo";
+        let _supabase;
+        try { _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e){}
         const translations = {
             it: {
                 header_sub: "GUEST PORTAL • NAVIGATORE GPS",
@@ -772,7 +778,45 @@
         }
 
 
+        
+        // CARICAMENTO DINAMICO DESTINAZIONI, TIPS E DIVIETI DAL CMS SUPABASE
+        async function caricaCMSGuestDinamico() {
+            if (typeof _supabase === 'undefined') return;
+
+            try {
+                const { data, error } = await _supabase.from('cms_contenuti').select('*').order('created_at', { ascending: false });
+
+                if (error || !data || data.length === 0) return;
+
+                // 1. Destinazioni dinamiche
+                const destinazioniCMS = data.filter(item => item.categoria === 'destinazioni');
+                if (destinazioniCMS.length > 0) {
+                    const listContainer = document.getElementById('punti-esatti-lista');
+                    if (listContainer) {
+                        destinazioniCMS.forEach(poi => {
+                            const img = poi.immagine_url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80';
+                            listContainer.innerHTML = `
+                                <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200 border-l-4 border-cyan-500">
+                                    <img src="${img}" alt="${poi.titolo}" class="w-full h-36 object-cover">
+                                    <div class="p-4 space-y-2">
+                                        <div class="flex justify-between items-start">
+                                            <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">${poi.sottotitolo || 'Nuovo Punto'}</span>
+                                        </div>
+                                        <h4 class="font-extrabold text-slate-800 text-base">${poi.titolo}</h4>
+                                        <p class="text-xs text-slate-600 leading-relaxed">${poi.descrizione}</p>
+                                    </div>
+                                </div>
+                            ` + listContainer.innerHTML;
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error("Errore caricamento CMS Guest:", err);
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
+            caricaCMSGuestDinamico();
             if(!verificaScadenzaAccesso()) return;
             const savedLang = localStorage.getItem('nauticovi_lang') || 'it';
             initMapNav();
