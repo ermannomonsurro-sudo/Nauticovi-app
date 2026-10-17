@@ -63,7 +63,7 @@
 
         <!-- FORM CHECK-IN & FATTURAZIONE -->
         <form id="checkin-form" onsubmit="inviaCheckin(event)" class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4 text-xs">
-            
+
             <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider border-b pb-2 flex items-center gap-2">
                 <i class="fa-solid fa-id-card text-cyan-600"></i> <span data-i18n="section_contract_info">Dati Intestatario Contratto & Fattura</span>
             </h3>
@@ -169,7 +169,8 @@
                 success_title: "Web Check-in Completato!",
                 success_desc: "Grazie! I tuoi dati e il contratto sono stati registrati con successo nel sistema di Nauticovi. Al tuo arrivo potrai salire subito a bordo!",
                 btn_back_home: "Torna alla Home",
-                alert_signature_required: "Per favore, apponi la firma prima di inviare il check-in."
+                alert_signature_required: "Per favore, apponi la firma prima di inviare il check-in.",
+                alert_invalid_link: "Link di check-in non valido. Usa il link ricevuto su WhatsApp."
             },
             en: {
                 header_sub: "FAST BOARDING WEB CHECK-IN",
@@ -192,7 +193,8 @@
                 success_title: "Web Check-in Completed!",
                 success_desc: "Thank you! Your details and contract have been successfully registered in the Nauticovi system. Upon arrival, you can board immediately!",
                 btn_back_home: "Back to Home",
-                alert_signature_required: "Please provide your signature before submitting check-in."
+                alert_signature_required: "Please provide your signature before submitting check-in.",
+                alert_invalid_link: "Invalid check-in link. Please use the link you received on WhatsApp."
             },
             es: {
                 header_sub: "WEB CHECK-IN EMBARQUE RÁPIDO",
@@ -215,7 +217,8 @@
                 success_title: "¡Web Check-in Completado!",
                 success_desc: "¡Gracias! Tus datos y el contrato se han registrado correctamente en el sistema de Nauticovi. A tu llegada podrás embarcar de inmediato.",
                 btn_back_home: "Volver a Inicio",
-                alert_signature_required: "Por favor, firma en el recuadro antes de enviar el check-in."
+                alert_signature_required: "Por favor, firma en el recuadro antes de enviar el check-in.",
+                alert_invalid_link: "Enlace de check-in no válido. Usa el enlace recibido por WhatsApp."
             }
         };
 
@@ -251,8 +254,22 @@
             if(signaturePad) signaturePad.clear();
         }
 
+        function ripristinaPulsante() {
+            const btn = document.getElementById('btn-submit');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-check-circle text-base"></i> <span>' + translations[currentLang].btn_confirm_checkin + '</span>';
+        }
+
         async function inviaCheckin(e) {
             e.preventDefault();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const noleggioId = urlParams.get('id');
+
+            if (!noleggioId) {
+                alert(translations[currentLang].alert_invalid_link);
+                return;
+            }
 
             if (signaturePad.isEmpty()) {
                 alert(translations[currentLang].alert_signature_required);
@@ -263,13 +280,7 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> ...';
 
-            const firmaData = signaturePad.toDataURL();
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const noleggioId = urlParams.get('id');
-
-            const payload = {
-                noleggio_id: noleggioId || null,
+            const dati = {
                 nome_cognome: document.getElementById('checkin-nome').value,
                 cf_piva: document.getElementById('checkin-cf').value.toUpperCase(),
                 telefono: document.getElementById('checkin-tel').value,
@@ -278,22 +289,22 @@
                 cap: document.getElementById('checkin-cap').value,
                 citta: document.getElementById('checkin-citta').value,
                 numero_documento: document.getElementById('checkin-doc').value.toUpperCase(),
-                firma_digitale: firmaData
+                firma_digitale: signaturePad.toDataURL()
             };
 
             try {
-                const { data, error } = await _supabase.from('checkin').insert([payload]);
+                // Funzione protetta lato database: registra il check-in e segna il noleggio come completato.
+                // Il browser non accede più direttamente alle tabelle "checkin" e "noleggi".
+                const { error } = await _supabase.rpc('invia_checkin', {
+                    p_noleggio_id: noleggioId,
+                    p_dati: dati
+                });
 
                 if (error) {
                     console.error("Errore Supabase:", error);
                     alert("Errore / Error: " + error.message);
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-check-circle text-base"></i> ' + translations[currentLang].btn_confirm_checkin;
+                    ripristinaPulsante();
                     return;
-                }
-
-                if (noleggioId) {
-                    await _supabase.from('noleggi').update({ stato_checkin: 'completato' }).eq('id', noleggioId);
                 }
 
                 document.getElementById('checkin-form').classList.add('hidden');
@@ -302,8 +313,7 @@
             } catch (err) {
                 console.error("Errore di rete:", err);
                 alert("Errore di connessione / Connection error.");
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-check-circle text-base"></i> ' + translations[currentLang].btn_confirm_checkin;
+                ripristinaPulsante();
             }
         }
     </script>
