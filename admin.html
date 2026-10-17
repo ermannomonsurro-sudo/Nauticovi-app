@@ -268,7 +268,7 @@
                                     <th class="p-2">Data</th>
                                     <th class="p-2">Importo</th>
                                     <th class="p-2">Stato Check-in</th>
-                                    <th class="p-2">Azioni WhatsApp</th>
+                                    <th class="p-2">Azioni WhatsApp & Fattura</th>
                                 </tr>
                             </thead>
                             <tbody id="clientiTable" class="divide-y">
@@ -485,7 +485,7 @@
             if (!conferma) return;
 
             try {
-                // STEP 1: Recuperiamo automaticamente l'ID Azienda (company_id) collegato al Token
+                // STEP 1: Recuperiamo l'ID Azienda (company_id)
                 const userCompaniesRes = await fetch("https://api-v2.fattureincloud.it/user/companies", {
                     method: "GET",
                     headers: {
@@ -497,14 +497,13 @@
                 const userCompaniesData = await userCompaniesRes.json();
 
                 if (!userCompaniesRes.ok || !userCompaniesData.data || !userCompaniesData.data.companies || userCompaniesData.data.companies.length === 0) {
-                    alert("⚠️ Errore nel recupero dell'azienda associata al Token Fatture in Cloud. Verificare i permessi del Token.");
-                    console.error("Dettagli errore aziende FIC:", userCompaniesData);
+                    alert("⚠️ Errore nel recupero dell'azienda associata al Token. Controlla le impostazioni di Fatture in Cloud.");
                     return;
                 }
 
-                const companyId = userCompaniesData.data.companies[0].id; // Prende la prima azienda associata all'account
+                const companyId = userCompaniesData.data.companies[0].id;
 
-                // STEP 2: Costruiamo il payload formattato secondo le specifiche ufficiali Fatture in Cloud API v2
+                // STEP 2: Costruiamo il payload
                 const payload = {
                     data: {
                         type: "invoice",
@@ -518,7 +517,7 @@
                             email: clienteData.email || null
                         },
                         date: noleggio.data_noleggio,
-                        is_draft: true, // SALVA COME BOZZA!
+                        is_draft: true, // BOZZA!
                         items_list: [
                             {
                                 name: `Noleggio imbarcazione ${noleggio.barca} - Data: ${noleggio.data_noleggio}`,
@@ -530,7 +529,7 @@
                     }
                 };
 
-                // STEP 3: Inviamo la richiesta all'endpoint corretto per i documenti emessi dell'azienda
+                // STEP 3: Invio API
                 const docRes = await fetch(`https://api-v2.fattureincloud.it/c/${companyId}/issued_documents`, {
                     method: "POST",
                     headers: {
@@ -543,17 +542,17 @@
                 const docData = await docRes.json();
 
                 if (docRes.ok) {
-                    alert(`✅ BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${docData.data.id}\nIl documento è stato salvato con successo nella sezione "Bozze" del tuo account Fatture in Cloud.`);
+                    alert(`✅ BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${docData.data.id}\nIl documento è stato salvato nella sezione "Bozze" del tuo account!`);
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
                     console.error("Errore risposta FIC:", docData);
-                    alert(`❌ Impossibile creare la bozza su Fatture in Cloud.\nMotivo: ${docData.error ? docData.error.message : 'Errore nei parametri'}`);
+                    alert(`❌ Impossibile creare la bozza su Fatture in Cloud.\nMotivo: ${docData.error ? docData.error.message : 'Verificare le opzioni'}`);
                 }
 
             } catch (err) {
                 console.error("Errore di rete FIC:", err);
-                alert("❌ Si è verificato un errore di rete durante la comunicazione con Fatture in Cloud.");
+                alert("❌ Errore di connessione a Fatture in Cloud.");
             }
         }
 
@@ -625,8 +624,10 @@
                     : `<span class="bg-amber-100 text-amber-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">⌛ In Attesa</span>`;
 
                 const btnFattura = n.stato_fattura === 'emessa'
-                    ? `<span class="bg-slate-200 text-slate-700 text-[9px] font-bold px-2 py-1 rounded-lg uppercase"><i class="fa-solid fa-file-check"></i> Fattura Emessa</span>`
-                    : `<button onclick="generaFatturaInCloud('${n.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] flex items-center gap-1 shadow" title="Genera Fattura su Fatture in Cloud">
+                    ? `<button onclick="generaFatturaInCloud('${n.id}')" class="bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded-lg font-bold text-[9px] flex items-center gap-1 shadow" title="Genera/Rigenera Bozza">
+                        <i class="fa-solid fa-arrows-rotate text-cyan-400"></i> Rigenera FIC
+                       </button>`
+                    : `<button onclick="generaFatturaInCloud('${n.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] flex items-center gap-1 shadow" title="Genera Bozza su Fatture in Cloud">
                         <i class="fa-solid fa-file-invoice-dollar"></i> Fattura FIC
                        </button>`;
 
