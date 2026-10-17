@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NAUTICOVI - Guest Portal & Navigatore GPS</title>
+    <title>NAUTICOVI - Guest Portal & Navigatore GPS Smart</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- CSS & JS Leaflet Mappa -->
@@ -13,13 +13,13 @@
     
     <style>
         #nav-map {
-            height: 400px !important;
+            height: 380px !important;
             width: 100% !important;
             border-radius: 1rem;
             z-index: 10;
         }
         .boat-marker-icon {
-            transition: transform 0.3s ease-out;
+            transition: transform 0.4s ease-out;
             display: flex;
             align-items: center;
             justify-center: center;
@@ -74,15 +74,13 @@
                 </div>
                 <div class="text-right">
                     <div class="flex items-center gap-1.5">
-                <a href="tel:+393484364498" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1.5 rounded-lg font-bold text-xs inline-flex items-center gap-1 shadow" title="Chiama Assistenza">
-                    <i class="fa-solid fa-phone"></i> <span class="hidden sm:inline">Chiama</span>
-                </a>
-                <a href="https://wa.me/393484364498?text=SOS%20Assistenza%20in%20mare!%20Ho%20bisogno%20di%20supporto." target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1.5 rounded-lg font-bold text-xs inline-flex items-center gap-1 shadow" title="Scrivi su WhatsApp">
-                    <i class="fa-brands fa-whatsapp text-sm"></i> <span class="hidden sm:inline">WhatsApp</span>
-                </a>
-            </div>
-                        <i class="fa-solid fa-phone"></i> SOS
-                    </a>
+                        <a href="tel:+393484364498" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1.5 rounded-lg font-bold text-xs inline-flex items-center gap-1 shadow" title="Chiama Assistenza">
+                            <i class="fa-solid fa-phone"></i> <span class="hidden sm:inline">Chiama</span>
+                        </a>
+                        <a href="https://wa.me/393484364498?text=SOS%20Assistenza%20in%20mare!%20Ho%20bisogno%20di%20supporto." target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1.5 rounded-lg font-bold text-xs inline-flex items-center gap-1 shadow" title="Scrivi su WhatsApp">
+                            <i class="fa-brands fa-whatsapp text-sm"></i> <span class="hidden sm:inline">WhatsApp</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -113,17 +111,18 @@
             <div id="punti-esatti-lista" class="space-y-3 pt-1"></div>
         </div>
 
-        <!-- SEZIONE 2: NAVIGATORE GPS LIVE IN STILE AUTO -->
-        <div id="sec-navigatore" class="tab-content hidden space-y-4">
+        <!-- SEZIONE 2: NAVIGATORE GPS SMART CON ASSISTENTE GUIDA SOTTO -->
+        <div id="sec-navigatore" class="tab-content hidden space-y-3">
             
-            <div class="bg-slate-900 text-white p-3.5 rounded-2xl shadow-md border border-cyan-500/30 flex justify-between items-center text-center font-mono text-xs">
+            <!-- Telemetria GPS Base -->
+            <div class="bg-slate-900 text-white p-3 rounded-2xl shadow-md border border-cyan-500/30 flex justify-between items-center text-center font-mono text-xs">
                 <div>
                     <span class="text-[9px] text-slate-400 block uppercase" data-i18n="telemetry_speed">Velocità</span>
                     <b class="text-cyan-400 text-base" id="live-speed">0.0 Nodi</b>
                 </div>
                 <div class="border-x border-slate-700 px-3">
-                    <span class="text-[9px] text-slate-400 block uppercase" data-i18n="telemetry_heading">Prua (Bussola)</span>
-                    <b class="text-emerald-400 text-base" id="live-heading">0°</b>
+                    <span class="text-[9px] text-slate-400 block uppercase" data-i18n="telemetry_dist">Distanza</span>
+                    <b class="text-emerald-400 text-base" id="live-dist">---</b>
                 </div>
                 <div>
                     <span class="text-[9px] text-slate-400 block uppercase" data-i18n="telemetry_target">Destinazione</span>
@@ -131,19 +130,23 @@
                 </div>
             </div>
 
-            <div id="active-nav-banner" class="hidden bg-cyan-600 text-white p-3 rounded-xl shadow text-xs flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-location-arrow text-base animate-bounce"></i>
+            <!-- BOX GUIDA FACILE PER NON ESPERTI (MESSAGGI CHIARI) -->
+            <div id="guidance-box" class="bg-slate-900 border-2 border-cyan-500 p-3.5 rounded-2xl shadow-xl text-white flex items-center justify-between transition-all">
+                <div class="flex items-center gap-3">
+                    <div id="guidance-icon-bg" class="w-11 h-11 bg-cyan-600/30 border border-cyan-400 rounded-xl flex items-center justify-center text-cyan-400 text-xl font-bold">
+                        <i id="guidance-icon" class="fa-solid fa-location-dot"></i>
+                    </div>
                     <div>
-                        <span class="text-[10px] opacity-80 block uppercase font-bold" data-i18n="active_nav_label">Navigazione Attiva verso:</span>
-                        <b class="text-sm font-black" id="active-target-title">Arco Magno</b>
+                        <span class="text-[9px] uppercase tracking-wider font-bold text-cyan-400 block" id="guidance-status-label" data-i18n="assistant_label">Assistente di Rotta</span>
+                        <h4 class="text-sm font-extrabold text-white leading-tight" id="guidance-msg" data-i18n="assistant_select_prompt">Seleziona una destinazione per iniziare</h4>
                     </div>
                 </div>
-                <button onclick="annullaNavigazione()" class="bg-slate-900/80 hover:bg-slate-900 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold" data-i18n="btn_stop_nav">
-                    Interrompi
+                <button id="btn-stop-nav-top" onclick="annullaNavigazione()" class="hidden bg-red-500/20 hover:bg-red-500/40 text-red-300 p-2 rounded-lg text-xs font-bold border border-red-500/30">
+                    <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
+            <!-- Mappa GPS Live -->
             <div class="bg-white p-2.5 rounded-2xl shadow-md border border-slate-200 relative">
                 <div id="nav-map"></div>
                 <button onclick="ricentraGPS()" class="absolute bottom-6 right-6 z-20 bg-slate-900 text-cyan-400 p-3 rounded-full shadow-2xl border border-cyan-500/40 text-sm" title="Ricentra Posizione Barca">
@@ -151,6 +154,7 @@
                 </button>
             </div>
 
+            <!-- Card Dettaglio POI Selezionato sulla Mappa -->
             <div id="poi-detail-card" class="bg-white p-4 rounded-2xl shadow-md border border-cyan-500/40 hidden space-y-2 text-xs">
                 <div class="flex justify-between items-start">
                     <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" id="poi-cat">Attrazione</span>
@@ -264,11 +268,11 @@
                 dest_section_desc: "Clicca su uno dei punti esatti per avviare il navigatore GPS in tempo reale verso la meta.",
                 btn_start_gps: "Avvia Navigatore GPS",
                 telemetry_speed: "Velocità",
-                telemetry_heading: "Prua (Bussola)",
+                telemetry_dist: "Distanza",
                 telemetry_target: "Destinazione",
                 target_none: "Nessuna",
-                active_nav_label: "Navigazione Attiva verso:",
-                btn_stop_nav: "Interrompi",
+                assistant_label: "Assistente di Rotta",
+                assistant_select_prompt: "Seleziona una destinazione per iniziare",
                 btn_start_card: "Avvia Navigatore verso questo Punto",
                 tips_title: "Consigli per la Navigazione",
                 tip1_h: "Accensione Motore",
@@ -284,7 +288,11 @@
                 modal_title: "Avviare Navigatore GPS?",
                 modal_sub: "Confermi di voler avviare la navigazione in tempo reale verso:",
                 btn_cancel: "Annulla",
-                btn_start_confirm: "Sì, Avvia!"
+                btn_start_confirm: "Sì, Avvia!",
+                msg_keep_course: "Sei sulla rotta giusta! Prosegui diritto.",
+                msg_turn_right: "Gira a DESTRA per rimetterti in rotta!",
+                msg_turn_left: "Gira a SINISTRA per rimetterti in rotta!",
+                msg_arrived: "Sei arrivato a destinazione!"
             },
             en: {
                 header_sub: "GUEST PORTAL • GPS NAVIGATION",
@@ -298,11 +306,11 @@
                 dest_section_desc: "Click on one of the exact spots to start real-time GPS navigation.",
                 btn_start_gps: "Start GPS Navigation",
                 telemetry_speed: "Speed",
-                telemetry_heading: "Heading (Compass)",
+                telemetry_dist: "Distance",
                 telemetry_target: "Destination",
                 target_none: "None",
-                active_nav_label: "Active Navigation to:",
-                btn_stop_nav: "Stop",
+                assistant_label: "Route Assistant",
+                assistant_select_prompt: "Select a destination to start",
                 btn_start_card: "Start Navigator to this Spot",
                 tips_title: "Boating Tips",
                 tip1_h: "Engine Starting",
@@ -318,7 +326,11 @@
                 modal_title: "Start GPS Navigation?",
                 modal_sub: "Confirm starting real-time navigation to:",
                 btn_cancel: "Cancel",
-                btn_start_confirm: "Yes, Start!"
+                btn_start_confirm: "Yes, Start!",
+                msg_keep_course: "On course! Keep straight ahead.",
+                msg_turn_right: "Turn RIGHT to get back on track!",
+                msg_turn_left: "Turn LEFT to get back on track!",
+                msg_arrived: "You have arrived at your destination!"
             },
             es: {
                 header_sub: "GUEST PORTAL • NAVEGADOR GPS",
@@ -332,11 +344,11 @@
                 dest_section_desc: "Haz clic en uno de los puntos exactos para iniciar la navegación GPS en tiempo real.",
                 btn_start_gps: "Iniciar Navegador GPS",
                 telemetry_speed: "Velocidad",
-                telemetry_heading: "Rumbo (Brújula)",
+                telemetry_dist: "Distancia",
                 telemetry_target: "Destino",
                 target_none: "Ninguno",
-                active_nav_label: "Navegación Activa hacia:",
-                btn_stop_nav: "Detener",
+                assistant_label: "Asistente de Ruta",
+                assistant_select_prompt: "Selecciona un destino para empezar",
                 btn_start_card: "Iniciar Navegador a este Punto",
                 tips_title: "Consejos de Navegación",
                 tip1_h: "Arranque del Motor",
@@ -352,7 +364,11 @@
                 modal_title: "¿Iniciar Navegador GPS?",
                 modal_sub: "Confirma iniciar navegación en tiempo real hacia:",
                 btn_cancel: "Cancelar",
-                btn_start_confirm: "¡Sí, Iniciar!"
+                btn_start_confirm: "¡Sí, Iniciar!",
+                msg_keep_course: "¡Vas bien! Continúa recto.",
+                msg_turn_right: "¡Gira a la DERECHA para corregir rumbo!",
+                msg_turn_left: "¡Gira a la IZQUIERDA para corregir rumbo!",
+                msg_arrived: "¡Has llegado a tu destino!"
             }
         };
 
@@ -384,7 +400,32 @@
         let map, userMarker, markersGroup, routePolyline;
         let destinazioneSelezionata = null;
         let destinazioneAttiva = null;
-        let currentHeading = 0;
+        
+        let lastLat = null;
+        let lastLng = null;
+        let currentMovementHeading = 0; // Prua calcolata SOLO dallo spostamento reale GPS
+
+        // Calcolo della distanza in metri tra due coordinate GPS (Haversine formula)
+        function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
+            const R = 6371000; // raggio terra in metri
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Calcolo dell'angolo di rotta / rilevamento tra due punti in gradi (0° - 360°)
+        function calculateBearing(lat1, lon1, lat2, lon2) {
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const y = Math.sin(dLon) * Math.cos(lat2 * Math.PI / 180);
+            const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) -
+                      Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos(dLon);
+            let brng = Math.atan2(y, x) * 180 / Math.PI;
+            return (brng + 360) % 360;
+        }
 
         function setLanguage(lang) {
             currentLang = lang;
@@ -462,8 +503,7 @@
             switchTab('navigatore');
 
             document.getElementById('target-poi-name').innerText = destinazioneAttiva.nome;
-            document.getElementById('active-target-title').innerText = destinazioneAttiva.nome;
-            document.getElementById('active-nav-banner').classList.remove('hidden');
+            document.getElementById('btn-stop-nav-top').classList.remove('hidden');
 
             tracciaRottaSullaMappa();
         }
@@ -471,7 +511,14 @@
         function annullaNavigazione() {
             destinazioneAttiva = null;
             document.getElementById('target-poi-name').innerText = translations[currentLang].target_none;
-            document.getElementById('active-nav-banner').classList.add('hidden');
+            document.getElementById('live-dist').innerText = "---";
+            document.getElementById('btn-stop-nav-top').classList.add('hidden');
+            
+            // Ripristina banner guida
+            document.getElementById('guidance-icon-bg').className = "w-11 h-11 bg-cyan-600/30 border border-cyan-400 rounded-xl flex items-center justify-center text-cyan-400 text-xl font-bold";
+            document.getElementById('guidance-icon').className = "fa-solid fa-location-dot";
+            document.getElementById('guidance-msg').innerText = translations[currentLang].assistant_select_prompt;
+
             if(routePolyline) map.removeLayer(routePolyline);
         }
 
@@ -500,38 +547,96 @@
             const boatIcon = L.divIcon({
                 className: 'boat-marker-container',
                 html: `<div id="boat-icon-inner" class="boat-marker-icon" style="transform: rotate(0deg);">
-                          <div class="bg-slate-900 text-cyan-400 p-2 rounded-full border-2 border-cyan-400 shadow-2xl flex items-center justify-center">
-                              <i class="fa-solid fa-location-arrow text-base"></i>
+                          <div class="bg-slate-900 text-cyan-400 p-2.5 rounded-full border-2 border-cyan-400 shadow-2xl flex items-center justify-center">
+                              <i class="fa-solid fa-location-arrow text-lg"></i>
                           </div>
                        </div>`,
-                iconSize: [32, 32],
-                iconAnchor: [16, 16]
+                iconSize: [36, 36],
+                iconAnchor: [18, 18]
             });
 
+            // GEOLOCALIZZAZIONE ED ELABORAZIONE INTELLIGENTE DELLA ROTTA
             if ("geolocation" in navigator) {
                 navigator.geolocation.watchPosition(
                     pos => {
                         const lat = pos.coords.latitude;
                         const lng = pos.coords.longitude;
-                        const speed = pos.coords.speed ? (pos.coords.speed * 1.94384).toFixed(1) : "0.0";
-                        currentHeading = pos.coords.heading ? Math.round(pos.coords.heading) : currentHeading;
+                        const speedKts = pos.coords.speed ? (pos.coords.speed * 1.94384).toFixed(1) : "0.0";
 
                         const speedUnit = currentLang === 'en' ? 'Knots' : (currentLang === 'es' ? 'Nudos' : 'Nodi');
-                        document.getElementById('live-speed').innerText = `${speed} ${speedUnit}`;
-                        document.getElementById('live-heading').innerText = `${currentHeading}°`;
+                        document.getElementById('live-speed').innerText = `${speedKts} ${speedUnit}`;
 
+                        // 1. PRUA CALCOLATA ESCLUSIVAMENTE DAL MOVIMENTO REALE DELLA BARCA (NON DALLA BUSSOLA/CELLULARE)
+                        if (lastLat !== null && lastLng !== null) {
+                            const distMoved = calculateDistanceMeters(lastLat, lastLng, lat, lng);
+                            // Se la barca si è spostata di almeno 2 metri, ricalcola la vera rotta della barca
+                            if (distMoved > 2) {
+                                currentMovementHeading = calculateBearing(lastLat, lastLng, lat, lng);
+                                lastLat = lat;
+                                lastLng = lng;
+                            }
+                        } else {
+                            lastLat = lat;
+                            lastLng = lng;
+                        }
+
+                        // Aggiorna la posizione della barca
                         if (!userMarker) {
                             userMarker = L.marker([lat, lng], { icon: boatIcon }).addTo(map);
                         } else {
                             userMarker.setLatLng([lat, lng]);
                         }
 
+                        // Ruota l'icona della barca solo secondo la prua di movimento reale
                         const boatEl = document.getElementById('boat-icon-inner');
                         if(boatEl) {
-                            boatEl.style.transform = `rotate(${currentHeading}deg)`;
+                            boatEl.style.transform = `rotate(${currentMovementHeading}deg)`;
                         }
 
-                        if(destinazioneAttiva) {
+                        // 2. ASSISTENTE GUIDA INTELLIGENTE SE LA NAVIGAZIONE È ATTIVA
+                        if (destinazioneAttiva) {
+                            const distToTarget = calculateDistanceMeters(lat, lng, destinazioneAttiva.lat, destinazioneAttiva.lng);
+                            
+                            // Mostra distanza residua in M / Km
+                            if (distToTarget > 1000) {
+                                document.getElementById('live-dist').innerText = (distToTarget / 1000).toFixed(1) + " Km";
+                            } else {
+                                document.getElementById('live-dist').innerText = Math.round(distToTarget) + " m";
+                            }
+
+                            // Rilevamento angolare verso il punto di destinazione
+                            const targetBearing = calculateBearing(lat, lng, destinazioneAttiva.lat, destinazioneAttiva.lng);
+                            
+                            // Differenza d'angolo tra la direzione in cui stiamo andando e la destinazione
+                            let angleDiff = (targetBearing - currentMovementHeading + 360) % 360;
+                            if (angleDiff > 180) angleDiff -= 360; // Risultato tra -180° e +180°
+
+                            const guidanceBg = document.getElementById('guidance-icon-bg');
+                            const guidanceIcon = document.getElementById('guidance-icon');
+                            const guidanceMsg = document.getElementById('guidance-msg');
+
+                            if (distToTarget < 50) {
+                                // ARRIVATI A DESTINAZIONE
+                                guidanceBg.className = "w-11 h-11 bg-emerald-500/30 border border-emerald-400 rounded-xl flex items-center justify-center text-emerald-400 text-xl font-bold animate-bounce";
+                                guidanceIcon.className = "fa-solid fa-flag-checkered";
+                                guidanceMsg.innerText = translations[currentLang].msg_arrived;
+                            } else if (Math.abs(angleDiff) <= 25) {
+                                // IN ROTTA CORRETTA (DRITTO)
+                                guidanceBg.className = "w-11 h-11 bg-emerald-500/30 border border-emerald-400 rounded-xl flex items-center justify-center text-emerald-400 text-xl font-bold";
+                                guidanceIcon.className = "fa-solid fa-arrow-up";
+                                guidanceMsg.innerText = translations[currentLang].msg_keep_course;
+                            } else if (angleDiff > 25) {
+                                // DESTINAZIONE A DESTRA -> GIRA A DESTRA
+                                guidanceBg.className = "w-11 h-11 bg-amber-500/30 border border-amber-400 rounded-xl flex items-center justify-center text-amber-400 text-xl font-bold animate-pulse";
+                                guidanceIcon.className = "fa-solid fa-turn-right";
+                                guidanceMsg.innerText = translations[currentLang].msg_turn_right;
+                            } else if (angleDiff < -25) {
+                                // DESTINAZIONE A SINISTRA -> GIRA A SINISTRA
+                                guidanceBg.className = "w-11 h-11 bg-amber-500/30 border border-amber-400 rounded-xl flex items-center justify-center text-amber-400 text-xl font-bold animate-pulse";
+                                guidanceIcon.className = "fa-solid fa-turn-left";
+                                guidanceMsg.innerText = translations[currentLang].msg_turn_left;
+                            }
+
                             tracciaRottaSullaMappa();
                         }
                     },
