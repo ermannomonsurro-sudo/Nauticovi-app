@@ -453,7 +453,7 @@
             }
         }
 
-        // AUTOMAZIONE INTEGRATA FATTURE IN CLOUD API v2 (SOLUZIONE CORS CON PROXY SECURED)
+        // AUTOMAZIONE INTEGRATA FATTURE IN CLOUD API v2 (GESTIONE ID AZIENDA MANUALE/AUTOMATICA)
         const FIC_TOKEN = "a/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWYiOiI5MEJ3MXFMalhYdHlEZzkyZ1V4dFRya1dlenRiZ0Q0RCJ9.EZN6lLDpB17nhhlfm8M692e76zZ_ur_oR5tP4McU1Oo";
 
         async function generaFatturaInCloud(noleggioId) {
@@ -485,31 +485,38 @@
             if (!conferma) return;
 
             try {
-                // STEP 1: Recupero Azienda (company_id) tramite Proxy CORS per aggirare il blocco del browser
                 const proxyUrl = "https://corsproxy.io/?";
-                const targetCompaniesUrl = encodeURIComponent("https://api-v2.fattureincloud.it/user/companies");
+                let companyId = localStorage.getItem("fic_company_id");
 
-                const userCompaniesRes = await fetch(proxyUrl + targetCompaniesUrl, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${FIC_TOKEN}`,
-                        "Content-Type": "application/json"
+                // Se non abbiamo ancora il Company ID salvato, tentiamo prima il recupero automatico
+                if (!companyId) {
+                    const targetCompaniesUrl = encodeURIComponent("https://api-v2.fattureincloud.it/user/companies");
+                    const userCompaniesRes = await fetch(proxyUrl + targetCompaniesUrl, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${FIC_TOKEN}`,
+                            "Content-Type": "application/json"
+                        }
+                    });
+
+                    if (userCompaniesRes.ok) {
+                        const userCompaniesData = await userCompaniesRes.json();
+                        if (userCompaniesData.data && userCompaniesData.data.companies && userCompaniesData.data.companies.length > 0) {
+                            companyId = userCompaniesData.data.companies[0].id;
+                            localStorage.setItem("fic_company_id", companyId);
+                        }
                     }
-                });
-
-                if (!userCompaniesRes.ok) {
-                    const errRes = await userCompaniesRes.json().catch(() => ({}));
-                    alert(`⚠️ Errore autorizzazione FIC (HTTP ${userCompaniesRes.status}): ${errRes.error ? errRes.error.message : 'Token non valido o permessi insufficienti'}`);
-                    return;
                 }
 
-                const userCompaniesData = await userCompaniesRes.json();
-                if (!userCompaniesData.data || !userCompaniesData.data.companies || userCompaniesData.data.companies.length === 0) {
-                    alert("⚠️ Nessuna azienda trovata associata a questo Token in Fatture in Cloud.");
-                    return;
+                // Se il recupero automatico fallisce o dà 403, chiediamo il Company ID una sola volta
+                if (!companyId) {
+                    companyId = prompt("Inserisci il tuo ID Azienda (Company ID) di Fatture in Cloud (lo trovi nel link dell'URL di Fatture in Cloud, es. /c/1234567/):");
+                    if (!companyId) {
+                        alert("Generazione bozza annullata: ID Azienda mancante.");
+                        return;
+                    }
+                    localStorage.setItem("fic_company_id", companyId.trim());
                 }
-
-                const companyId = userCompaniesData.data.companies[0].id;
 
                 // STEP 2: Costruzione Payload Documento
                 const payload = {
@@ -537,7 +544,7 @@
                     }
                 };
 
-                // STEP 3: Invio Richiesta creazione Bozza tramite Proxy CORS
+                // STEP 3: Invio Richiesta creazione Bozza
                 const targetDocUrl = encodeURIComponent(`https://api-v2.fattureincloud.it/c/${companyId}/issued_documents`);
                 const docRes = await fetch(proxyUrl + targetDocUrl, {
                     method: "POST",
@@ -551,12 +558,15 @@
                 const docData = await docRes.json();
 
                 if (docRes.ok) {
-                    alert(`✅ BOZZA CREATA CON SUCCESSO SU FATTURE IN CLOUD!\n\nID Bozza Generata: ${docData.data.id}\n\nIl documento è stato salvato correttamente nella sezione "Bozze" del tuo account Fatture in Cloud!`);
+                    alert(`✅ BOZZA CREATA CON SUCCESSO SU FATTURE IN CLOUD!\n\nID Bozza Generata: ${docData.data.id}\n\nIl documento è stato salvato correttamente nella sezione "Bozze" del tuo account!`);
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
                     console.error("Dettaglio Errore FIC:", docData);
-                    alert(`❌ Errore Fatture in Cloud:\n${docData.error ? docData.error.message : 'Parametri del documento non validi'}`);
+                    if (docRes.status === 403) {
+                        localStorage.removeItem("fic_company_id");
+                    }
+                    alert(`❌ Errore Fatture in Cloud (HTTP ${docRes.status}):\n${docData.error ? docData.error.message : 'Verificare le autorizzazioni dell\'azienda o il token.'}`);
                 }
 
             } catch (err) {
