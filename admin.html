@@ -106,14 +106,14 @@
                 </div>
             </div>
 
-            <!-- 2. SEZIONE CMS - GESTIONE CONTENUTI & FLOTTA -->
+            <!-- 2. SEZIONE CMS - GESTIONE CONTENUTI & FLOTTA (CON COORDINATE GPS ED AUDIOGUIDA) -->
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 gap-2">
                     <div>
                         <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                             <i class="fa-solid fa-layer-group text-cyan-600"></i> CMS — Gestione Contenuti & Flotta
                         </h2>
-                        <p class="text-xs text-slate-500">Aggiungi e aggiorna i punti d'interesse GPS, le regole di bordo e i dati delle imbarcazioni</p>
+                        <p class="text-xs text-slate-500">Aggiungi e aggiorna i punti d'interesse GPS, le coordinate esatte, le regole e le barche</p>
                     </div>
                 </div>
 
@@ -136,17 +136,36 @@
 
                             <div>
                                 <label class="block font-bold text-slate-600 uppercase">Titolo</label>
-                                <input type="text" id="cms_titolo" required placeholder="Es. Gommone Marlin 2" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                                <input type="text" id="cms_titolo" required placeholder="Es. Grotta Azzurra" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
                             </div>
 
                             <div>
-                                <label class="block font-bold text-slate-600 uppercase">Sottotitolo / Dettaglio (es. Max 6 Persone)</label>
-                                <input type="text" id="cms_sottotitolo" placeholder="Es. Gommone • Max 6 Persone" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                                <label class="block font-bold text-slate-600 uppercase">Sottotitolo / Dettaglio</label>
+                                <input type="text" id="cms_sottotitolo" placeholder="Es. Grotta Marina • Snorkeling" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
                             </div>
 
                             <div>
                                 <label class="block font-bold text-slate-600 uppercase">Descrizione / Dettagli</label>
                                 <textarea id="cms_descrizione" required rows="2" placeholder="Inserisci la descrizione..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none"></textarea>
+                            </div>
+
+                            <!-- CAMPI COORDINATE GPS ED AUDIOGUIDA PER DESTINAZIONI -->
+                            <div id="box-gps-cms" class="p-3 bg-cyan-50/60 border border-cyan-200 rounded-xl space-y-2">
+                                <b class="block text-cyan-900 font-bold uppercase text-[10px]">📍 Coordinate GPS & Audioguida</b>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">Latitudine</label>
+                                        <input type="number" step="any" id="cms_lat" placeholder="Es. 39.8731" class="w-full p-1.5 border rounded bg-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">Longitudine</label>
+                                        <input type="number" step="any" id="cms_lng" placeholder="Es. 15.7735" class="w-full p-1.5 border rounded bg-white">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[9px] font-bold text-slate-600 uppercase">Testo Audioguida (Letto all'arrivo)</label>
+                                    <textarea id="cms_audioguida" rows="2" placeholder="Benvenuto alla Grotta Azzurra..." class="w-full p-1.5 border rounded bg-white text-[11px]"></textarea>
+                                </div>
                             </div>
 
                             <div>
@@ -298,9 +317,6 @@
             console.error("Supabase init error:", err);
         }
 
-        // ===================================================================
-        // LOGIN / SESSIONE (Supabase Auth)
-        // ===================================================================
         function mostraPannello() {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('admin-panel').style.display = 'block';
@@ -352,9 +368,7 @@
             });
         });
 
-        // ===================================================================
-        // CMS
-        // ===================================================================
+        // CMS LOGIC CON GESTIONE COORDINATE GPS
         async function caricaContenutiCMS() {
             const container = document.getElementById('cmsListaContenuti');
             if(!container || !_supabase) return;
@@ -363,7 +377,7 @@
                 const { data, error } = await _supabase.from('cms_contenuti').select('*').order('created_at', { ascending: false });
 
                 if (error || !data || data.length === 0) {
-                    container.innerHTML = `<p class="text-xs text-slate-400 italic">Nessun contenuto CMS personalizzato presente. Aggiungi il primo dal form a sinistra!</p>`;
+                    container.innerHTML = `<p class="text-xs text-slate-400 italic">Nessun contenuto CMS presente. Aggiungi il primo dal form!</p>`;
                     return;
                 }
 
@@ -373,12 +387,18 @@
                                      : (item.categoria === 'flotta' ? 'bg-emerald-100 text-emerald-800'
                                      : (item.categoria === 'tips' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'));
 
+                    let gpsInfo = '';
+                    if (item.categoria === 'destinazioni' && item.latitudine) {
+                        gpsInfo = `<span class="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-mono">GPS: ${item.latitudine}, ${item.longitudine}</span>`;
+                    }
+
                     container.innerHTML += `
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-start text-xs gap-3">
                             <div class="space-y-1">
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-2 flex-wrap">
                                     <span class="${badgeColor} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">${item.categoria}</span>
                                     <b class="text-slate-800 text-xs">${item.titolo}</b>
+                                    ${gpsInfo}
                                 </div>
                                 <p class="text-slate-600 text-[11px]">${item.descrizione}</p>
                             </div>
@@ -395,11 +415,18 @@
 
         function togglePrezziCMS() {
             const cat = document.getElementById('cms_categoria').value;
-            const box = document.getElementById('box-prezzi-cms');
+            const boxPrezzi = document.getElementById('box-prezzi-cms');
+            const boxGps = document.getElementById('box-gps-cms');
+            
             if (cat === 'flotta') {
-                box.classList.remove('hidden');
+                boxPrezzi.classList.remove('hidden');
+                boxGps.classList.add('hidden');
+            } else if (cat === 'destinazioni') {
+                boxPrezzi.classList.add('hidden');
+                boxGps.classList.remove('hidden');
             } else {
-                box.classList.add('hidden');
+                boxPrezzi.classList.add('hidden');
+                boxGps.classList.add('hidden');
             }
         }
 
@@ -416,6 +443,9 @@
                 sottotitolo: document.getElementById('cms_sottotitolo').value,
                 descrizione: document.getElementById('cms_descrizione').value,
                 immagine_url: document.getElementById('cms_immagine_url').value,
+                latitudine: cat === 'destinazioni' ? (parseFloat(document.getElementById('cms_lat').value) || null) : null,
+                longitudine: cat === 'destinazioni' ? (parseFloat(document.getElementById('cms_lng').value) || null) : null,
+                testo_audioguida: cat === 'destinazioni' ? document.getElementById('cms_audioguida').value : null,
                 prezzo_bassa_mezza: cat === 'flotta' ? (parseFloat(document.getElementById('cms_bassa_mezza').value) || 120) : null,
                 prezzo_bassa_intera: cat === 'flotta' ? (parseFloat(document.getElementById('cms_bassa_intera').value) || 200) : null,
                 prezzo_alta_mezza: cat === 'flotta' ? (parseFloat(document.getElementById('cms_alta_mezza').value) || 150) : null,
@@ -441,12 +471,9 @@
             }
         }
 
-        // ===================================================================
-        // INTEGRAZIONE FATTURE IN CLOUD - REGIME FORFETTARIO
-        // Il token di FIC NON è più qui: sta solo sul server (/api/fattura).
-        // ===================================================================
-        const VAT_ID_FORFETTARIO = 66;   // "Contribuenti forfettari"
-        const GESTISCI_BOLLO = false;    // true = addebita 2 € di bollo sopra 77,47 € (totale pagamento +2)
+        // FATTURE IN CLOUD INTEGRATION
+        const VAT_ID_FORFETTARIO = 66;
+        const GESTISCI_BOLLO = false;
 
         async function generaFatturaInCloud(noleggioId) {
             const noleggio = listaNoleggi.find(n => String(n.id) === String(noleggioId));
@@ -488,21 +515,14 @@
             const conferma = confirm(`Vuoi generare la BOZZA di fattura per ${clienteData.nome_cognome} (€${importoTotale}) su Fatture in Cloud?`);
             if (!conferma) return;
 
-            // Anagrafica cliente
             const entityData = {
                 name: (clienteData.nome_cognome || noleggio.nome_cliente).trim(),
                 country: "Italia"
             };
 
-            if (clienteData.indirizzo && String(clienteData.indirizzo).trim() !== "") {
-                entityData.address_street = String(clienteData.indirizzo).trim();
-            }
-            if (clienteData.cap && String(clienteData.cap).trim() !== "") {
-                entityData.address_postal_code = String(clienteData.cap).trim();
-            }
-            if (clienteData.citta && String(clienteData.citta).trim() !== "") {
-                entityData.address_city = String(clienteData.citta).trim();
-            }
+            if (clienteData.indirizzo && String(clienteData.indirizzo).trim() !== "") entityData.address_street = String(clienteData.indirizzo).trim();
+            if (clienteData.cap && String(clienteData.cap).trim() !== "") entityData.address_postal_code = String(clienteData.cap).trim();
+            if (clienteData.citta && String(clienteData.citta).trim() !== "") entityData.address_city = String(clienteData.citta).trim();
 
             if (clienteData.cf_piva && String(clienteData.cf_piva).trim() !== "") {
                 const cfClean = String(clienteData.cf_piva).trim();
@@ -517,7 +537,6 @@
                 entityData.email = String(clienteData.email).trim();
             }
 
-            // Bollo (opzionale) e totale da pagare
             const bollo = (GESTISCI_BOLLO && importoTotale > 77.47) ? 2 : 0;
             const totaleDaPagare = Math.round((importoTotale + bollo) * 100) / 100;
 
@@ -564,7 +583,6 @@
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
-                    console.error("Dettaglio errore risposta FIC:", data);
                     alert("Errore Fatture in Cloud:\n" + JSON.stringify(data.error || data, null, 2));
                 }
             } catch (err) {
@@ -572,9 +590,6 @@
             }
         }
 
-        // ===================================================================
-        // DATI NOLEGGI & DASHBOARD
-        // ===================================================================
         let listaNoleggi = [];
 
         async function caricaDatiCloud() {
@@ -602,8 +617,6 @@
                     listaNoleggi = data || [];
                     aggiornaDashboardKPI(listaNoleggi);
                     renderTable(listaNoleggi);
-                } else {
-                    console.error("Errore Supabase:", error);
                 }
             } catch(err) {
                 console.error("Errore di rete:", err);
@@ -641,7 +654,6 @@
             noleggi.forEach((n) => {
                 const checkinLink = `${window.location.origin}/checkin.html?id=${n.id}`;
                 const guestLink = `${window.location.origin}/guest.html?cliente=${encodeURIComponent(n.nome_cliente)}&barca=${encodeURIComponent(n.barca)}&date=${n.data_noleggio}`;
-                // wa.me accetta solo cifre (niente +, spazi o trattini)
                 const telefonoWa = String(n.telefono || '').replace(/\D/g, '');
 
                 const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).\n\n⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}\n\n🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
