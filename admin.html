@@ -496,12 +496,16 @@
                 const data = await res.json();
 
                 if (res.ok && data.data) {
-                    alert(`✅ BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${data.data.id}\nIl documento è stato salvato nella sezione "Bozze" del tuo account Fatture in Cloud!`);
+                    alert(`✅ BOZZA CREATA SU FATTURE IN CLOUD!
+
+ID Bozza: ${data.data.id}
+Il documento è stato salvato nella sezione "Bozze" del tuo account Fatture in Cloud!`);
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
                     const msg = data.error ? (data.error.message || JSON.stringify(data.error)) : 'Parametri non validi';
-                    alert(`❌ Errore Fatture in Cloud:\n${msg}`);
+                    alert(`❌ Errore Fatture in Cloud:
+${msg}`);
                 }
             } catch (err) {
                 alert(`❌ Errore di rete: ${err.message}`);
@@ -565,7 +569,11 @@
                 const checkinLink = `${window.location.origin}/checkin.html?id=${n.id}`;
                 const guestLink = `${window.location.origin}/guest.html?cliente=${encodeURIComponent(n.nome_cliente)}&barca=${encodeURIComponent(n.barca)}&date=${n.data_noleggio}`;
                 
-                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).\n\n⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}\n\n🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
+                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).
+
+⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}
+
+🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
 
                 const badgeCheckin = n.stato_checkin === 'completato' 
                     ? `<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">✓ Completato</span>`
@@ -630,9 +638,11 @@
         }
 
         function esportaCSV() {
-            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin\n";
+            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin
+";
             listaNoleggi.forEach(n => {
-                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"\n`;
+                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"
+`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
