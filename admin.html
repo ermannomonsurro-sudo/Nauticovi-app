@@ -417,7 +417,7 @@
             }
         }
 
-        // INTEGRATIVO FATTURE IN CLOUD PER REGIME FORFETTARIO (FIX PAGAMENTI & TOTALE)
+        // INTEGRATIVO FATTURE IN CLOUD PER REGIME FORFETTARIO
         const FIC_TOKEN = "a/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWYiOiI5MEJ3MXFMalhYdHlEZzkyZ1V4dFRya1dlenRiZ0Q0RCJ9.EZN6lLDpB17nhhlfm8M692e76zZ_ur_oR5tP4McU1Oo";
         const COMPANY_ID = "944372";
 
@@ -465,7 +465,7 @@
 
             const importoTotale = Number(parseFloat(noleggio.importo).toFixed(2));
 
-            // PAYLOAD OPTIMIZED PER FATTURE IN CLOUD V2 FORFETTARIO
+            // PAYLOAD OPTIMIZED PER FATTURE IN CLOUD V2 (SENZA PAYMENTS_LIST PER EVITARE ERRORE CONVALIDA BOZZA)
             const payload = {
                 data: {
                     type: "invoice",
@@ -479,13 +479,6 @@
                             net_price: importoTotale,
                             gross_price: importoTotale,
                             vat: { id: 0, value: 0 }
-                        }
-                    ],
-                    payments_list: [
-                        {
-                            amount: importoTotale,
-                            due_date: noleggio.data_noleggio,
-                            status: "not_paid"
                         }
                     ]
                 }
