@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NAUTICOVI - Gestione Admin</title>
+    <title>NAUTICOVI - Gestione Admin & Dashboard Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Supabase Client JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans">
 
@@ -16,7 +18,10 @@
                 <i class="fa-solid fa-water text-cyan-500 text-2xl"></i>
                 <h1 class="text-xl font-black text-slate-900 tracking-wider">NAUTICOVI ADMIN</h1>
             </div>
-            <p class="text-xs text-slate-500">Inserisci la password riservata per accedere al gestionale</p><a href="index.html" class="inline-block text-xs text-cyan-600 font-bold hover:underline my-1"><i class="fa-solid fa-arrow-left"></i> Torna alla Home</a>
+            <p class="text-xs text-slate-500">Inserisci la password riservata per accedere al gestionale cloud</p>
+            <a href="index.html" class="inline-block text-xs text-cyan-600 font-bold hover:underline my-1">
+                <i class="fa-solid fa-arrow-left"></i> Torna alla Home
+            </a>
             
             <form onsubmit="checkLogin(event)" class="space-y-3">
                 <input type="password" id="admin-pass" placeholder="Password" required class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
@@ -28,113 +33,103 @@
         </div>
     </div>
 
-    <!-- PANNELLO DOCK ADMIN (NASCOSTO DI DEFAULT) -->
+    <!-- PANNELLO DOCK ADMIN -->
     <div id="admin-panel" class="hidden">
         <!-- Header Navbar -->
         <nav class="bg-slate-900 text-white p-4 shadow-xl border-b border-cyan-500/30 flex justify-between items-center sticky top-0 z-50">
             <div class="flex items-center space-x-3">
                 <span class="text-xl font-black tracking-widest text-cyan-400">NAUTICOVI</span>
-                <span class="text-[10px] bg-cyan-900 text-cyan-200 border border-cyan-500/40 px-2 py-0.5 rounded font-bold uppercase">GESTIONALE</span>
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-bold uppercase flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> SUPABASE CLOUD LIVE
+                </span>
             </div>
-            <div class="flex gap-3 items-center"><a href="index.html" class="text-xs text-cyan-400 hover:text-white font-bold"><i class="fa-solid fa-house"></i> Home</a><button onclick="logout()" class="text-xs text-slate-400 hover:text-white">Esci</button></div>
+            <div class="flex gap-3 items-center">
+                <a href="index.html" class="text-xs text-cyan-400 hover:text-white font-bold"><i class="fa-solid fa-house"></i> Home</a>
+                <button onclick="logout()" class="text-xs text-slate-400 hover:text-white">Esci</button>
+            </div>
         </nav>
 
         <div class="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
 
-            <!-- DASHBOARD RISULTATI & FILTRI -->
+            <!-- DASHBOARD RISULTATI KPI IN TEMPO REALE -->
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-3">
-                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-line text-cyan-600"></i> Dashboard Risultati
-                    </h2>
-                    <select id="filtroPeriodo" onchange="aggiornaDashboard()" class="p-2 border rounded-lg bg-slate-50 font-bold text-xs text-slate-700 outline-none">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-cyan-600"></i> Dashboard Monitoraggio Risultati
+                        </h2>
+                        <p class="text-xs text-slate-500">Statistiche e fatturato sincronizzati direttamente dal database cloud Supabase</p>
+                    </div>
+                    <select id="filtroPeriodo" onchange="caricaDatiCloud()" class="p-2 border rounded-lg bg-slate-50 font-bold text-xs text-slate-700 outline-none">
                         <option value="tutto">Tutti i Noleggi</option>
                         <option value="oggi">Oggi</option>
+                        <option value="mese">Mese Corrente</option>
                     </select>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- KPI 1: Fatturato -->
                     <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-cyan-500 flex justify-between items-center">
                         <div>
-                            <p class="text-xs text-slate-400 font-medium uppercase">Fatturato Totale</p>
-                            <h3 class="text-2xl font-black text-cyan-400 mt-1" id="kpiFatturato">€0</h3>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Fatturato Incassato</p>
+                            <h3 class="text-2xl font-black text-cyan-400 mt-0.5" id="kpiFatturato">€0</h3>
                         </div>
-                        <i class="fa-solid fa-euro-sign text-3xl text-slate-700"></i>
+                        <i class="fa-solid fa-euro-sign text-2xl text-slate-700"></i>
                     </div>
 
+                    <!-- KPI 2: Noleggi Totali -->
                     <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-emerald-500 flex justify-between items-center">
                         <div>
-                            <p class="text-xs text-slate-400 font-medium uppercase">Noleggi Registrati</p>
-                            <h3 class="text-2xl font-black text-emerald-400 mt-1" id="kpiNoleggi">0</h3>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Noleggi Registrati</p>
+                            <h3 class="text-2xl font-black text-emerald-400 mt-0.5" id="kpiNoleggi">0</h3>
                         </div>
-                        <i class="fa-solid fa-ship text-3xl text-slate-700"></i>
+                        <i class="fa-solid fa-ship text-2xl text-slate-700"></i>
+                    </div>
+
+                    <!-- KPI 3: Check-in Completati -->
+                    <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-amber-500 flex justify-between items-center">
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Web Check-in</p>
+                            <h3 class="text-2xl font-black text-amber-400 mt-0.5" id="kpiCheckin">0 / 0</h3>
+                        </div>
+                        <i class="fa-solid fa-id-card text-2xl text-slate-700"></i>
+                    </div>
+
+                    <!-- KPI 4: Incasso Medio -->
+                    <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-purple-500 flex justify-between items-center">
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Incasso Medio / Barca</p>
+                            <h3 class="text-2xl font-black text-purple-400 mt-0.5" id="kpiMedio">€0</h3>
+                        </div>
+                        <i class="fa-solid fa-calculator text-2xl text-slate-700"></i>
                     </div>
                 </div>
             </div>
 
-            <!-- VISUALIZZATORE CALENDARIO FLOTTA -->
-            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
-                <h2 class="text-md font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
-                    <i class="fa-solid fa-calendar-check text-cyan-600"></i> Calendario Disponibilità Flotta
-                </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 text-xs">
-                    <div class="p-3 bg-slate-50 rounded-xl border text-center">
-                        <b class="block text-slate-800">Marlin 1</b>
-                        <span class="text-[10px] text-emerald-600 font-bold">Libero Oggi</span>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded-xl border text-center">
-                        <b class="block text-slate-800">Marlin 2</b>
-                        <span class="text-[10px] text-emerald-600 font-bold">Libero Oggi</span>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded-xl border text-center">
-                        <b class="block text-slate-800">Poseidon 1</b>
-                        <span class="text-[10px] text-emerald-600 font-bold">Libero Oggi</span>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded-xl border text-center">
-                        <b class="block text-slate-800">Poseidon 2</b>
-                        <span class="text-[10px] text-emerald-600 font-bold">Libero Oggi</span>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded-xl border text-center">
-                        <b class="block text-slate-800">Lancia 30CV</b>
-                        <span class="text-[10px] text-emerald-600 font-bold">Libero Oggi</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- REGISTRO CLIENTE & FORM EXPORT -->
+            <!-- REGISTRO CLIENTE & TABELLA CLOUD -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
+                <!-- Form Registrazione Noleggio -->
                 <div class="lg:col-span-1 bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
                     <h2 class="text-md font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-user-plus text-cyan-600"></i> Registra Noleggio
+                        <i class="fa-solid fa-user-plus text-cyan-600"></i> Nuovo Noleggio su Cloud
                     </h2>
 
-                    <form id="crmForm" class="space-y-3 text-xs">
+                    <form id="crmForm" onsubmit="registraNoleggioCloud(event)" class="space-y-3 text-xs">
                         <div>
-                            <label class="block font-bold text-slate-600 uppercase">Nome e Cognome</label>
+                            <label class="block font-bold text-slate-600 uppercase">Nome e Cognome Cliente</label>
                             <input type="text" id="nome" required placeholder="Mario Rossi" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block font-bold text-slate-600 uppercase">CF / P.IVA</label>
-                                <input type="text" id="cf_piva" required placeholder="CF" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
-                            </div>
-                            <div>
-                                <label class="block font-bold text-slate-600 uppercase">Telefono</label>
-                                <input type="tel" id="telefono" required placeholder="Telefono" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
-                            </div>
-                        </div>
-
                         <div>
-                            <label class="block font-bold text-slate-600 uppercase">Email (per Fattura)</label>
-                            <input type="email" id="email" required placeholder="email@dominio.it" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                            <label class="block font-bold text-slate-600 uppercase">Telefono (WhatsApp)</label>
+                            <input type="tel" id="telefono" required placeholder="+39 333..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
                         </div>
 
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="block font-bold text-slate-600 uppercase">Barca</label>
-                                <select id="barca" class="w-full mt-1 p-2 border rounded-lg bg-white outline-none">
+                                <label class="block font-bold text-slate-600 uppercase">Barca Assegnata</label>
+                                <select id="barca" class="w-full mt-1 p-2 border rounded-lg bg-white outline-none font-semibold">
                                     <option>Marlin 1</option>
                                     <option>Marlin 2</option>
                                     <option>Poseidon 1</option>
@@ -143,46 +138,53 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block font-bold text-slate-600 uppercase">Importo (€)</label>
+                                <label class="block font-bold text-slate-600 uppercase">Importo Totale (€)</label>
                                 <input type="number" id="importo" required placeholder="150" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block font-bold text-slate-600 uppercase">Data Noleggio</label>
-                            <input type="date" id="data_noleggio" required class="w-full mt-1 p-2 border rounded-lg outline-none">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold text-slate-600 uppercase">Caparra (€)</label>
+                                <input type="number" id="caparra" required placeholder="75" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-600 uppercase">Data Noleggio</label>
+                                <input type="date" id="data_noleggio" required class="w-full mt-1 p-2 border rounded-lg outline-none">
+                            </div>
                         </div>
 
-                        <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2.5 rounded-lg shadow transition flex justify-center items-center gap-2">
-                            <i class="fa-solid fa-save"></i> Salva e Blocca Data
+                        <button type="submit" id="btn-salva-noleggio" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2.5 rounded-lg shadow transition flex justify-center items-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Salva Noleggio in Cloud
                         </button>
                     </form>
                 </div>
 
+                <!-- Tabella Noleggi e Stato Check-in / Fatture -->
                 <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-md border border-slate-200">
-                    <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b pb-2 gap-2">
                         <h2 class="text-md font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-users text-cyan-600"></i> Anagrafica Noleggi
+                            <i class="fa-solid fa-users text-cyan-600"></i> Anagrafica Noleggi & Web Check-in
                         </h2>
-                        <button onclick="exportCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold shadow">
-                            <i class="fa-solid fa-file-excel"></i> Esporta Fatture in Cloud
+                        <button onclick="esportaCSV('noleggi')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold shadow flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-excel"></i> Esporta Excel / Fatture in Cloud
                         </button>
                     </div>
 
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr class="bg-slate-100 border-b">
+                                <tr class="bg-slate-100 border-b text-slate-700 font-bold uppercase text-[10px]">
                                     <th class="p-2">Cliente</th>
-                                    <th class="p-2">CF / P.IVA</th>
                                     <th class="p-2">Barca</th>
                                     <th class="p-2">Data</th>
                                     <th class="p-2">Importo</th>
-                                    <th class="p-2">Azioni</th>
+                                    <th class="p-2">Stato Check-in</th>
+                                    <th class="p-2">Azioni WhatsApp</th>
                                 </tr>
                             </thead>
                             <tbody id="clientiTable" class="divide-y">
-                                <!-- Popolato via JS -->
+                                <!-- Popolato via Supabase JS -->
                             </tbody>
                         </table>
                     </div>
@@ -193,14 +195,19 @@
         </div>
     </div>
 
+    <!-- SCRIPT SUPABASE & CRM ADMIN LOGIC -->
     <script>
+        const SUPABASE_URL = "https://cbvpixcfhmedbapnvfmw.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_V0B06YxZ1oW6tqg_6yx5og_OgbhxlUo";
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         function checkLogin(e) {
             e.preventDefault();
             const pass = document.getElementById('admin-pass').value;
             if(pass === 'nauticovi2026') {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('admin-panel').classList.remove('hidden');
-                aggiornaDashboard();
+                caricaDatiCloud();
             } else {
                 document.getElementById('login-error').classList.remove('hidden');
             }
@@ -211,70 +218,132 @@
             document.getElementById('admin-panel').classList.add('hidden');
         }
 
-        let clienti = JSON.parse(localStorage.getItem('nauticovi_clienti')) || [];
+        let listaNoleggi = [];
 
-        function aggiornaDashboard() {
-            let totale = 0;
-            clienti.forEach(c => totale += parseFloat(c.importo || 0));
-            document.getElementById('kpiFatturato').innerText = `€${totale}`;
-            document.getElementById('kpiNoleggi').innerText = clienti.length;
-            renderTable();
+        async function caricaDatiCloud() {
+            const filtro = document.getElementById('filtroPeriodo').value;
+            
+            let query = _supabase.from('noleggi').select('*').order('data_noleggio', { ascending: false });
+
+            const oggi = new Date().toISOString().split('T')[0];
+            if (filtro === 'oggi') {
+                query = query.eq('data_noleggio', oggi);
+            }
+
+            const { data, error } = await query;
+
+            if (error) {
+                console.error("Errore caricamento Supabase:", error);
+                return;
+            }
+
+            listaNoleggi = data || [];
+            aggiornaDashboardKPI(listaNoleggi);
+            renderTable(listaNoleggi);
         }
 
-        function renderTable() {
+        function aggiornaDashboardKPI(noleggi) {
+            let totaleFatturato = 0;
+            let checkinCompletati = 0;
+
+            noleggi.forEach(n => {
+                totaleFatturato += parseFloat(n.importo || 0);
+                if (n.stato_checkin === 'completato') checkinCompletati++;
+            });
+
+            const numNoleggi = noleggi.length;
+            const mediaIncasso = numNoleggi > 0 ? (totaleFatturato / numNoleggi).toFixed(0) : 0;
+
+            document.getElementById('kpiFatturato').innerText = `€${totaleFatturato.toLocaleString('it-IT')}`;
+            document.getElementById('kpiNoleggi').innerText = numNoleggi;
+            document.getElementById('kpiCheckin').innerText = `${checkinCompletati} / ${numNoleggi}`;
+            document.getElementById('kpiMedio').innerText = `€${mediaIncasso}`;
+        }
+
+        function renderTable(noleggi) {
             const tbody = document.getElementById('clientiTable');
             tbody.innerHTML = '';
-            clienti.forEach((c, index) => {
-                const msg = encodeURIComponent(`Ciao ${c.nome}! Ecco il riepilogo per il noleggio della barca ${c.barca} del ${c.data_noleggio}. Importo totale: €${c.importo}. Caparra 50%: €${c.importo/2}.`);
+
+            if(noleggi.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Nessun noleggio trovato per questo periodo.</td></tr>`;
+                return;
+            }
+
+            noleggi.forEach((n) => {
+                const checkinLink = `${window.location.origin}/checkin.html?id=${n.id}`;
+                const guestLink = `${window.location.origin}/guest.html?cliente=${encodeURIComponent(n.nome_cliente)}&barca=${encodeURIComponent(n.barca)}&date=${n.data_noleggio}`;
+                
+                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).\n\n⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}\n\n🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
+
+                const badgeCheckin = n.stato_checkin === 'completato' 
+                    ? `<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">✓ Completato</span>`
+                    : `<span class="bg-amber-100 text-amber-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">⌛ In Attesa</span>`;
+
                 tbody.innerHTML += `
                     <tr>
-                        <td class="p-2 font-bold">${c.nome}</td>
-                        <td class="p-2 font-mono">${c.cf_piva}</td>
-                        <td class="p-2">${c.barca}</td>
-                        <td class="p-2">${c.data_noleggio}</td>
-                        <td class="p-2 font-bold text-emerald-600">€${c.importo}</td>
-                        <td class="p-2 flex gap-2">
-                            <a href="https://wa.me/${c.telefono}?text=${msg}" target="_blank" class="text-emerald-600 font-bold" title="Invia Preventivo"><i class="fa-brands fa-whatsapp"></i></a>
-                            <button onclick="elimina(${index})" class="text-red-500 font-bold"><i class="fa-solid fa-trash"></i></button>
+                        <td class="p-2 font-bold text-slate-800">${n.nome_cliente}</td>
+                        <td class="p-2 font-semibold text-cyan-700">${n.barca}</td>
+                        <td class="p-2 font-mono text-slate-600">${n.data_noleggio}</td>
+                        <td class="p-2 font-bold text-emerald-600">€${n.importo}</td>
+                        <td class="p-2">${badgeCheckin}</td>
+                        <td class="p-2 flex gap-2 items-center">
+                            <a href="https://wa.me/${n.telefono}?text=${msgWhatsApp}" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] flex items-center gap-1 shadow" title="Invia Link WhatsApp">
+                                <i class="fa-brands fa-whatsapp text-xs"></i> Invia Link
+                            </a>
+                            <button onclick="eliminaNoleggio('${n.id}')" class="text-red-400 hover:text-red-600 p-1" title="Elimina">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
                         </td>
                     </tr>
                 `;
             });
         }
 
-        document.getElementById('crmForm').addEventListener('submit', function(e) {
+        async function registraNoleggioCloud(e) {
             e.preventDefault();
-            const nuovo = {
-                nome: document.getElementById('nome').value,
-                cf_piva: document.getElementById('cf_piva').value,
-                telefono: document.getElementById('telefono').value,
-                email: document.getElementById('email').value,
-                barca: document.getElementById('barca').value,
-                importo: document.getElementById('importo').value,
-                data_noleggio: document.getElementById('data_noleggio').value
-            };
-            clienti.push(nuovo);
-            localStorage.setItem('nauticovi_clienti', JSON.stringify(clienti));
-            aggiornaDashboard();
-            this.reset();
-        });
+            const btn = document.getElementById('btn-salva-noleggio');
+            btn.disabled = true;
 
-        function elimina(index) {
-            clienti.splice(index, 1);
-            localStorage.setItem('nauticovi_clienti', JSON.stringify(clienti));
-            aggiornaDashboard();
+            const nuovo = {
+                nome_cliente: document.getElementById('nome').value,
+                telefono: document.getElementById('telefono').value,
+                barca: document.getElementById('barca').value,
+                importo: parseFloat(document.getElementById('importo').value),
+                caparra: parseFloat(document.getElementById('caparra').value),
+                data_noleggio: document.getElementById('data_noleggio').value,
+                stato_checkin: 'in_attesa'
+            };
+
+            const { data, error } = await _supabase.from('noleggi').insert([nuovo]);
+
+            if (error) {
+                alert("Errore nel salvataggio su Cloud: " + error.message);
+            } else {
+                document.getElementById('crmForm').reset();
+                caricaDatiCloud();
+            }
+            btn.disabled = false;
         }
 
-        function exportCSV() {
-            let csv = "Nome,CodiceFiscale_PIVA,Email,Telefono,Descrizione,Importo,Data\n";
-            clienti.forEach(c => {
-                csv += `"${c.nome}","${c.cf_piva}","${c.email}","${c.telefono}","Noleggio barca ${c.barca}",${c.importo},"${c.data_noleggio}"\n`;
+        async function eliminaNoleggio(id) {
+            if(confirm("Sei sicuro di voler eliminare questo noleggio dal database cloud?")) {
+                await _supabase.from('noleggi').delete().eq('id', id);
+                caricaDatiCloud();
+            }
+        }
+
+        function esportaCSV() {
+            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin
+";
+            listaNoleggi.forEach(n => {
+                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"
+`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.setAttribute('href', url);
-            a.setAttribute('download', 'import_fatture_in_cloud_nauticovi.csv');
+            a.setAttribute('download', 'noleggi_nauticovi_cloud.csv');
             a.click();
         }
     </script>
