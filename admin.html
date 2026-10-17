@@ -197,31 +197,53 @@
 
     <!-- SCRIPT SUPABASE & CRM ADMIN LOGIC -->
     <script>
+        // CREDENZIALI SUPABASE
         const SUPABASE_URL = "https://cbvpixcfhmedbapnvfmw.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_V0B06YxZ1oW6tqg_6yx5og_OgbhxlUo";
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let _supabase;
 
-        
-        // GESTIONE LOGIN ADMIN
-        function checkLogin(e) {
-            if(e) e.preventDefault();
-            const passInput = document.getElementById('admin-pass');
-            const pass = passInput ? passInput.value.trim() : '';
-            if(pass === 'nauticovi2026') {
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('admin-panel').classList.remove('hidden');
-                caricaDatiCloud();
-            } else {
-                const errEl = document.getElementById('login-error');
-                if(errEl) errEl.classList.remove('hidden');
-            }
-            return false;
+        try {
+            _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (err) {
+            console.error("Errore inizializzazione Supabase:", err);
         }
 
+        // FUNZIONE CHECK LOGIN SICURA
+        function checkLogin(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            const passInput = document.getElementById('admin-pass');
+            const pass = passInput ? passInput.value.trim() : '';
+
+            if (pass === 'nauticovi2026') {
+                // 1. Nascondi login e mostra subito il pannello Admin
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('admin-panel').classList.remove('hidden');
+                document.getElementById('admin-panel').style.display = 'block';
+
+                // 2. Tenta il caricamento dati senza bloccare l'accesso
+                setTimeout(() => {
+                    caricaDatiCloud().catch(err => {
+                        console.error("Errore nel caricamento dati Supabase:", err);
+                    });
+                }, 100);
+
+                return false;
+            } else {
+                const errEl = document.getElementById('login-error');
+                if (errEl) errEl.classList.remove('hidden');
+                return false;
+            }
+        }
 
         function logout() {
-            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('admin-panel').classList.add('hidden');
+            document.getElementById('admin-panel').style.display = 'none';
+            document.getElementById('admin-pass').value = '';
         }
 
         let listaNoleggi = [];
