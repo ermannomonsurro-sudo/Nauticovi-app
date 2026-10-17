@@ -25,7 +25,7 @@
             
             <form onsubmit="checkLogin(event)" class="space-y-3">
                 <input type="password" id="admin-pass" placeholder="Password" required class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
-                <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl shadow transition text-xs">
+                <button type="button" onclick="eseguiLogin()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl shadow transition text-xs">
                     Accedi al Gestionale
                 </button>
             </form>
@@ -205,46 +205,81 @@
         try {
             _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } catch (err) {
-            console.error("Errore inizializzazione Supabase:", err);
+            console.error("Supabase init error:", err);
         }
 
-        // FUNZIONE CHECK LOGIN SICURA
-        function checkLogin(e) {
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-
+        // TASTO ACCEDI / INVIO FORM INFFALLIBILE
+        function eseguiLogin() {
             const passInput = document.getElementById('admin-pass');
-            const pass = passInput ? passInput.value.trim() : '';
+            const passValue = passInput ? passInput.value.trim() : '';
 
-            if (pass === 'nauticovi2026') {
-                // 1. Nascondi login e mostra subito il pannello Admin
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('admin-panel').classList.remove('hidden');
-                document.getElementById('admin-panel').style.display = 'block';
+            if (passValue === 'nauticovi2026') {
+                // Sblocco visivo immediato
+                const loginBox = document.getElementById('login-screen');
+                const adminBox = document.getElementById('admin-panel');
+                
+                if (loginBox) {
+                    loginBox.classList.add('hidden');
+                    loginBox.style.display = 'none';
+                }
+                if (adminBox) {
+                    adminBox.classList.remove('hidden');
+                    adminBox.style.display = 'block';
+                }
 
-                // 2. Tenta il caricamento dati senza bloccare l'accesso
-                setTimeout(() => {
-                    caricaDatiCloud().catch(err => {
-                        console.error("Errore nel caricamento dati Supabase:", err);
-                    });
-                }, 100);
+                // Salva lo stato di login nella sessione per evitare che si disconnetta al refresh
+                sessionStorage.setItem('nauticovi_admin_auth', 'true');
 
+                // Carica i dati in background
+                if (typeof caricaDatiCloud === 'function') {
+                    caricaDatiCloud().catch(err => console.error(err));
+                }
                 return false;
             } else {
-                const errEl = document.getElementById('login-error');
-                if (errEl) errEl.classList.remove('hidden');
+                const errBox = document.getElementById('login-error');
+                if (errBox) errBox.classList.remove('hidden');
                 return false;
             }
+        }
+
+        function checkLogin(e) {
+            if (e && e.preventDefault) e.preventDefault();
+            return eseguiLogin();
         }
 
         function logout() {
-            document.getElementById('login-screen').style.display = 'flex';
-            document.getElementById('admin-panel').classList.add('hidden');
-            document.getElementById('admin-panel').style.display = 'none';
-            document.getElementById('admin-pass').value = '';
+            sessionStorage.removeItem('nauticovi_admin_auth');
+            const loginBox = document.getElementById('login-screen');
+            const adminBox = document.getElementById('admin-panel');
+            
+            if (loginBox) {
+                loginBox.classList.remove('hidden');
+                loginBox.style.display = 'flex';
+            }
+            if (adminBox) {
+                adminBox.classList.add('hidden');
+                adminBox.style.display = 'none';
+            }
+            const passInput = document.getElementById('admin-pass');
+            if (passInput) passInput.value = '';
         }
+
+        // Auto-login se già autenticato nella sessione
+        window.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('nauticovi_admin_auth') === 'true') {
+                const loginBox = document.getElementById('login-screen');
+                const adminBox = document.getElementById('admin-panel');
+                if (loginBox) {
+                    loginBox.classList.add('hidden');
+                    loginBox.style.display = 'none';
+                }
+                if (adminBox) {
+                    adminBox.classList.remove('hidden');
+                    adminBox.style.display = 'block';
+                    caricaDatiCloud().catch(err => console.error(err));
+                }
+            }
+        });
 
         let listaNoleggi = [];
 
