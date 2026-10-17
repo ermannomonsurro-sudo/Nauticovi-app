@@ -1,36 +1,73 @@
+// /api/fattura.js  (Vercel Serverless Function)
+//
+// Variabili d'ambiente da impostare su Vercel (Settings -> Environment Variables):
+//   FIC_TOKEN          token API di Fatture in Cloud (con scrittura su "Fatture emesse")
+//   FIC_COMPANY_ID     id azienda su Fatture in Cloud
+//   SUPABASE_URL       https://cbvpixcfhmedbapnvfmw.supabase.co
+//   SUPABASE_ANON_KEY  chiave pubblica (publishable) di Supabase
+//   ADMIN_EMAIL        email dell'utente admin creato su Supabase Auth
+
 export default async function handler(req, res) {
-  // Gestione permessi CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
+  // Nessun CORS aperto: pagina admin e API stanno sullo stesso dominio.
   if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Metodo non consentito' });
   }
 
-  const { token, companyId, payload } = req.body;
+  const { FIC_TOKEN, FIC_COMPANY_ID, SUPABASE_URL, SUPABASE_ANON_KEY, ADMIN_EMAIL } = process.env;
+
+  if (!FIC_TOKEN || !FIC_COMPANY_ID || !SUPABASE_URL || !SUPABASE_ANON_KEY || !ADMIN_EMAIL) {
+    return res.status(500).json({ error: 'Configurazione server incompleta' });
+  }
+
+  // 1. Verifica che la richiesta arrivi dall'admin loggato su Supabase
+  const authHeader = req.headers.authorization || '';
+  const jwt = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+  if (!jwt) {
+    return res.status(401).json({ error: 'Non autenticato' });
+  }
 
   try {
-    const response = await fetch(`https://api-v2.fattureincloud.it/c/${companyId}/issued_documents`, {
-      method: 'POST',
+    const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${jwt}`
+      }
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json(data);
+    if (!userRes.ok) {
+      return res.status(401).json({ error: 'Sessione non valida o scaduta' });
     }
 
-    return res.status(200).json(data);
+    const user = await userRes.json();
+    if (!user.email || user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+      return res.status(403).json({ error: 'Utente non autorizzato' });
+    }
+
+    // 2. Valida il documento ricevuto
+    const documento = req.body && req.body.payload && req.body.payload.data;
+    if (!documento || typeof documento !== 'object') {
+      return res.status(400).json({ error: 'Payload mancante' });
+    }
+
+    // Dal browser si possono creare solo BOZZE di fattura
+    const body = { data: { ...documento, type: 'invoice', is_draft: true } };
+
+    // 3. Chiamata a Fatture in Cloud con il token tenuto solo sul server
+    const response = await fetch(
+      `https://api-v2.fattureincloud.it/c/${FIC_COMPANY_ID}/issued_documents`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${FIC_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      }
+    );
+
+    const data = await response.json();
+    return res.status(response.status).json(data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
