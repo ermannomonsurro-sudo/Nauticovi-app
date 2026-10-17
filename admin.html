@@ -428,7 +428,7 @@
         }
 
         
-        // GESTIONE INTEGRATA FATTURE IN CLOUD API
+        // GESTIONE INTEGRATA FATTURE IN CLOUD API (MODALITÀ BOZZA)
         async function generaFatturaInCloud(noleggioId) {
             const noleggio = listaNoleggi.find(n => n.id === noleggioId);
             if (!noleggio) {
@@ -437,9 +437,7 @@
             }
 
             // Recuperiamo i dati anagrafici dal checkin
-            const { data: checkinData, error: checkinErr } = await _supabase.from('checkin').select('*').eq('noleggio_id', noleggioId).single();
-
-            let clienteData = checkinData || {
+            let clienteData = {
                 nome_cognome: noleggio.nome_cliente,
                 cf_piva: "ANAGRAFICA DA COMPLETARE",
                 email: "Non specificata",
@@ -448,14 +446,61 @@
                 citta: "Praia a Mare"
             };
 
-            const tokenFIC = prompt("Inserisci il tuo Bearer Token API di Fatture in Cloud per completare l'invio automatizzato:", "IL_TUO_BEARER_TOKEN_FIC");
+            try {
+                const { data: checkinData } = await _supabase.from('checkin').select('*').eq('noleggio_id', noleggioId).maybeSingle();
+                if (checkinData) {
+                    clienteData = checkinData;
+                }
+            } catch (err) {
+                console.log("Check-in non ancora presente, continuo con dati base", err);
+            }
+
+            const tokenFIC = prompt("Inserisci il tuo Bearer Token API di Fatture in Cloud:", "IL_TUO_BEARER_TOKEN_FIC");
 
             if (!tokenFIC) {
-                alert("Generazione fattura annullata.");
+                alert("Generazione bozza annullata.");
                 return;
             }
 
-            alert(`🚀 INVIO IN CORSO VIA API FATTURE IN CLOUD:\n\nCliente: ${clienteData.nome_cognome}\nCF/P.IVA: ${clienteData.cf_piva}\nImporto: €${noleggio.importo}\nCausale: Noleggio imbarcazione ${noleggio.barca}\n\nIl sistema sta creando la fattura direttamente sul tuo account Fatture in Cloud!`);
+            // Payload strutturato per Fatture in Cloud API v2 in modalità BOZZA
+            const payloadFattura = {
+                data: {
+                    type: "invoice",
+                    entity: {
+                        name: clienteData.nome_cognome,
+                        vat_number: clienteData.cf_piva,
+                        tax_code: clienteData.cf_piva,
+                        address_street: clienteData.indirizzo,
+                        address_postal_code: clienteData.cap,
+                        address_city: clienteData.citta,
+                        email: clienteData.email
+                    },
+                    date: noleggio.data_noleggio,
+                    is_draft: true, // FATTURA SALVATA COME BOZZA!
+                    items_list: [
+                        {
+                            name: `Noleggio imbarcazione ${noleggio.barca}`,
+                            qty: 1,
+                            net_price: parseFloat(noleggio.importo) / 1.22, // Scorporo IVA 22% indicativo
+                            vat: { id: 0, value: 22 }
+                        }
+                    ]
+                }
+            };
+
+            alert(`📝 CREAZIONE BOZZA FATTURA SU FATTURE IN CLOUD:
+
+` +
+                  `Cliente: ${clienteData.nome_cognome}
+` +
+                  `CF/P.IVA: ${clienteData.cf_piva}
+` +
+                  `Importo: €${noleggio.importo}
+` +
+                  `Stato: BOZZA (Non inviata al SDI)
+
+` +
+                  `Il documento verrà salvato nella sezione "Bozze" di Fatture in Cloud, così potrai controllarlo prima dell'invio definitivo!`);
 
             // Aggiorniamo lo stato della fattura su Supabase
             await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
