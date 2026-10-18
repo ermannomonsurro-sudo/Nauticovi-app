@@ -34,18 +34,25 @@
             transform: scale(1.15);
             border-color: #06b6d4;
         }
+        /* Style per i Marker di Pericolo Rossi */
         .danger-marker-icon {
             background-color: #ef4444;
             color: #ffffff;
             border: 2px solid #ffffff;
             border-radius: 50%;
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.5);
             font-size: 14px;
+            animation: pulse-danger 2s infinite;
+        }
+        @keyframes pulse-danger {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
     </style>
     <!-- Supabase Client JS SDK -->
@@ -112,6 +119,7 @@
                             <i class="fa-brands fa-whatsapp text-sm"></i> <span class="hidden sm:inline">WhatsApp</span>
                         </a>
                     </div>
+                    
                     <button onclick="impostaRottaBanchina()" class="bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-extrabold px-3 py-1.5 rounded-xl shadow flex items-center gap-1.5 text-xs transition active:scale-95">
                         <i class="fa-solid fa-anchor"></i> <span data-i18n="btn_return_base">Torna in Banchina</span>
                     </button>
@@ -157,10 +165,13 @@
             </div>
         </div>
 
-        <!-- TAB NAVIGAZIONE INTERNA -->
-        <div class="grid grid-cols-4 bg-slate-200 p-1 rounded-xl text-[10px] font-bold text-slate-600 gap-1 shadow-inner">
+        <!-- TAB NAVIGAZIONE INTERNA COMPLETA (5 TAB) -->
+        <div class="grid grid-cols-5 bg-slate-200 p-1 rounded-xl text-[10px] font-bold text-slate-600 gap-1 shadow-inner">
             <button onclick="switchTab('destinazioni')" id="tab-destinazioni" class="tab-btn py-2 rounded-lg bg-white text-slate-900 shadow flex flex-col sm:flex-row items-center justify-center gap-1">
                 <i class="fa-solid fa-location-dot text-cyan-600"></i> <span data-i18n="tab_dest">Destinazioni</span>
+            </button>
+            <button onclick="switchTab('itinerari')" id="tab-itinerari" class="tab-btn py-2 rounded-lg hover:text-slate-900 flex flex-col sm:flex-row items-center justify-center gap-1">
+                <i class="fa-solid fa-route text-purple-600"></i> <span data-i18n="tab_itineraries">Itinerari</span>
             </button>
             <button onclick="switchTab('mappa')" id="tab-mappa" class="tab-btn py-2 rounded-lg hover:text-slate-900 flex flex-col sm:flex-row items-center justify-center gap-1">
                 <i class="fa-solid fa-compass text-cyan-600"></i> <span data-i18n="tab_map">Mappa GPS</span>
@@ -183,7 +194,20 @@
             </div>
         </div>
 
-        <!-- SEZIONE 2: MAPPA GPS & TELEMETRIA -->
+        <!-- SEZIONE 2: ITINERARI & TOUR A TEMPO -->
+        <div id="sec-itinerari" class="tab-content hidden space-y-4">
+            <div class="space-y-3">
+                <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5 px-1">
+                    <i class="fa-solid fa-route text-purple-600"></i> <span data-i18n="itin_section_title">Itinerari Consigliati in Base al Tempo</span>
+                </h3>
+                <p class="text-xs text-slate-500 px-1" data-i18n="itin_section_desc">Tour raggruppati che collegano 2 o più destinazioni per sfruttare al meglio il tuo tempo a bordo.</p>
+                <div id="itinerari-cards-container" class="space-y-4">
+                    <p class="text-xs text-slate-400 italic text-center py-4" data-i18n="loading_itin">Caricamento itinerari dal CMS...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEZIONE 3: MAPPA GPS & TELEMETRIA -->
         <div id="sec-mappa" class="tab-content hidden space-y-4">
             <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md border border-cyan-500/40 grid grid-cols-3 gap-2 text-center text-xs">
                 <div>
@@ -215,7 +239,7 @@
             </div>
         </div>
 
-        <!-- SEZIONE 3: TIPS -->
+        <!-- SEZIONE 4: TIPS -->
         <div id="sec-tips" class="tab-content hidden space-y-3">
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2 text-xs uppercase tracking-wider">
@@ -225,7 +249,7 @@
             </div>
         </div>
 
-        <!-- SEZIONE 4: DIVIETI -->
+        <!-- SEZIONE 5: DIVIETI -->
         <div id="sec-divieti" class="tab-content hidden space-y-3">
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <h3 class="font-bold text-red-600 flex items-center gap-2 border-b pb-2 text-xs uppercase tracking-wider">
@@ -243,6 +267,7 @@
 
     </main>
 
+    <!-- TRADUZIONI MULTILINGUA & LOGICA COMPLETA -->
     <script>
         const SUPABASE_URL = "https://cbvpixcfhmedbapnvfmw.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_V0B06YxZ1oW6tqg_6yx5og_OgbhxlUo";
@@ -264,10 +289,16 @@
                 weather_air: "Temp. Aria",
                 weather_water: "Temp. Acqua",
                 tab_dest: "Destinazioni",
+                tab_itineraries: "Itinerari",
                 tab_map: "Mappa GPS",
                 tab_tips: "Tips Barca",
                 tab_rules: "Divieti",
                 dest_section_title: "Punti di Interesse & Calette",
+                itin_section_title: "Itinerari Consigliati in Base al Tempo",
+                itin_section_desc: "Tour raggruppati che collegano 2 o più destinazioni per sfruttare al meglio il tuo tempo a bordo.",
+                btn_start_tour: "Avvia Questo Tour",
+                loading_itin: "Caricamento itinerari dal CMS...",
+                no_itin_cms: "Nessun itinerario trovato nel CMS.",
                 telem_speed: "Velocità",
                 telem_dist: "Distanza Target",
                 telem_eta: "ETA Stimato",
@@ -289,10 +320,16 @@
                 weather_air: "Air Temp.",
                 weather_water: "Water Temp.",
                 tab_dest: "Destinations",
+                tab_itineraries: "Itineraries",
                 tab_map: "GPS Map",
                 tab_tips: "Boat Tips",
                 tab_rules: "Rules",
                 dest_section_title: "Points of Interest & Coves",
+                itin_section_title: "Recommended Time-Based Itineraries",
+                itin_section_desc: "Grouped tours connecting 2 or more destinations to make the most of your time on board.",
+                btn_start_tour: "Start This Tour",
+                loading_itin: "Loading itineraries from CMS...",
+                no_itin_cms: "No itineraries found in CMS.",
                 telem_speed: "Speed",
                 telem_dist: "Target Distance",
                 telem_eta: "Est. ETA",
@@ -314,10 +351,16 @@
                 weather_air: "Temp. Aire",
                 weather_water: "Temp. Agua",
                 tab_dest: "Destinos",
+                tab_itineraries: "Itinerarios",
                 tab_map: "Mapa GPS",
                 tab_tips: "Tips Barco",
                 tab_rules: "Prohibiciones",
                 dest_section_title: "Puntos de Interés y Calas",
+                itin_section_title: "Itinerarios Recomendados por Tiempo",
+                itin_section_desc: "Rutas agrupadas que conectan 2 o más destinos para aprovechar al máximo tu tiempo a bordo.",
+                btn_start_tour: "Iniciar Este Tour",
+                loading_itin: "Cargando itinerarios desde el CMS...",
+                no_itin_cms: "No se encontraron itinerarios en el CMS.",
                 telem_speed: "Velocidad",
                 telem_dist: "Distancia Objetivo",
                 telem_eta: "ETA Est.",
@@ -331,16 +374,42 @@
 
         let currentLang = 'it';
         let poiList = [];
-        let pericoliList = []; 
+        let pericoliList = [];
+        let itinerariList = [];
         let map, boatMarker, markersGroup, dangersGroup;
         let currentTarget = null;
 
-        function parseCoordinate(val) {
-            if (val === null || val === undefined) return null;
-            if (typeof val === 'number') return isNaN(val) ? null : val;
-            const str = String(val).trim().replace(',', '.');
-            const num = parseFloat(str);
-            return isNaN(num) ? null : num;
+        // PARSER DI COORDINATE SMART
+        // Risolve sia virgola che punto, sia coordinate invertite, sia coordinate incollate nel sottotitolo!
+        function parseSmartCoords(latVal, lngVal, extraStr = "") {
+            const rawText = `${latVal || ''} ${lngVal || ''} ${extraStr || ''}`.replace(/,/g, '.');
+            const matches = rawText.match(/[-+]?\d*\.\d+|\d+/g);
+            
+            let lat = null;
+            let lng = null;
+
+            if (matches && matches.length >= 2) {
+                const nums = matches.map(n => parseFloat(n)).filter(n => !isNaN(n));
+                
+                // Riconosce latitudine (range ~38.0 - 41.0 per Praia/Calabria) e longitudine (range ~14.0 - 17.0)
+                for (let num of nums) {
+                    if (num >= 38.0 && num <= 41.5) {
+                        lat = num;
+                    } else if (num >= 14.0 && num <= 17.5) {
+                        lng = num;
+                    }
+                }
+
+                // Fallback se i numeri non rientrano nei range stretti
+                if (lat === null || lng === null) {
+                    if (nums.length >= 2) {
+                        lat = nums[0];
+                        lng = nums[1];
+                    }
+                }
+            }
+
+            return { lat, lng };
         }
 
         function setLanguage(lang) {
@@ -359,6 +428,7 @@
             });
 
             renderPoiCards();
+            renderItinerariCards();
         }
 
         function switchTab(tab) {
@@ -404,14 +474,45 @@
             });
         }
 
+        function renderItinerariCards() {
+            const container = document.getElementById('itinerari-cards-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const btnTourText = translations[currentLang]?.btn_start_tour || "Avvia Questo Tour";
+
+            if (itinerariList.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-4">${translations[currentLang]?.no_itin_cms || 'Nessun itinerario trovato nel CMS.'}</p>`;
+                return;
+            }
+
+            itinerariList.forEach(itin => {
+                const img = itin.immagine_url || 'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80';
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-purple-200 border-l-4 border-l-purple-600 space-y-2">
+                        <img src="${img}" alt="${itin.titolo}" class="w-full h-36 object-cover">
+                        <div class="p-4 space-y-2">
+                            <div class="flex justify-between items-start">
+                                <span class="bg-purple-100 text-purple-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">${itin.sottotitolo || 'Tour'}</span>
+                            </div>
+                            <h4 class="font-extrabold text-slate-900 text-base">${itin.titolo}</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">${itin.descrizione}</p>
+                            <button onclick="avviaItinerarioCMS('${itin.id}')" class="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
+                                <i class="fa-solid fa-route"></i> ${btnTourText}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
         function disegnaMarkerMappa() {
             if (!markersGroup) return;
             markersGroup.clearLayers();
             poiList.forEach(poi => {
-                const lat = parseCoordinate(poi.latitudine);
-                const lng = parseCoordinate(poi.longitudine);
-                if(lat !== null && lng !== null) {
-                    L.marker([lat, lng]).addTo(markersGroup)
+                const coords = parseSmartCoords(poi.latitudine, poi.longitudine, poi.sottotitolo);
+                if(coords.lat !== null && coords.lng !== null) {
+                    L.marker([coords.lat, coords.lng]).addTo(markersGroup)
                         .bindPopup(`<b>${poi.titolo}</b><br><span style="font-size:11px">${poi.descrizione}</span>`);
                 }
             });
@@ -429,10 +530,9 @@
             });
 
             pericoliList.forEach(p => {
-                const lat = parseCoordinate(p.latitudine);
-                const lng = parseCoordinate(p.longitudine);
-                if (lat !== null && lng !== null) {
-                    L.marker([lat, lng], { icon: dangerIcon })
+                const coords = parseSmartCoords(p.latitudine, p.longitudine, p.sottotitolo);
+                if (coords.lat !== null && coords.lng !== null) {
+                    L.marker([coords.lat, coords.lng], { icon: dangerIcon })
                         .addTo(dangersGroup)
                         .bindPopup(`
                             <div class="text-xs p-1">
@@ -492,15 +592,24 @@
             currentTarget = poi;
             switchTab('mappa');
 
-            const lat = parseCoordinate(poi.latitudine);
-            const lng = parseCoordinate(poi.longitudine);
+            const coords = parseSmartCoords(poi.latitudine, poi.longitudine, poi.sottotitolo);
 
-            if (map && lat !== null && lng !== null) {
-                map.setView([lat, lng], 14);
+            if (map && coords.lat !== null && coords.lng !== null) {
+                map.setView([coords.lat, coords.lng], 14);
             }
             
             const guidanceEl = document.getElementById('assistant-msg');
             if (guidanceEl) guidanceEl.innerText = `Rotta verso: ${poi.titolo}`;
+        }
+
+        function avviaItinerarioCMS(idItin) {
+            const itin = itinerariList.find(i => String(i.id) === String(idItin));
+            if (itin) {
+                currentTarget = itin;
+                switchTab('mappa');
+                const guidanceEl = document.getElementById('assistant-msg');
+                if (guidanceEl) guidanceEl.innerText = `Tour Attivo: ${itin.titolo}`;
+            }
         }
 
         function impostaRottaBanchina() {
@@ -527,8 +636,11 @@
 
                 poiList = data.filter(i => i.categoria === 'destinazioni');
                 pericoliList = data.filter(i => i.categoria === 'pericoli');
+                itinerariList = data.filter(i => i.categoria === 'itinerari');
 
                 renderPoiCards();
+                renderItinerariCards();
+
                 if (map) {
                     disegnaMarkerMappa();
                     disegnaSegnaliPericoloMappa();
