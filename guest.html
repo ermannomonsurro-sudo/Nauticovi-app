@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -136,7 +135,7 @@
             </p>
         </div>
 
-        <!-- TAB NAVIGAZIONE INTERNA (CON DIVIETI SEMPRE VISIBILI) -->
+        <!-- TAB NAVIGAZIONE INTERNA -->
         <div class="grid grid-cols-5 bg-slate-200 p-1 rounded-xl text-[10px] font-bold text-slate-600 gap-1 shadow-inner">
             <button onclick="switchTab('destinazioni')" id="tab-destinazioni" class="tab-btn py-2 rounded-lg bg-white text-slate-900 shadow flex flex-col sm:flex-row items-center justify-center gap-1">
                 <i class="fa-solid fa-location-dot text-cyan-600"></i> <span data-i18n="tab_dest">Destinazioni</span>
@@ -155,30 +154,34 @@
             </button>
         </div>
 
-        <!-- SEZIONE 1: LISTA DESTINAZIONI SINGOLE -->
+        <!-- SEZIONE 1: LISTA DESTINAZIONI SINGOLE DAL CMS -->
         <div id="sec-destinazioni" class="tab-content space-y-3">
             <h3 class="font-black text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5 px-1">
                 <i class="fa-solid fa-map-pin text-cyan-600"></i> <span data-i18n="dest_section_title">Destinazioni Singole & Punti GPS</span>
             </h3>
-            <p class="text-xs text-slate-500 px-1" data-i18n="dest_section_desc">Scegli una meta specifica per avviare il navigatore GPS diretto verso la posizione esatta.</p>
+            <p class="text-xs text-slate-500 px-1" data-i18n="dest_section_desc">Scegli una meta specifica gestita dal CMS per avviare il navigatore GPS diretto verso la posizione esatta.</p>
 
-            <div id="punti-esatti-lista" class="space-y-3 pt-1"></div>
+            <div id="punti-esatti-lista" class="space-y-3 pt-1">
+                <p class="text-xs text-slate-400 italic text-center py-4">Caricamento destinazioni dal CMS...</p>
+            </div>
         </div>
 
-        <!-- SEZIONE 2: LISTA ITINERARI & TOUR A TEMPO RAGGRUPPATI -->
+        <!-- SEZIONE 2: LISTA ITINERARI & TOUR A TEMPO DAL CMS -->
         <div id="sec-itinerari" class="tab-content hidden space-y-3">
             <h3 class="font-black text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5 px-1">
                 <i class="fa-solid fa-route text-purple-600"></i> <span data-i18n="itin_section_title">Itinerari Consigliati in Base al Tempo</span>
             </h3>
             <p class="text-xs text-slate-500 px-1" data-i18n="itin_section_desc">Tour raggruppati che collegano 2 o più destinazioni per sfruttare al meglio il tuo tempo a bordo.</p>
 
-            <div id="itinerari-lista" class="space-y-3 pt-1"></div>
+            <div id="itinerari-lista" class="space-y-3 pt-1">
+                <p class="text-xs text-slate-400 italic text-center py-4">Caricamento itinerari dal CMS...</p>
+            </div>
         </div>
 
         <!-- SEZIONE 3: NAVIGATORE GPS SMART CON ASSISTENTE GUIDA & AUDIOGUIDA -->
         <div id="sec-navigatore" class="tab-content hidden space-y-3">
             
-            <!-- Telemetria GPS Base con Tempo Arrivo Stimato (ETA) -->
+            <!-- Telemetria GPS Base -->
             <div class="bg-slate-900 text-white p-3 rounded-2xl shadow-md border border-cyan-500/30 grid grid-cols-4 gap-1 text-center font-mono text-xs">
                 <div>
                     <span class="text-[9px] text-slate-400 block uppercase" data-i18n="telemetry_speed">Velocità</span>
@@ -210,7 +213,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-1">
-                    <!-- PULSANTE RIPRODUZIONE AUDIOGUIDA -->
+                    <!-- PULSANTE RIPRODUZIONE AUDIOGUIDA MP3 -->
                     <button id="btn-audio-guide" onclick="event.stopPropagation(); riproduciAudioguida();" class="hidden bg-cyan-500 hover:bg-cyan-400 text-slate-900 p-2 rounded-xl text-xs font-black shadow flex items-center gap-1 border border-white/20">
                         <i class="fa-solid fa-volume-high"></i> <span class="hidden sm:inline">Ascolta</span>
                     </button>
@@ -303,7 +306,7 @@
             </div>
         </div>
 
-        <!-- BOX SCATTA & CONDIVIDI (INSTAGRAM & RECENSIONI GOOGLE) -->
+        <!-- BOX SCATTA & CONDIVIDI -->
         <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200 text-center space-y-2 text-xs">
             <b class="text-slate-800 font-extrabold flex items-center justify-center gap-1.5 uppercase text-[11px]">
                 <i class="fa-solid fa-camera-retro text-rose-500"></i> <span data-i18n="share_title">Scatta & Condividi i Tuoi Momenti</span>
@@ -319,7 +322,7 @@
             </div>
         </div>
 
-        <!-- PULSANTE SOS ASSISTENZA GPS (IN FONDO ALLA PAGINA) -->
+        <!-- PULSANTE SOS ASSISTENZA GPS -->
         <div class="pt-1">
             <button onclick="inviaSOSPosizioneGPS()" class="w-full bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white font-extrabold p-4 rounded-2xl shadow-xl flex items-center justify-center gap-2.5 text-xs transition active:scale-95 border border-red-400/40">
                 <i class="fa-solid fa-circle-radiation text-base animate-pulse"></i>
@@ -338,7 +341,7 @@
             <div>
                 <h3 class="font-extrabold text-slate-900 text-base" data-i18n="modal_title">Avviare Navigatore GPS?</h3>
                 <p class="text-xs text-slate-500 mt-1" data-i18n="modal_sub">Confermi di voler avviare la navigazione in tempo reale verso:</p>
-                <b class="text-cyan-700 text-sm block mt-1" id="modal-target-name">Arco Magno</b>
+                <b class="text-cyan-700 text-sm block mt-1" id="modal-target-name">Destinazione</b>
             </div>
             <div class="grid grid-cols-2 gap-2 pt-2 text-xs font-bold">
                 <button onclick="chiudiModale()" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition" data-i18n="btn_cancel">
@@ -351,14 +354,13 @@
         </div>
     </div>
 
-    <!-- DIZIONARIO MULTILINGUA GUEST -->
     <script>
         const SUPABASE_URL = "https://cbvpixcfhmedbapnvfmw.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_V0B06YxZ1oW6tqg_6yx5og_OgbhxlUo";
         let _supabase;
         try { _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e){}
 
-        const BANCHINA_PARTENZA = { id: "banchina", nome: "Banchina Noleggio Nauticovi (Praia)", lat: 39.8820, lng: 15.7760 };
+        const BANCHINA_PARTENZA = { id: "banchina", nome: "Banchina Noleggio Nauticovi (Praia)", latitudine: 39.8820, longitudine: 15.7760 };
 
         const translations = {
             it: {
@@ -375,13 +377,13 @@
                 weather_wind: "Vento",
                 weather_wind_val: "NW • 5 kts",
                 weather_temp: "Temp. Acqua",
-                weather_tip: "💡 <b>Consiglio di Bordo:</b> Mare calmo perfetto per l'Isola di Dino e l'Arco Magno. Nel pomeriggio brezza da Nord.",
+                weather_tip: "💡 <b>Consiglio di Bordo:</b> Mare calmo perfetto per la navigazione costiera.",
                 tab_dest: "Destinazioni",
                 tab_itineraries: "Itinerari",
                 tab_map: "Mappa GPS",
                 tab_rules: "Divieti",
                 dest_section_title: "Destinazioni Singole & Punti GPS",
-                dest_section_desc: "Scegli una meta specifica per avviare il navigatore GPS diretto verso la posizione esatta.",
+                dest_section_desc: "Scegli una meta specifica gestita dal CMS per avviare il navigatore GPS diretto verso la posizione esatta.",
                 itin_section_title: "Itinerari Consigliati in Base al Tempo",
                 itin_section_desc: "Tour raggruppati che collegano 2 o più destinazioni per sfruttare al meglio il tuo tempo a bordo.",
                 btn_start_gps: "Avvia Navigatore GPS",
@@ -394,16 +396,7 @@
                 assistant_select_prompt: "Seleziona una destinazione per iniziare",
                 btn_start_card: "Avvia Navigatore verso questo Punto",
                 tips_title: "Consigli per la Navigazione",
-                tip1_h: "Accensione Motore",
-                tip1_p: "Mettere la leva in folle (N) e agganciare lo stacco di sicurezza prima di girare la chiave.",
-                tip2_h: "Ancoraggio Corretto",
-                tip2_p: "Calare l'ancora sempre su fondale sabbioso di colore chiaro, mai sulla roccia o sulla posidonia.",
-                tip3_h: "Tendalino Parasole",
-                tip3_p: "Fissare il tendalino solo a barca ferma o a velocità bassissima per evitare danni alla struttura.",
                 rules_title: "Regole Tassative di Bordo",
-                rule1: "<b>Distanza Bagnanti:</b> VIETATO avvicinarsi a meno di 200 metri dalle spiagge con bagnanti.",
-                rule2: "<b>Velocità nelle Grotte:</b> VIETATO entrare veloci nelle grotte. Procedere solo a motore al minimo o a remi.",
-                rule3: "<b>Protezione Fondali:</b> VIETATO gettare l'ancora sulle praterie protette di Posidonia oceanica.",
                 share_title: "Scatta & Condividi i Tuoi Momenti",
                 share_desc: "Taggaci nelle tue Storie Instagram o lasciaci una recensione al rientro!",
                 btn_sos_gps: "🆘 SOS - Invia Posizione GPS all'Assistenza",
@@ -411,179 +404,25 @@
                 modal_sub: "Confermi di voler avviare la navigazione in tempo reale verso:",
                 btn_cancel: "Annulla",
                 btn_start_confirm: "Sì, Avvia!",
-                msg_photo_spot: "📸 Sei vicino all'Arco Magno! Momento perfetto per una foto!",
                 msg_keep_course: "Sei sulla rotta giusta! Prosegui diritto.",
                 msg_turn_right: "Gira a DESTRA per rimetterti in rotta!",
                 msg_turn_left: "Gira a SINISTRA per rimetterti in rotta!",
                 msg_near_100m: "Attenzione: Sei a meno di 100m! Riduci la velocità a motore al minimo.",
                 msg_arrived: "Sei arrivato a destinazione!"
-            },
-            en: {
-                header_sub: "GUEST PORTAL • GPS NAVIGATION",
-                active_rental: "Active Rental",
-                welcome_title: "Welcome Aboard!",
-                boat_label: "Boat:",
-                btn_return_base: "Return to Base",
-                return_notice: "Recommended return time:",
-                weather_title: "Live Weather & Sea State",
-                weather_status: "Good",
-                weather_sea: "Sea State",
-                weather_sea_val: "Calm (0.2m)",
-                weather_wind: "Wind",
-                weather_wind_val: "NW • 5 kts",
-                weather_temp: "Water Temp.",
-                weather_tip: "💡 <b>Captain Tip:</b> Perfect calm sea for Dino Island & Arco Magno. Afternoon light breeze from North.",
-                tab_dest: "Destinations",
-                tab_itineraries: "Itineraries",
-                tab_map: "GPS Map",
-                tab_rules: "Rules",
-                dest_section_title: "Single Destinations & GPS Points",
-                dest_section_desc: "Choose a specific spot to start direct real-time GPS navigation.",
-                itin_section_title: "Recommended Tour Itineraries",
-                itin_section_desc: "Grouped tours connecting 2 or more destinations based on your available time.",
-                btn_start_gps: "Start GPS Navigation",
-                telemetry_speed: "Speed",
-                telemetry_dist: "Distance",
-                telemetry_eta: "Time",
-                telemetry_target: "Destination",
-                target_none: "None",
-                assistant_label: "Route Assistant",
-                assistant_select_prompt: "Select a destination to start",
-                btn_start_card: "Start Navigator to this Spot",
-                tips_title: "Boating Tips",
-                tip1_h: "Engine Starting",
-                tip1_p: "Put the lever in neutral (N) and attach the kill-switch lanyard before turning the key.",
-                tip2_h: "Proper Anchoring",
-                tip2_p: "Always drop anchor on light-colored sand bottoms, never on rocks or posidonia seagrass.",
-                tip3_h: "Sun Awning Bimini",
-                tip3_p: "Secure the bimini top only when stopped or at low speed to avoid frame damage.",
-                rules_title: "Mandatory Board Rules",
-                rule1: "<b>Swimmers Distance:</b> PROHIBITED to approach within 200 meters of beaches with swimmers.",
-                rule2: "<b>Caves Speed:</b> PROHIBITED to enter caves at speed. Idle engine or row only.",
-                rule3: "<b>Seabed Protection:</b> PROHIBITED to anchor on protected Posidonia seagrass meadows.",
-                share_title: "Snap & Share Your Moments",
-                share_desc: "Tag us on Instagram stories or leave us a review when back!",
-                btn_sos_gps: "🆘 SOS - Send GPS Location to Assistance",
-                modal_title: "Start GPS Navigation?",
-                modal_sub: "Confirm starting real-time navigation to:",
-                btn_cancel: "Cancel",
-                btn_start_confirm: "Yes, Start!",
-                msg_photo_spot: "📸 You're near Arco Magno! Perfect spot for a photo!",
-                msg_keep_course: "On course! Keep straight ahead.",
-                msg_turn_right: "Turn RIGHT to get back on track!",
-                msg_turn_left: "Turn LEFT to get back on track!",
-                msg_near_100m: "Warning: Less than 100m away! Reduce speed to idle.",
-                msg_arrived: "You have arrived at your destination!"
-            },
-            es: {
-                header_sub: "GUEST PORTAL • NAVEGADOR GPS",
-                active_rental: "Alquiler Activo",
-                welcome_title: "¡Bienvenido a Bordo!",
-                boat_label: "Barco:",
-                btn_return_base: "Volver a Base",
-                return_notice: "Regreso recomendado al muelle:",
-                weather_title: "Meteo y Mar en Tiempo Real",
-                weather_status: "Bueno",
-                weather_sea: "Estado del Mar",
-                weather_sea_val: "Calmo (0.2m)",
-                weather_wind: "Viento",
-                weather_wind_val: "NW • 5 kts",
-                weather_temp: "Temp. Agua",
-                weather_tip: "💡 <b>Consejo de Bordo:</b> Mar en calma ideal para la Isla de Dino y el Arco Magno.",
-                tab_dest: "Destinos",
-                tab_itineraries: "Itinerarios",
-                tab_map: "Mapa GPS",
-                tab_rules: "Reglas",
-                dest_section_title: "Destinos Individuales y Puntos GPS",
-                dest_section_desc: "Elige un punto específico para iniciar navegación directa en tiempo real.",
-                itin_section_title: "Itinerarios Recomendados",
-                itin_section_desc: "Rutas agrupadas con 2 o más destinos para aprovechar al máximo tu tiempo.",
-                btn_start_gps: "Iniciar Navegador GPS",
-                telemetry_speed: "Velocidad",
-                telemetry_dist: "Distancia",
-                telemetry_eta: "Tiempo",
-                telemetry_target: "Destino",
-                target_none: "Ninguno",
-                assistant_label: "Asistente de Ruta",
-                assistant_select_prompt: "Selecciona un destino para empezar",
-                btn_start_card: "Iniciar Navegador a este Punto",
-                tips_title: "Consejos de Navegación",
-                tip1_h: "Arranque del Motor",
-                tip1_p: "Poner la palanca en punto muerto (N) y enganchar el paro de seguridad antes de girar la llave.",
-                tip2_h: "Fondeo Correcto",
-                tip2_p: "Echar el ancla siempre en fondo de arena clara, nunca sobre rocas o posidonia.",
-                tip3_h: "Toldo Parasol",
-                tip3_p: "Fijar el toldo solo con el barco parado o a muy baja velocidad para evitar daños.",
-                rules_title: "Reglas Obligatorias a Bordo",
-                rule1: "<b>Distancia a Bañistas:</b> PROHIBIDO acercarse a menos de 200 metros de playas con bañistas.",
-                rule2: "<b>Velocidad en Cuevas:</b> PROHIBIDO entrar rápido en las cuevas. Solo motor al mínimo o remos.",
-                rule3: "<b>Protección del Fondo:</b> PROHIBIDO fondear sobre praderas protegidas de Posidonia.",
-                share_title: "Captura y Comparte Tus Fotos",
-                share_desc: "¡Etiquétanos en Instagram o déjanos una reseña al volver!",
-                btn_sos_gps: "🆘 SOS - Enviar Ubicación GPS a Asistencia",
-                modal_title: "¿Iniciar Navegador GPS?",
-                modal_sub: "Confirma iniciar navegación en tiempo real hacia:",
-                btn_cancel: "Cancelar",
-                btn_start_confirm: "¡Sí, Iniciar!",
-                msg_photo_spot: "📸 ¡Cerca del Arco Magno! Momento ideal para una foto.",
-                msg_keep_course: "¡Vas bien! Continúa recto.",
-                msg_turn_right: "¡Gira a la DERECHA para corregir rumbo!",
-                msg_turn_left: "¡Gira a la IZQUIERDA para corregir rumbo!",
-                msg_near_100m: "Atención: ¡A menos de 100m! Reduce la velocidad al mínimo.",
-                msg_arrived: "¡Has llegado a tu destino!"
             }
         };
-
-        // DESTINAZIONI SINGOLE PREDEFINITE
-        const puntiEsattiMultilang = {
-            it: [
-                { id: "arcomagno", nome: "Arco Magno (San Nicola Arcella)", cat: "Baia Naturale", desc: "Famoso arco di roccia su baia incantata. Mantenere la distanza di sicurezza dalle spiagge.", lat: 39.8456, lng: 15.7889, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80", audio: "Benvenuto all'Arco Magno. Questo passaggio naturale era usato nel medioevo dalle navi saracene. Ammira la laguna incastonato nella roccia." },
-                { id: "anchor_dino", nome: "⚓ Ancoraggio Sabbia - Isola di Dino", cat: "Fondale Sabbioso", desc: "Area di ancoraggio sicura su sabbia a 4m di profondità. Zero rischio incastro ancora.", lat: 39.8705, lng: 15.7710, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80", audio: "Sei giunto all'area di ancoraggio sicuro su sabbia. Cala la cima per tre volte la profondità." },
-                { id: "grotta_leone", nome: "Grotta del Leone & Snorkeling", cat: "Grotta & Snorkeling", desc: "Roccia immersa con sagoma a leone. Fondale sabbioso eccezionale per l'ancoraggio e tuffi.", lat: 39.8695, lng: 15.7720, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", audio: "Ti trovi alla Grotta del Leone. Osserva la roccia naturale a forma di leone ruggente a guardia dell'isola." },
-                { id: "grotta_azzurra", nome: "Grotta Azzurra (Isola di Dino)", cat: "Grotta Marina", desc: "Grotta principale dell'Isola di Dino. Entrare esclusivamente a motore al minimo o a remi.", lat: 39.8731, lng: 15.7735, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80", audio: "Ti trovi all'Isola di Dino. La Grotta Azzurra è celebre per i giochi di luce creati dal sole che si riflette sui fondali sabbiosi." },
-                { id: "secca_castrocucco", nome: "Secca di Castrocucco (Maratea)", cat: "Secca & Fondali", desc: "Prima insenature della costa di Maratea verso nord. Acque trasparenti ricche di pesci.", lat: 39.9000, lng: 15.7500, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", audio: "Sei giunto alla Secca di Castrocucco, inizio della costa di Maratea. Un paradiso per lo snorkeling." }
-            ]
-        };
-
-        // ITINERARI & TOUR RAGGRUPPATI IN BASE AL TEMPO DISPONIBILE
-        const itinerariMultilang = [
-            {
-                id: "tour_2h",
-                titolo: "Tour Express Isola di Dino (2 Ore)",
-                durata: "2 Ore",
-                desc: "Raggruppa le 3 tappe imperdibili dell'Isola di Dino per chi ha poco tempo a disposizione.",
-                tappe: ["Isola di Dino", "Grotta Azzurra", "Grotta del Leone"],
-                lat: 39.8731, lng: 15.7735,
-                img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80"
-            },
-            {
-                id: "tour_4h",
-                titolo: "Tour Classico Riviera dei Cedri (4 Ore)",
-                durata: "4 Ore",
-                desc: "Il tour più richiesto: circumnavigazione dell'Isola di Dino ed esplorazione della laguna dell'Arco Magno.",
-                tappe: ["Isola di Dino", "Grotta Azzurra", "Arco Magno", "Grotta del Saraceno"],
-                lat: 39.8456, lng: 15.7889,
-                img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80"
-            },
-            {
-                id: "tour_full",
-                titolo: "Tour VIP Costa Lucana & Maratea (Giornata Intera)",
-                durata: "Giornata Intera",
-                desc: "Itinerario completo: Isola di Dino, Arco Magno e risalita della Costa di Maratea fino alle spiagge nere e al Cristo Redentore.",
-                tappe: ["Isola di Dino", "Arco Magno", "Secca di Castrocucco", "Cristo Redentore"],
-                lat: 39.9000, lng: 15.7500,
-                img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80"
-            }
-        ];
 
         let currentLang = 'it';
         let map, userMarker, markersGroup, routePolyline;
         let destinazioneSelezionata = null;
         let destinazioneAttiva = null;
+        let listaDestinazioniCMS = [];
+        let listaItinerariCMS = [];
         
         let lastLat = null;
         let lastLng = null;
         let currentMovementHeading = 0;
+        let audioPlayer = null;
 
         function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
             const R = 6371000;
@@ -610,89 +449,15 @@
             localStorage.setItem('nauticovi_lang', lang);
 
             document.querySelectorAll('.flag-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('flag-' + lang).classList.add('active');
+            const flagBtn = document.getElementById('flag-' + lang);
+            if (flagBtn) flagBtn.classList.add('active');
 
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (translations[lang][key]) {
+                if (translations[lang] && translations[lang][key]) {
                     el.innerHTML = translations[lang][key];
                 }
             });
-
-            generaListaPunti();
-            generaListaItinerari();
-        }
-
-        function generaListaPunti() {
-            const container = document.getElementById('punti-esatti-lista');
-            if (!container) return;
-            container.innerHTML = '';
-            let list = puntiEsattiMultilang[currentLang] || puntiEsattiMultilang['it'];
-            const btnText = translations[currentLang].btn_start_gps;
-
-            list.forEach(poi => {
-                container.innerHTML += `
-                    <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
-                        <img src="${poi.img}" alt="${poi.nome}" class="w-full h-36 object-cover">
-                        <div class="p-4 space-y-2">
-                            <div class="flex justify-between items-start">
-                                <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">${poi.cat}</span>
-                            </div>
-                            <h4 class="font-extrabold text-slate-800 text-base">${poi.nome}</h4>
-                            <p class="text-xs text-slate-600 leading-relaxed">${poi.desc}</p>
-                            
-                            <button onclick="chiediConfermaNavigazione('${poi.id}')" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
-                                <i class="fa-solid fa-location-arrow"></i> ${btnText}
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function generaListaItinerari() {
-            const container = document.getElementById('itinerari-lista');
-            if (!container) return;
-            container.innerHTML = '';
-
-            itinerariMultilang.forEach(itin => {
-                const badgeDurata = itin.durata === '2 Ore' ? 'bg-amber-100 text-amber-800' : (itin.durata === '4 Ore' ? 'bg-cyan-100 text-cyan-800' : 'bg-purple-100 text-purple-800');
-                const tappeBadges = itin.tappe.map(t => `<span class="bg-slate-100 text-slate-700 text-[9px] font-bold px-2 py-0.5 rounded-md border border-slate-200">📍 ${t}</span>`).join(' ');
-
-                container.innerHTML += `
-                    <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-purple-200 border-l-4 border-l-purple-600 space-y-2">
-                        <img src="${itin.img}" alt="${itin.titolo}" class="w-full h-36 object-cover">
-                        <div class="p-4 space-y-2">
-                            <div class="flex justify-between items-start">
-                                <span class="${badgeDurata} text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">⏱️ ${itin.durata}</span>
-                            </div>
-                            <h4 class="font-extrabold text-slate-900 text-base">${itin.titolo}</h4>
-                            <p class="text-xs text-slate-600 leading-relaxed">${itin.desc}</p>
-                            
-                            <div class="pt-1 flex flex-wrap gap-1">
-                                ${tappeBadges}
-                            </div>
-
-                            <button onclick="avviaItinerarioTour('${itin.id}')" class="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
-                                <i class="fa-solid fa-route"></i> Avvia Tour (${itin.durata})
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function avviaItinerarioTour(idItin) {
-            const itin = itinerariMultilang.find(i => i.id === idItin);
-            if (itin) {
-                destinazioneSelezionata = {
-                    id: itin.id,
-                    nome: itin.titolo,
-                    lat: itin.lat,
-                    lng: itin.lng
-                };
-                confermaAvvioNavigazione();
-            }
         }
 
         function switchTab(tab) {
@@ -716,7 +481,12 @@
         }
 
         function rottaRientroBanchina() {
-            destinazioneSelezionata = BANCHINA_PARTENZA;
+            destinazioneSelezionata = {
+                id: "banchina",
+                titolo: BANCHINA_PARTENZA.nome,
+                latitudine: BANCHINA_PARTENZA.latitudine,
+                longitudine: BANCHINA_PARTENZA.longitudine
+            };
             confermaAvvioNavigazione();
         }
 
@@ -734,44 +504,41 @@
             window.open(urlWa, '_blank');
         }
 
-        let audioPlayer = null;
-
         function riproduciAudioguida() {
             if (!destinazioneAttiva) return;
 
-            // 1. Se esiste un file MP3 caricato su Supabase/Cloud (Voce Naturale)
+            // 1. Riproduzione MP3 reale caricato su Supabase
             if (destinazioneAttiva.audio_url) {
                 if (audioPlayer) {
                     if (!audioPlayer.paused) {
                         audioPlayer.pause();
-                        document.getElementById('btn-audio-guide').innerHTML = '<i class="fa-solid fa-volume-high"></i> <span class="hidden sm:inline">Ascolta MP3</span>';
+                        document.getElementById('btn-audio-guide').innerHTML = '<i class="fa-solid fa-volume-high"></i> <span class="hidden sm:inline">Ascolta</span>';
                         return;
                     }
                 } else {
                     audioPlayer = new Audio(destinazioneAttiva.audio_url);
                     audioPlayer.onended = () => {
-                        document.getElementById('btn-audio-guide').innerHTML = '<i class="fa-solid fa-volume-high"></i> <span class="hidden sm:inline">Ascolta MP3</span>';
+                        document.getElementById('btn-audio-guide').innerHTML = '<i class="fa-solid fa-volume-high"></i> <span class="hidden sm:inline">Ascolta</span>';
                     };
                 }
                 audioPlayer.play();
-                document.getElementById('btn-audio-guide').innerHTML = '<i class="fa-solid fa-pause"></i> <span class="hidden sm:inline">Pausa MP3</span>';
+                document.getElementById('btn-audio-guide').innerHTML = '<i class="fa-solid fa-pause"></i> <span class="hidden sm:inline">Pausa</span>';
                 return;
             }
 
-            // 2. Fallback: se non c'è il file MP3 ma c'è il testo, usa la voce di sistema
-            if (destinazioneAttiva.audio && 'speechSynthesis' in window) {
+            // 2. Fallback con sintesi vocale se presente solo il testo
+            if (destinazioneAttiva.testo_audioguida && 'speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                const msg = new SpeechSynthesisUtterance(destinazioneAttiva.audio);
+                const msg = new SpeechSynthesisUtterance(destinazioneAttiva.testo_audioguida);
                 msg.lang = currentLang === 'en' ? 'en-US' : (currentLang === 'es' ? 'es-ES' : 'it-IT');
                 window.speechSynthesis.speak(msg);
             }
         }
 
         function chiediConfermaNavigazione(idPoi) {
-            const list = puntiEsattiMultilang[currentLang] || puntiEsattiMultilang['it'];
-            destinazioneSelezionata = list.find(p => p.id === idPoi);
+            destinazioneSelezionata = listaDestinazioniCMS.find(p => String(p.id) === String(idPoi));
             if(destinazioneSelezionata) {
-                document.getElementById('modal-target-name').innerText = destinazioneSelezionata.nome;
+                document.getElementById('modal-target-name').innerText = destinazioneSelezionata.titolo;
                 document.getElementById('confirm-modal').classList.remove('hidden');
             }
         }
@@ -785,10 +552,10 @@
             destinazioneAttiva = destinazioneSelezionata;
             switchTab('navigatore');
 
-            document.getElementById('target-poi-name').innerText = destinazioneAttiva.nome;
+            document.getElementById('target-poi-name').innerText = destinazioneAttiva.titolo;
             document.getElementById('btn-stop-nav-top').classList.remove('hidden');
 
-            if (destinazioneAttiva.audio || destinazioneAttiva.audio_url) {
+            if (destinazioneAttiva.audio_url || destinazioneAttiva.testo_audioguida) {
                 document.getElementById('btn-audio-guide').classList.remove('hidden');
             } else {
                 document.getElementById('btn-audio-guide').classList.add('hidden');
@@ -825,28 +592,14 @@
 
             markersGroup = L.layerGroup().addTo(map);
 
-            const list = puntiEsattiMultilang['it'];
-            list.forEach(poi => {
-                const m = L.marker([poi.lat, poi.lng]).addTo(markersGroup);
-                m.on('click', () => {
-                    const currentList = puntiEsattiMultilang[currentLang] || puntiEsattiMultilang['it'];
-                    const localizedPoi = currentList.find(p => p.id === poi.id) || poi;
-                    document.getElementById('poi-title').innerText = localizedPoi.nome;
-                    document.getElementById('poi-cat').innerText = localizedPoi.cat;
-                    document.getElementById('poi-desc').innerText = localizedPoi.desc;
-                    document.getElementById('btn-avvia-card').onclick = () => chiediConfermaNavigazione(poi.id);
-                    document.getElementById('poi-detail-card').classList.remove('hidden');
-                });
-            });
-
-            // ICONA PERSONALIZZATA CON LA VERA FORMA DELLA BARCA
+            // ICONA PERSONALIZZATA BARCA
             const boatIcon = L.divIcon({
                 className: 'boat-marker-container',
                 html: `<div id="boat-icon-inner" class="boat-marker-icon" style="transform: rotate(0deg);">
                           <div class="drop-shadow-2xl">
                               <svg width="34" height="48" viewBox="0 0 34 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                                   <path d="M17 2C10 12 4 22 4 36C4 42 8 45 17 45C26 45 30 42 30 36C30 22 24 12 17 2Z" fill="#0f172a" stroke="#06b6d4" stroke-width="2.5"/>
-                                  <path d="M17 8C13 15 9 22 9 32C9 38 12 40 17 40C22 40 25 38 25 32C25 22 21 15 17 8Z" fill="#06b6d4" opacity="0.8"/>
+                                  <path d="M17 8C13 15 9 22 9 32C25 38 25 32C25 22 21 15 17 8Z" fill="#06b6d4" opacity="0.8"/>
                                   <path d="M12 24H22V27H12V24Z" fill="#ffffff"/>
                                   <path d="M17 11L20 18H14L17 11Z" fill="#ffffff"/>
                               </svg>
@@ -861,11 +614,10 @@
                     pos => {
                         const lat = pos.coords.latitude;
                         const lng = pos.coords.longitude;
-                        const rawSpeed = pos.coords.speed || 0; // m/s
+                        const rawSpeed = pos.coords.speed || 0;
                         const speedKts = (rawSpeed * 1.94384).toFixed(1);
 
-                        const speedUnit = currentLang === 'en' ? 'Kts' : (currentLang === 'es' ? 'Nudos' : 'Nodi');
-                        document.getElementById('live-speed').innerText = `${speedKts} ${speedUnit}`;
+                        document.getElementById('live-speed').innerText = `${speedKts} Kts`;
 
                         if (lastLat !== null && lastLng !== null) {
                             const distMoved = calculateDistanceMeters(lastLat, lastLng, lat, lng);
@@ -890,8 +642,8 @@
                             boatEl.style.transform = `rotate(${currentMovementHeading}deg)`;
                         }
 
-                        if (destinazioneAttiva) {
-                            const distToTarget = calculateDistanceMeters(lat, lng, destinazioneAttiva.lat, destinazioneAttiva.lng);
+                        if (destinazioneAttiva && destinazioneAttiva.latitudine && destinazioneAttiva.longitudine) {
+                            const distToTarget = calculateDistanceMeters(lat, lng, destinazioneAttiva.latitudine, destinazioneAttiva.longitudine);
                             
                             if (distToTarget > 1000) {
                                 document.getElementById('live-dist').innerText = (distToTarget / 1000).toFixed(1) + " Km";
@@ -904,7 +656,7 @@
                             const etaMinutes = Math.ceil(etaSeconds / 60);
                             document.getElementById('live-eta').innerText = `~${etaMinutes} min`;
 
-                            const targetBearing = calculateBearing(lat, lng, destinazioneAttiva.lat, destinazioneAttiva.lng);
+                            const targetBearing = calculateBearing(lat, lng, destinazioneAttiva.latitudine, destinazioneAttiva.longitudine);
                             let angleDiff = (targetBearing - currentMovementHeading + 360) % 360;
                             if (angleDiff > 180) angleDiff -= 360;
 
@@ -912,12 +664,7 @@
                             const guidanceIcon = document.getElementById('guidance-icon');
                             const guidanceMsg = document.getElementById('guidance-msg');
 
-                            // NOTIFICA FOTO SPOT VICINO AD ARCO MAGNO O GROTTA AZZURRA (< 150m)
-                            if (destinazioneAttiva.id === 'arcomagno' && distToTarget < 150 && distToTarget >= 40) {
-                                guidanceBg.className = "w-11 h-11 bg-purple-500/30 border border-purple-400 rounded-xl flex items-center justify-center text-purple-300 text-xl font-bold animate-pulse";
-                                guidanceIcon.className = "fa-solid fa-camera-retro";
-                                guidanceMsg.innerText = translations[currentLang].msg_photo_spot;
-                            } else if (distToTarget < 40) {
+                            if (distToTarget < 40) {
                                 guidanceBg.className = "w-11 h-11 bg-emerald-500/30 border border-emerald-400 rounded-xl flex items-center justify-center text-emerald-400 text-xl font-bold animate-bounce";
                                 guidanceIcon.className = "fa-solid fa-flag-checkered";
                                 guidanceMsg.innerText = translations[currentLang].msg_arrived;
@@ -949,9 +696,9 @@
         }
 
         function tracciaRottaSullaMappa() {
-            if(!destinazioneAttiva || !userMarker) return;
+            if(!destinazioneAttiva || !userMarker || !destinazioneAttiva.latitudine) return;
             const userLatLng = userMarker.getLatLng();
-            const targetLatLng = [destinazioneAttiva.lat, destinazioneAttiva.lng];
+            const targetLatLng = [destinazioneAttiva.latitudine, destinazioneAttiva.longitudine];
 
             if(routePolyline) map.removeLayer(routePolyline);
 
@@ -973,6 +720,104 @@
 
         function chiudiPoiCard() {
             document.getElementById('poi-detail-card').classList.add('hidden');
+        }
+
+        // CARICAMENTO ESCLUSIVO DAL CMS SUPABASE
+        async function caricaCMSGuestDinamico() {
+            if (typeof _supabase === 'undefined') return;
+
+            try {
+                const { data, error } = await _supabase.from('cms_contenuti').select('*').order('created_at', { ascending: false });
+
+                if (error || !data) return;
+
+                // 1. FILTRA DESTINAZIONI SINGOLE
+                listaDestinazioniCMS = data.filter(item => item.categoria === 'destinazioni');
+                const listContainer = document.getElementById('punti-esatti-lista');
+                if (listContainer) {
+                    if (listaDestinazioniCMS.length === 0) {
+                        listContainer.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-4">Nessuna destinazione trovata nel CMS.</p>`;
+                    } else {
+                        listContainer.innerHTML = '';
+                        listaDestinazioniCMS.forEach(poi => {
+                            const img = poi.immagine_url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80';
+                            listContainer.innerHTML += `
+                                <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
+                                    <img src="${img}" alt="${poi.titolo}" class="w-full h-36 object-cover">
+                                    <div class="p-4 space-y-2">
+                                        <div class="flex justify-between items-start">
+                                            <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">${poi.sottotitolo || 'Punto GPS'}</span>
+                                        </div>
+                                        <h4 class="font-extrabold text-slate-800 text-base">${poi.titolo}</h4>
+                                        <p class="text-xs text-slate-600 leading-relaxed">${poi.descrizione}</p>
+                                        
+                                        <button onclick="chiediConfermaNavigazione('${poi.id}')" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
+                                            <i class="fa-solid fa-location-arrow"></i> Avvia Navigatore GPS
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                }
+
+                // 2. AGGIORNA MARKER MAPPA GPS CON I SOLI PUNTI DEL CMS
+                if (markersGroup) {
+                    markersGroup.clearLayers();
+                    listaDestinazioniCMS.forEach(poi => {
+                        if (poi.latitudine && poi.longitudine) {
+                            const m = L.marker([poi.latitudine, poi.longitudine]).addTo(markersGroup);
+                            m.on('click', () => {
+                                document.getElementById('poi-title').innerText = poi.titolo;
+                                document.getElementById('poi-cat').innerText = poi.sottotitolo || 'Attrazione';
+                                document.getElementById('poi-desc').innerText = poi.descrizione;
+                                document.getElementById('btn-avvia-card').onclick = () => chiediConfermaNavigazione(poi.id);
+                                document.getElementById('poi-detail-card').classList.remove('hidden');
+                            });
+                        }
+                    });
+                }
+
+                // 3. FILTRA ITINERARI & TOUR
+                listaItinerariCMS = data.filter(item => item.categoria === 'itinerari');
+                const itinContainer = document.getElementById('itinerari-lista');
+                if (itinContainer) {
+                    if (listaItinerariCMS.length === 0) {
+                        itinContainer.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-4">Nessun itinerario trovato nel CMS.</p>`;
+                    } else {
+                        itinContainer.innerHTML = '';
+                        listaItinerariCMS.forEach(itin => {
+                            const img = itin.immagine_url || 'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80';
+                            itinContainer.innerHTML += `
+                                <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-purple-200 border-l-4 border-l-purple-600 space-y-2">
+                                    <img src="${img}" alt="${itin.titolo}" class="w-full h-36 object-cover">
+                                    <div class="p-4 space-y-2">
+                                        <div class="flex justify-between items-start">
+                                            <span class="bg-purple-100 text-purple-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">${itin.sottotitolo || 'Tour'}</span>
+                                        </div>
+                                        <h4 class="font-extrabold text-slate-900 text-base">${itin.titolo}</h4>
+                                        <p class="text-xs text-slate-600 leading-relaxed">${itin.descrizione}</p>
+                                        <button onclick="avviaItinerarioCMS('${itin.id}')" class="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
+                                            <i class="fa-solid fa-route"></i> Avvia Questo Tour
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                }
+
+            } catch (err) {
+                console.error("Errore caricamento CMS Guest:", err);
+            }
+        }
+
+        function avviaItinerarioCMS(idItin) {
+            const itin = listaItinerariCMS.find(i => String(i.id) === String(idItin));
+            if (itin) {
+                destinazioneSelezionata = itin;
+                confermaAvvioNavigazione();
+            }
         }
 
         function verificaScadenzaAccesso() {
@@ -1049,72 +894,12 @@
             `;
         }
 
-        async function caricaCMSGuestDinamico() {
-            if (typeof _supabase === 'undefined') return;
-
-            try {
-                const { data, error } = await _supabase.from('cms_contenuti').select('*').order('created_at', { ascending: false });
-
-                if (error || !data || data.length === 0) return;
-
-                const destinazioniCMS = data.filter(item => item.categoria === 'destinazioni');
-                if (destinazioniCMS.length > 0) {
-                    const listContainer = document.getElementById('punti-esatti-lista');
-                    if (listContainer) {
-                        destinazioniCMS.forEach(poi => {
-                            const img = poi.immagine_url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80';
-                            listContainer.innerHTML = `
-                                <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200 border-l-4 border-cyan-500">
-                                    <img src="${img}" alt="${poi.titolo}" class="w-full h-36 object-cover">
-                                    <div class="p-4 space-y-2">
-                                        <div class="flex justify-between items-start">
-                                            <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">${poi.sottotitolo || 'Nuovo Punto'}</span>
-                                        </div>
-                                        <h4 class="font-extrabold text-slate-800 text-base">${poi.titolo}</h4>
-                                        <p class="text-xs text-slate-600 leading-relaxed">${poi.descrizione}</p>
-                                    </div>
-                                </div>
-                            ` + listContainer.innerHTML;
-                        });
-                    }
-                }
-
-                // Carica itinerari dinamici se presenti nel CMS
-                const itinerariCMS = data.filter(item => item.categoria === 'itinerari');
-                if (itinerariCMS.length > 0) {
-                    const itinContainer = document.getElementById('itinerari-lista');
-                    if (itinContainer) {
-                        itinerariCMS.forEach(itin => {
-                            const img = itin.immagine_url || 'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80';
-                            itinContainer.innerHTML = `
-                                <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-purple-200 border-l-4 border-l-purple-600 space-y-2">
-                                    <img src="${img}" alt="${itin.titolo}" class="w-full h-36 object-cover">
-                                    <div class="p-4 space-y-2">
-                                        <div class="flex justify-between items-start">
-                                            <span class="bg-purple-100 text-purple-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">${itin.sottotitolo || 'Tour Custom'}</span>
-                                        </div>
-                                        <h4 class="font-extrabold text-slate-900 text-base">${itin.titolo}</h4>
-                                        <p class="text-xs text-slate-600 leading-relaxed">${itin.descrizione}</p>
-                                        <button onclick="selezionaDestinazione(${itin.latitudine || 39.8731}, ${itin.longitudine || 15.7735}, '${itin.titolo.replace(/'/g, "\\'")}')" class="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
-                                            <i class="fa-solid fa-route"></i> Avvia Questo Tour
-                                        </button>
-                                    </div>
-                                </div>
-                            ` + itinContainer.innerHTML;
-                        });
-                    }
-                }
-            } catch (err) {
-                console.error("Errore caricamento CMS Guest:", err);
-            }
-        }
-
         window.addEventListener('DOMContentLoaded', () => {
-            caricaCMSGuestDinamico();
             if(!verificaScadenzaAccesso()) return;
             const savedLang = localStorage.getItem('nauticovi_lang') || 'it';
             initMapNav();
             setLanguage(savedLang);
+            caricaCMSGuestDinamico();
         });
     </script>
 </body>
