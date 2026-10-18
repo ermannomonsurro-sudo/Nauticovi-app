@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -765,7 +766,6 @@
                 window.speechSynthesis.speak(msg);
             }
         }
-        }
 
         function chiediConfermaNavigazione(idPoi) {
             const list = puntiEsattiMultilang[currentLang] || puntiEsattiMultilang['it'];
@@ -788,7 +788,7 @@
             document.getElementById('target-poi-name').innerText = destinazioneAttiva.nome;
             document.getElementById('btn-stop-nav-top').classList.remove('hidden');
 
-            if (destinazioneAttiva.audio) {
+            if (destinazioneAttiva.audio || destinazioneAttiva.audio_url) {
                 document.getElementById('btn-audio-guide').classList.remove('hidden');
             } else {
                 document.getElementById('btn-audio-guide').classList.add('hidden');
@@ -809,6 +809,10 @@
             document.getElementById('guidance-icon').className = "fa-solid fa-location-dot";
             document.getElementById('guidance-msg').innerText = translations[currentLang].assistant_select_prompt;
 
+            if (audioPlayer) {
+                audioPlayer.pause();
+                audioPlayer = null;
+            }
             if ('speechSynthesis' in window) window.speechSynthesis.cancel();
             if(routePolyline) map.removeLayer(routePolyline);
         }
@@ -1091,7 +1095,7 @@
                                         </div>
                                         <h4 class="font-extrabold text-slate-900 text-base">${itin.titolo}</h4>
                                         <p class="text-xs text-slate-600 leading-relaxed">${itin.descrizione}</p>
-                                        <button onclick="selezionaDestinazione(${itin.latitudine || 39.8731}, ${itin.longitudine || 15.7735}, '${itin.titolo.replace(/'/g, "\'")}')" class="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
+                                        <button onclick="selezionaDestinazione(${itin.latitudine || 39.8731}, ${itin.longitudine || 15.7735}, '${itin.titolo.replace(/'/g, "\\'")}')" class="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
                                             <i class="fa-solid fa-route"></i> Avvia Questo Tour
                                         </button>
                                     </div>
@@ -1115,4 +1119,3 @@
     </script>
 </body>
 </html>
-
