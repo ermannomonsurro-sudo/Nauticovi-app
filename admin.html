@@ -367,18 +367,30 @@
             const email = document.getElementById('admin-email').value.trim();
             const password = document.getElementById('admin-pass').value;
 
+            if (!email || !password) return;
+
             btn.disabled = true;
-            const { error } = await _supabase.auth.signInWithPassword({ email, password });
-            btn.disabled = false;
+            btn.innerText = "Accesso in corso...";
 
-            if (error) {
-                errorEl.classList.remove('hidden');
-                return;
+            try {
+                const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+                
+                if (error) {
+                    errorEl.classList.remove('hidden');
+                    errorEl.innerText = "Credenziali errate o account non verificato.";
+                    btn.disabled = false;
+                    btn.innerText = "Accedi al Gestionale";
+                    return;
+                }
+
+                errorEl.classList.add('hidden');
+                document.getElementById('admin-pass').value = '';
+                mostraPannello();
+            } catch (err) {
+                console.error("Errore imprevisto:", err);
+                btn.disabled = false;
+                btn.innerText = "Accedi al Gestionale";
             }
-
-            errorEl.classList.add('hidden');
-            document.getElementById('admin-pass').value = '';
-            mostraPannello();
         }
 
         async function logout() {
@@ -453,6 +465,39 @@
                 });
             } catch (err) {
                 console.error("Errore CMS:", err);
+            }
+        }
+
+        function gestisciNuovaCategoria() {
+            const nuovaCat = prompt("Inserisci il nome della nuova Categoria (es. 'eventi', 'offerte'):");
+            if (nuovaCat && nuovaCat.trim() !== '') {
+                const select = document.getElementById('cms_categoria');
+                const option = document.createElement('option');
+                const valClean = nuovaCat.trim().toLowerCase().replace(/\s+/g, '_');
+                option.value = valClean;
+                option.text = '📌 ' + nuovaCat.trim();
+                select.add(option);
+                select.value = valClean;
+                toggleCampiCMS();
+            }
+        }
+
+        function toggleCampiCMS() {
+            const cat = document.getElementById('cms_categoria').value;
+            const boxPrezzi = document.getElementById('box-prezzi-cms');
+            const boxGps = document.getElementById('box-gps-cms');
+            const boxItinerario = document.getElementById('box-itinerario-cms');
+            
+            boxPrezzi.classList.add('hidden');
+            boxGps.classList.add('hidden');
+            boxItinerario.classList.add('hidden');
+
+            if (cat === 'flotta') {
+                boxPrezzi.classList.remove('hidden');
+            } else if (cat === 'destinazioni') {
+                boxGps.classList.remove('hidden');
+            } else if (cat === 'itinerari') {
+                boxItinerario.classList.remove('hidden');
             }
         }
 
@@ -537,7 +582,6 @@
             }
             btn.disabled = false;
         }
-
 
         async function eliminaContenutoCMS(id) {
             if (confirm("Sei sicuro di voler eliminare questo contenuto dal CMS?")) {
@@ -654,15 +698,11 @@
                 const data = await res.json();
 
                 if (res.ok && data.data) {
-                    alert(`BOZZA CREATA SU FATTURE IN CLOUD!
-
-ID Bozza: ${data.data.id}
-Il documento è nella sezione "Bozze" del tuo account.`);
+                    alert(`BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${data.data.id}\nIl documento è nella sezione "Bozze" del tuo account.`);
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
-                    alert("Errore Fatture in Cloud:
-" + JSON.stringify(data.error || data, null, 2));
+                    alert("Errore Fatture in Cloud:\n" + JSON.stringify(data.error || data, null, 2));
                 }
             } catch (err) {
                 alert("Errore di rete: " + err.message);
@@ -735,11 +775,7 @@ Il documento è nella sezione "Bozze" del tuo account.`);
                 const guestLink = `${window.location.origin}/guest.html?cliente=${encodeURIComponent(n.nome_cliente)}&barca=${encodeURIComponent(n.barca)}&date=${n.data_noleggio}`;
                 const telefonoWa = String(n.telefono || '').replace(/\D/g, '');
 
-                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).
-
-⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}
-
-🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
+                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).\n\n⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}\n\n🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
 
                 const badgeCheckin = n.stato_checkin === 'completato'
                     ? `<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">✓ Completato</span>`
@@ -804,11 +840,9 @@ Il documento è nella sezione "Bozze" del tuo account.`);
         }
 
         function esportaCSV() {
-            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin
-";
+            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin\n";
             listaNoleggi.forEach(n => {
-                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"
-`;
+                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
@@ -820,4 +854,3 @@ Il documento è nella sezione "Bozze" del tuo account.`);
     </script>
 </body>
 </html>
-
