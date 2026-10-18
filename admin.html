@@ -188,6 +188,10 @@
                                     <label class="block text-[9px] font-bold text-slate-600 uppercase">Testo Audioguida (Letto all'arrivo)</label>
                                     <textarea id="cms_audioguida" rows="2" placeholder="Benvenuto alla Grotta Azzurra..." class="w-full p-1.5 border rounded bg-white text-[11px]"></textarea>
                                 </div>
+                                <div>
+                                    <label class="block text-[9px] font-bold text-slate-600 uppercase">URL File Audio MP3 (Es. caricato su Supabase Storage)</label>
+                                    <input type="url" id="cms_audio_url" placeholder="https://.../grotta_azzurra.mp3" class="w-full p-1.5 border rounded bg-white text-xs">
+                                </div>
                             </div>
 
                             <div>
@@ -452,39 +456,6 @@
             }
         }
 
-        function gestisciNuovaCategoria() {
-            const nuovaCat = prompt("Inserisci il nome della nuova Categoria (es. 'eventi', 'offerte'):");
-            if (nuovaCat && nuovaCat.trim() !== '') {
-                const select = document.getElementById('cms_categoria');
-                const option = document.createElement('option');
-                const valClean = nuovaCat.trim().toLowerCase().replace(/\s+/g, '_');
-                option.value = valClean;
-                option.text = '📌 ' + nuovaCat.trim();
-                select.add(option);
-                select.value = valClean;
-                toggleCampiCMS();
-            }
-        }
-
-        function toggleCampiCMS() {
-            const cat = document.getElementById('cms_categoria').value;
-            const boxPrezzi = document.getElementById('box-prezzi-cms');
-            const boxGps = document.getElementById('box-gps-cms');
-            const boxItinerario = document.getElementById('box-itinerario-cms');
-            
-            boxPrezzi.classList.add('hidden');
-            boxGps.classList.add('hidden');
-            boxItinerario.classList.add('hidden');
-
-            if (cat === 'flotta') {
-                boxPrezzi.classList.remove('hidden');
-            } else if (cat === 'destinazioni') {
-                boxGps.classList.remove('hidden');
-            } else if (cat === 'itinerari') {
-                boxItinerario.classList.remove('hidden');
-            }
-        }
-
         function caricaInModificaCMS(id) {
             const item = listaCMSCache.find(i => String(i.id) === String(id));
             if (!item) return;
@@ -502,6 +473,7 @@
                 document.getElementById('cms_lat').value = item.latitudine || '';
                 document.getElementById('cms_lng').value = item.longitudine || '';
                 document.getElementById('cms_audioguida').value = item.testo_audioguida || '';
+                if (document.getElementById('cms_audio_url')) document.getElementById('cms_audio_url').value = item.audio_url || '';
             } else if (item.categoria === 'flotta') {
                 document.getElementById('cms_bassa_mezza').value = item.prezzo_bassa_mezza || '';
                 document.getElementById('cms_bassa_intera').value = item.prezzo_bassa_intera || '';
@@ -539,6 +511,7 @@
                 latitudine: cat === 'destinazioni' ? (parseFloat(document.getElementById('cms_lat').value) || null) : null,
                 longitudine: cat === 'destinazioni' ? (parseFloat(document.getElementById('cms_lng').value) || null) : null,
                 testo_audioguida: cat === 'destinazioni' ? document.getElementById('cms_audioguida').value : null,
+                audio_url: cat === 'destinazioni' ? (document.getElementById('cms_audio_url').value || null) : null,
                 prezzo_bassa_mezza: cat === 'flotta' ? (parseFloat(document.getElementById('cms_bassa_mezza').value) || 120) : null,
                 prezzo_bassa_intera: cat === 'flotta' ? (parseFloat(document.getElementById('cms_bassa_intera').value) || 200) : null,
                 prezzo_alta_mezza: cat === 'flotta' ? (parseFloat(document.getElementById('cms_alta_mezza').value) || 150) : null,
@@ -564,6 +537,7 @@
             }
             btn.disabled = false;
         }
+
 
         async function eliminaContenutoCMS(id) {
             if (confirm("Sei sicuro di voler eliminare questo contenuto dal CMS?")) {
@@ -680,11 +654,15 @@
                 const data = await res.json();
 
                 if (res.ok && data.data) {
-                    alert(`BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${data.data.id}\nIl documento è nella sezione "Bozze" del tuo account.`);
+                    alert(`BOZZA CREATA SU FATTURE IN CLOUD!
+
+ID Bozza: ${data.data.id}
+Il documento è nella sezione "Bozze" del tuo account.`);
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
-                    alert("Errore Fatture in Cloud:\n" + JSON.stringify(data.error || data, null, 2));
+                    alert("Errore Fatture in Cloud:
+" + JSON.stringify(data.error || data, null, 2));
                 }
             } catch (err) {
                 alert("Errore di rete: " + err.message);
@@ -757,7 +735,11 @@
                 const guestLink = `${window.location.origin}/guest.html?cliente=${encodeURIComponent(n.nome_cliente)}&barca=${encodeURIComponent(n.barca)}&date=${n.data_noleggio}`;
                 const telefonoWa = String(n.telefono || '').replace(/\D/g, '');
 
-                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).\n\n⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}\n\n🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
+                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).
+
+⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}
+
+🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
 
                 const badgeCheckin = n.stato_checkin === 'completato'
                     ? `<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">✓ Completato</span>`
@@ -822,9 +804,11 @@
         }
 
         function esportaCSV() {
-            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin\n";
+            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin
+";
             listaNoleggi.forEach(n => {
-                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"\n`;
+                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"
+`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
@@ -836,3 +820,4 @@
     </script>
 </body>
 </html>
+
