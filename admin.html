@@ -106,14 +106,14 @@
                 </div>
             </div>
 
-            <!-- 2. SEZIONE CMS - GESTIONE CONTENUTI & FLOTTA (CON COORDINATE GPS ED AUDIOGUIDA) -->
+            <!-- 2. SEZIONE CMS - GESTIONE CONTENUTI, DESTINAZIONI, ITINERARI & CATEGORIE DINAMICHE -->
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 gap-2">
                     <div>
                         <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group text-cyan-600"></i> CMS — Gestione Contenuti & Flotta
+                            <i class="fa-solid fa-layer-group text-cyan-600"></i> CMS — Gestione Contenuti, Itinerari & Categorie
                         </h2>
-                        <p class="text-xs text-slate-500">Aggiungi e aggiorna i punti d'interesse GPS, le coordinate esatte, le regole e le barche</p>
+                        <p class="text-xs text-slate-500">Gestisci le destinazioni singole, gli itinerari a tempo (tour raggruppati) e personalizza le categorie</p>
                     </div>
                 </div>
 
@@ -125,9 +125,13 @@
 
                         <form id="cmsForm" onsubmit="salvaContenutoCMS(event)" class="space-y-3 text-xs">
                             <div>
-                                <label class="block font-bold text-slate-600 uppercase">Categoria</label>
-                                <select id="cms_categoria" onchange="togglePrezziCMS()" class="w-full mt-1 p-2 border rounded-lg bg-white font-semibold outline-none">
-                                    <option value="destinazioni">📍 Destinazione / Punto GPS</option>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="block font-bold text-slate-600 uppercase">Categoria CMS</label>
+                                    <button type="button" onclick="gestisciNuovaCategoria()" class="text-[10px] text-cyan-600 font-bold hover:underline">+ Nuova Categoria</button>
+                                </div>
+                                <select id="cms_categoria" onchange="toggleCampiCMS()" class="w-full p-2 border rounded-lg bg-white font-semibold outline-none">
+                                    <option value="destinazioni">📍 Destinazione Singola / Punto GPS</option>
+                                    <option value="itinerari">🧭 Itinerario / Tour Raggruppato</option>
                                     <option value="flotta">🚤 Barca / Flotta</option>
                                     <option value="tips">💡 Tip / Consiglio di Guida</option>
                                     <option value="divieti">🚫 Regola / Divieto di Bordo</option>
@@ -136,12 +140,12 @@
 
                             <div>
                                 <label class="block font-bold text-slate-600 uppercase">Titolo</label>
-                                <input type="text" id="cms_titolo" required placeholder="Es. Grotta Azzurra" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                                <input type="text" id="cms_titolo" required placeholder="Es. Tour Isola di Dino + Arco Magno" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
                             </div>
 
                             <div>
-                                <label class="block font-bold text-slate-600 uppercase">Sottotitolo / Dettaglio</label>
-                                <input type="text" id="cms_sottotitolo" placeholder="Es. Grotta Marina • Snorkeling" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                                <label class="block font-bold text-slate-600 uppercase">Sottotitolo / Dettaglio (es. Durata: 4 Ore)</label>
+                                <input type="text" id="cms_sottotitolo" placeholder="Es. Tour 4 Ore • 3 Tappe Consigliate" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
                             </div>
 
                             <div>
@@ -149,7 +153,24 @@
                                 <textarea id="cms_descrizione" required rows="2" placeholder="Inserisci la descrizione..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none"></textarea>
                             </div>
 
-                            <!-- CAMPI COORDINATE GPS ED AUDIOGUIDA PER DESTINAZIONI -->
+                            <!-- CAMPO PER ITINERARI: SELEZIONE DESTINAZIONI RAGGRUPPATE -->
+                            <div id="box-itinerario-cms" class="hidden p-3 bg-purple-50 border border-purple-200 rounded-xl space-y-2">
+                                <b class="block text-purple-900 font-bold uppercase text-[10px]">🧭 Dettagli Itinerario / Tour</b>
+                                <div>
+                                    <label class="block text-[9px] font-bold text-slate-600 uppercase">Durata Consigliata</label>
+                                    <select id="cms_itinerario_durata" class="w-full p-1.5 border rounded bg-white text-xs font-semibold">
+                                        <option value="2h">2 Ore (Tour Express)</option>
+                                        <option value="4h">4 Ore (Tour Classico)</option>
+                                        <option value="giornata">Giornata Intera (Tour VIP)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[9px] font-bold text-slate-600 uppercase">Destinazioni Incluse (Separate da virgola)</label>
+                                    <input type="text" id="cms_itinerario_tappe" placeholder="Isola di Dino, Grotta Azzurra, Arco Magno" class="w-full p-1.5 border rounded bg-white text-xs">
+                                </div>
+                            </div>
+
+                            <!-- CAMPI COORDINATE GPS ED AUDIOGUIDA PER DESTINAZIONI SINGOLE -->
                             <div id="box-gps-cms" class="p-3 bg-cyan-50/60 border border-cyan-200 rounded-xl space-y-2">
                                 <b class="block text-cyan-900 font-bold uppercase text-[10px]">📍 Coordinate GPS & Audioguida</b>
                                 <div class="grid grid-cols-2 gap-2">
@@ -368,7 +389,7 @@
             });
         });
 
-        // CMS LOGIC CON GESTIONE COORDINATE GPS
+        // CMS LOGIC CON CATEGORIE MODIFICABILI E DISTINZIONE DESTINAZIONI vs ITINERARI
         async function caricaContenutiCMS() {
             const container = document.getElementById('cmsListaContenuti');
             if(!container || !_supabase) return;
@@ -384,12 +405,15 @@
                 container.innerHTML = '';
                 data.forEach(item => {
                     const badgeColor = item.categoria === 'destinazioni' ? 'bg-cyan-100 text-cyan-800'
+                                     : (item.categoria === 'itinerari' ? 'bg-purple-100 text-purple-800'
                                      : (item.categoria === 'flotta' ? 'bg-emerald-100 text-emerald-800'
-                                     : (item.categoria === 'tips' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'));
+                                     : (item.categoria === 'tips' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800')));
 
-                    let gpsInfo = '';
+                    let extraInfo = '';
                     if (item.categoria === 'destinazioni' && item.latitudine) {
-                        gpsInfo = `<span class="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-mono">GPS: ${item.latitudine}, ${item.longitudine}</span>`;
+                        extraInfo = `<span class="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-mono">GPS: ${item.latitudine}, ${item.longitudine}</span>`;
+                    } else if (item.categoria === 'itinerari' && item.sottotitolo) {
+                        extraInfo = `<span class="text-[9px] bg-purple-200 text-purple-900 px-1.5 py-0.5 rounded font-bold">${item.sottotitolo}</span>`;
                     }
 
                     container.innerHTML += `
@@ -398,7 +422,7 @@
                                 <div class="flex items-center gap-2 flex-wrap">
                                     <span class="${badgeColor} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">${item.categoria}</span>
                                     <b class="text-slate-800 text-xs">${item.titolo}</b>
-                                    ${gpsInfo}
+                                    ${extraInfo}
                                 </div>
                                 <p class="text-slate-600 text-[11px]">${item.descrizione}</p>
                             </div>
@@ -413,20 +437,36 @@
             }
         }
 
-        function togglePrezziCMS() {
+        function gestisciNuovaCategoria() {
+            const nuovaCat = prompt("Inserisci il nome della nuova Categoria (es. 'eventi', 'offerte'):");
+            if (nuovaCat && nuovaCat.trim() !== '') {
+                const select = document.getElementById('cms_categoria');
+                const option = document.createElement('option');
+                const valClean = nuovaCat.trim().toLowerCase().replace(/\s+/g, '_');
+                option.value = valClean;
+                option.text = '📌 ' + nuovaCat.trim();
+                select.add(option);
+                select.value = valClean;
+                toggleCampiCMS();
+            }
+        }
+
+        function toggleCampiCMS() {
             const cat = document.getElementById('cms_categoria').value;
             const boxPrezzi = document.getElementById('box-prezzi-cms');
             const boxGps = document.getElementById('box-gps-cms');
+            const boxItinerario = document.getElementById('box-itinerario-cms');
             
+            boxPrezzi.classList.add('hidden');
+            boxGps.classList.add('hidden');
+            boxItinerario.classList.add('hidden');
+
             if (cat === 'flotta') {
                 boxPrezzi.classList.remove('hidden');
-                boxGps.classList.add('hidden');
             } else if (cat === 'destinazioni') {
-                boxPrezzi.classList.add('hidden');
                 boxGps.classList.remove('hidden');
-            } else {
-                boxPrezzi.classList.add('hidden');
-                boxGps.classList.add('hidden');
+            } else if (cat === 'itinerari') {
+                boxItinerario.classList.remove('hidden');
             }
         }
 
@@ -440,7 +480,7 @@
             const nuovoItem = {
                 categoria: cat,
                 titolo: document.getElementById('cms_titolo').value,
-                sottotitolo: document.getElementById('cms_sottotitolo').value,
+                sottotitolo: cat === 'itinerari' ? `Durata: ${document.getElementById('cms_itinerario_durata').value.toUpperCase()}` : document.getElementById('cms_sottotitolo').value,
                 descrizione: document.getElementById('cms_descrizione').value,
                 immagine_url: document.getElementById('cms_immagine_url').value,
                 latitudine: cat === 'destinazioni' ? (parseFloat(document.getElementById('cms_lat').value) || null) : null,
@@ -458,7 +498,7 @@
                 alert("Errore nel salvataggio CMS: " + error.message);
             } else {
                 document.getElementById('cmsForm').reset();
-                togglePrezziCMS();
+                toggleCampiCMS();
                 caricaContenutiCMS();
             }
             btn.disabled = false;
@@ -579,11 +619,15 @@
                 const data = await res.json();
 
                 if (res.ok && data.data) {
-                    alert(`BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${data.data.id}\nIl documento è nella sezione "Bozze" del tuo account.`);
+                    alert(`BOZZA CREATA SU FATTURE IN CLOUD!
+
+ID Bozza: ${data.data.id}
+Il documento è nella sezione "Bozze" del tuo account.`);
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
-                    alert("Errore Fatture in Cloud:\n" + JSON.stringify(data.error || data, null, 2));
+                    alert("Errore Fatture in Cloud:
+" + JSON.stringify(data.error || data, null, 2));
                 }
             } catch (err) {
                 alert("Errore di rete: " + err.message);
@@ -656,7 +700,11 @@
                 const guestLink = `${window.location.origin}/guest.html?cliente=${encodeURIComponent(n.nome_cliente)}&barca=${encodeURIComponent(n.barca)}&date=${n.data_noleggio}`;
                 const telefonoWa = String(n.telefono || '').replace(/\D/g, '');
 
-                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).\n\n⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}\n\n🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
+                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).
+
+⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}
+
+🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
 
                 const badgeCheckin = n.stato_checkin === 'completato'
                     ? `<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">✓ Completato</span>`
@@ -721,9 +769,11 @@
         }
 
         function esportaCSV() {
-            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin\n";
+            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin
+";
             listaNoleggi.forEach(n => {
-                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"\n`;
+                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"
+`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
