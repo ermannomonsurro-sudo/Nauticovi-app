@@ -579,7 +579,6 @@
         let map, userMarker, markersGroup, routePolyline;
         let destinazioneSelezionata = null;
         let destinazioneAttiva = null;
-        let filtroItinerarioAttivo = 'tutti';
         
         let lastLat = null;
         let lastLng = null;
@@ -734,14 +733,38 @@
             window.open(urlWa, '_blank');
         }
 
+        let audioPlayer = null;
+
         function riproduciAudioguida() {
-            if (!destinazioneAttiva || !destinazioneAttiva.audio) return;
-            if ('speechSynthesis' in window) {
+            if (!destinazioneAttiva) return;
+
+            // 1. Se esiste un file MP3 caricato su Supabase/Cloud (Voce Naturale)
+            if (destinazioneAttiva.audio_url) {
+                if (audioPlayer) {
+                    if (!audioPlayer.paused) {
+                        audioPlayer.pause();
+                        document.getElementById('btn-audio-guide').innerHTML = '<i class="fa-solid fa-volume-high"></i> <span class="hidden sm:inline">Ascolta MP3</span>';
+                        return;
+                    }
+                } else {
+                    audioPlayer = new Audio(destinazioneAttiva.audio_url);
+                    audioPlayer.onended = () => {
+                        document.getElementById('btn-audio-guide').innerHTML = '<i class="fa-solid fa-volume-high"></i> <span class="hidden sm:inline">Ascolta MP3</span>';
+                    };
+                }
+                audioPlayer.play();
+                document.getElementById('btn-audio-guide').innerHTML = '<i class="fa-solid fa-pause"></i> <span class="hidden sm:inline">Pausa MP3</span>';
+                return;
+            }
+
+            // 2. Fallback: se non c'è il file MP3 ma c'è il testo, usa la voce di sistema
+            if (destinazioneAttiva.audio && 'speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 const msg = new SpeechSynthesisUtterance(destinazioneAttiva.audio);
                 msg.lang = currentLang === 'en' ? 'en-US' : (currentLang === 'es' ? 'es-ES' : 'it-IT');
                 window.speechSynthesis.speak(msg);
             }
+        }
         }
 
         function chiediConfermaNavigazione(idPoi) {
@@ -819,7 +842,7 @@
                           <div class="drop-shadow-2xl">
                               <svg width="34" height="48" viewBox="0 0 34 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                                   <path d="M17 2C10 12 4 22 4 36C4 42 8 45 17 45C26 45 30 42 30 36C30 22 24 12 17 2Z" fill="#0f172a" stroke="#06b6d4" stroke-width="2.5"/>
-                                  <path d="M17 8C13 15 9 22 9 32C25 38 25 32C25 22 21 15 17 8Z" fill="#06b6d4" opacity="0.8"/>
+                                  <path d="M17 8C13 15 9 22 9 32C9 38 12 40 17 40C22 40 25 38 25 32C25 22 21 15 17 8Z" fill="#06b6d4" opacity="0.8"/>
                                   <path d="M12 24H22V27H12V24Z" fill="#ffffff"/>
                                   <path d="M17 11L20 18H14L17 11Z" fill="#ffffff"/>
                               </svg>
@@ -1068,7 +1091,7 @@
                                         </div>
                                         <h4 class="font-extrabold text-slate-900 text-base">${itin.titolo}</h4>
                                         <p class="text-xs text-slate-600 leading-relaxed">${itin.descrizione}</p>
-                                        <button onclick="selezionaDestinazione(${itin.latitudine || 39.8731}, ${itin.longitudine || 15.7735}, '${itin.titolo.replace(/'/g, "\\'")}')" class="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
+                                        <button onclick="selezionaDestinazione(${itin.latitudine || 39.8731}, ${itin.longitudine || 15.7735}, '${itin.titolo.replace(/'/g, "\'")}')" class="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
                                             <i class="fa-solid fa-route"></i> Avvia Questo Tour
                                         </button>
                                     </div>
@@ -1092,3 +1115,4 @@
     </script>
 </body>
 </html>
+
