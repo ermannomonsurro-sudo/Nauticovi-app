@@ -124,6 +124,7 @@
                         </h3>
 
                         <form id="cmsForm" onsubmit="salvaContenutoCMS(event)" class="space-y-3 text-xs">
+                            <input type="hidden" id="cms_edit_id" value="">
                             <div>
                                 <div class="flex justify-between items-center mb-1">
                                     <label class="block font-bold text-slate-600 uppercase">Categoria CMS</label>
@@ -219,9 +220,14 @@
                                 </div>
                             </div>
 
-                            <button type="submit" id="btn-salva-cms" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg shadow transition flex justify-center items-center gap-2">
-                                <i class="fa-solid fa-floppy-disk"></i> Salva Contenuto su Cloud
-                            </button>
+                            <div class="flex gap-2">
+                                <button type="submit" id="btn-salva-cms" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg shadow transition flex justify-center items-center gap-2">
+                                    <i class="fa-solid fa-floppy-disk"></i> <span id="btn-salva-cms-text">Salva Contenuto su Cloud</span>
+                                </button>
+                                <button type="button" id="btn-annulla-edit-cms" onclick="resetFormCMS()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2.5 rounded-lg transition" title="Annulla Modifica">
+                                    Annulla
+                                </button>
+                            </div>
                         </form>
                     </div>
 
@@ -389,7 +395,9 @@
             });
         });
 
-        // CMS LOGIC CON CATEGORIE MODIFICABILI E DISTINZIONE DESTINAZIONI vs ITINERARI
+        // CMS LOGIC CON EDITING E MODIFICA CONTENUTI ESISTENTI
+        let listaCMSCache = [];
+
         async function caricaContenutiCMS() {
             const container = document.getElementById('cmsListaContenuti');
             if(!container || !_supabase) return;
@@ -398,10 +406,12 @@
                 const { data, error } = await _supabase.from('cms_contenuti').select('*').order('created_at', { ascending: false });
 
                 if (error || !data || data.length === 0) {
+                    listaCMSCache = [];
                     container.innerHTML = `<p class="text-xs text-slate-400 italic">Nessun contenuto CMS presente. Aggiungi il primo dal form!</p>`;
                     return;
                 }
 
+                listaCMSCache = data;
                 container.innerHTML = '';
                 data.forEach(item => {
                     const badgeColor = item.categoria === 'destinazioni' ? 'bg-cyan-100 text-cyan-800'
@@ -426,9 +436,14 @@
                                 </div>
                                 <p class="text-slate-600 text-[11px]">${item.descrizione}</p>
                             </div>
-                            <button onclick="eliminaContenutoCMS('${item.id}')" class="text-red-400 hover:text-red-600 p-1" title="Elimina">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
+                            <div class="flex items-center gap-1">
+                                <button onclick="caricaInModificaCMS('${item.id}')" class="text-cyan-600 hover:text-cyan-800 p-1 font-bold text-xs" title="Modifica">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <button onclick="eliminaContenutoCMS('${item.id}')" class="text-red-400 hover:text-red-600 p-1" title="Elimina">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     `;
                 });
@@ -470,14 +485,52 @@
             }
         }
 
+        function caricaInModificaCMS(id) {
+            const item = listaCMSCache.find(i => String(i.id) === String(id));
+            if (!item) return;
+
+            document.getElementById('cms_edit_id').value = item.id;
+            document.getElementById('cms_categoria').value = item.categoria || 'destinazioni';
+            toggleCampiCMS();
+
+            document.getElementById('cms_titolo').value = item.titolo || '';
+            document.getElementById('cms_sottotitolo').value = item.sottotitolo || '';
+            document.getElementById('cms_descrizione').value = item.descrizione || '';
+            document.getElementById('cms_immagine_url').value = item.immagine_url || '';
+
+            if (item.categoria === 'destinazioni') {
+                document.getElementById('cms_lat').value = item.latitudine || '';
+                document.getElementById('cms_lng').value = item.longitudine || '';
+                document.getElementById('cms_audioguida').value = item.testo_audioguida || '';
+            } else if (item.categoria === 'flotta') {
+                document.getElementById('cms_bassa_mezza').value = item.prezzo_bassa_mezza || '';
+                document.getElementById('cms_bassa_intera').value = item.prezzo_bassa_intera || '';
+                document.getElementById('cms_alta_mezza').value = item.prezzo_alta_mezza || '';
+                document.getElementById('cms_alta_intera').value = item.prezzo_alta_intera || '';
+            }
+
+            document.getElementById('btn-salva-cms-text').innerText = 'Aggiorna Contenuto';
+            document.getElementById('btn-annulla-edit-cms').classList.remove('hidden');
+            document.getElementById('cmsForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetFormCMS() {
+            document.getElementById('cmsForm').reset();
+            document.getElementById('cms_edit_id').value = '';
+            document.getElementById('btn-salva-cms-text').innerText = 'Salva Contenuto su Cloud';
+            document.getElementById('btn-annulla-edit-cms').classList.add('hidden');
+            toggleCampiCMS();
+        }
+
         async function salvaContenutoCMS(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-salva-cms');
             btn.disabled = true;
 
+            const editId = document.getElementById('cms_edit_id').value;
             const cat = document.getElementById('cms_categoria').value;
 
-            const nuovoItem = {
+            const itemData = {
                 categoria: cat,
                 titolo: document.getElementById('cms_titolo').value,
                 sottotitolo: cat === 'itinerari' ? `Durata: ${document.getElementById('cms_itinerario_durata').value.toUpperCase()}` : document.getElementById('cms_sottotitolo').value,
@@ -492,13 +545,21 @@
                 prezzo_alta_intera: cat === 'flotta' ? (parseFloat(document.getElementById('cms_alta_intera').value) || 220) : null
             };
 
-            const { data, error } = await _supabase.from('cms_contenuti').insert([nuovoItem]);
+            let error;
+            if (editId) {
+                // UPDATE
+                const result = await _supabase.from('cms_contenuti').update(itemData).eq('id', editId);
+                error = result.error;
+            } else {
+                // INSERT
+                const result = await _supabase.from('cms_contenuti').insert([itemData]);
+                error = result.error;
+            }
 
             if (error) {
                 alert("Errore nel salvataggio CMS: " + error.message);
             } else {
-                document.getElementById('cmsForm').reset();
-                toggleCampiCMS();
+                resetFormCMS();
                 caricaContenutiCMS();
             }
             btn.disabled = false;
@@ -619,15 +680,11 @@
                 const data = await res.json();
 
                 if (res.ok && data.data) {
-                    alert(`BOZZA CREATA SU FATTURE IN CLOUD!
-
-ID Bozza: ${data.data.id}
-Il documento è nella sezione "Bozze" del tuo account.`);
+                    alert(`BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${data.data.id}\nIl documento è nella sezione "Bozze" del tuo account.`);
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
-                    alert("Errore Fatture in Cloud:
-" + JSON.stringify(data.error || data, null, 2));
+                    alert("Errore Fatture in Cloud:\n" + JSON.stringify(data.error || data, null, 2));
                 }
             } catch (err) {
                 alert("Errore di rete: " + err.message);
@@ -700,11 +757,7 @@ Il documento è nella sezione "Bozze" del tuo account.`);
                 const guestLink = `${window.location.origin}/guest.html?cliente=${encodeURIComponent(n.nome_cliente)}&barca=${encodeURIComponent(n.barca)}&date=${n.data_noleggio}`;
                 const telefonoWa = String(n.telefono || '').replace(/\D/g, '');
 
-                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).
-
-⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}
-
-🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
+                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).\n\n⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}\n\n🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
 
                 const badgeCheckin = n.stato_checkin === 'completato'
                     ? `<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">✓ Completato</span>`
@@ -769,11 +822,9 @@ Il documento è nella sezione "Bozze" del tuo account.`);
         }
 
         function esportaCSV() {
-            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin
-";
+            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin\n";
             listaNoleggi.forEach(n => {
-                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"
-`;
+                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
