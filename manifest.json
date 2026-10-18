@@ -1,10 +1,12 @@
 {
-  "name": "Nauticovi",
+  "name": "Nauticovi Rental & Nav",
   "short_name": "Nauticovi",
-  "start_url": "/index.html",
+  "description": "Gestionale Noleggio e Navigatore GPS di Bordo",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "logo.png",
