@@ -44,8 +44,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Nauticovi">
-    <link rel="apple-touch-icon" href="logo.png">
-    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="app-icon.png">
+    <link rel="icon" type="image/png" href="app-icon.png">
 
     <script>
       if ('serviceWorker' in navigator) {
@@ -117,38 +117,44 @@
             </div>
         </div>
 
-        <!-- WIDGET METEO & MARE LIVE -->
+        <!-- WIDGET METEO & MARE LIVE (OPEN-METEO) -->
         <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 space-y-2.5 text-xs">
             <div class="flex justify-between items-center border-b pb-2">
                 <h3 class="font-extrabold text-slate-800 flex items-center gap-1.5 uppercase text-[11px]">
                     <i class="fa-solid fa-cloud-sun-rain text-cyan-600"></i> <span data-i18n="weather_title">Meteo & Condizioni Mare Live</span>
                 </h3>
-                <span class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full uppercase" data-i18n="weather_status">Favorevole</span>
+                <span id="weather-status-badge" class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full uppercase" data-i18n="weather_status">Favorevole</span>
             </div>
 
-            <div class="grid grid-cols-3 gap-2 text-center pt-1">
+            <div class="grid grid-cols-4 gap-1.5 text-center pt-1">
                 <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
                     <span class="text-[9px] text-slate-400 uppercase font-bold block" data-i18n="weather_sea">Stato Mare</span>
-                    <b class="text-slate-800 text-xs mt-0.5 block flex items-center justify-center gap-1">
-                        🌊 <span data-i18n="weather_sea_val">Calmo (0.2m)</span>
+                    <b class="text-slate-800 text-[11px] mt-0.5 block" id="live-sea">
+                        🌊 <span id="live-sea-val">Calmo (0.2m)</span>
                     </b>
                 </div>
                 <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
                     <span class="text-[9px] text-slate-400 uppercase font-bold block" data-i18n="weather_wind">Vento</span>
-                    <b class="text-slate-800 text-xs mt-0.5 block flex items-center justify-center gap-1">
-                        💨 <span data-i18n="weather_wind_val">NW • 5 kts</span>
+                    <b class="text-slate-800 text-[11px] mt-0.5 block" id="live-wind">
+                        💨 <span id="live-wind-val">-- kts</span>
                     </b>
                 </div>
                 <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
-                    <span class="text-[9px] text-slate-400 uppercase font-bold block" data-i18n="weather_temp">Temp. Acqua</span>
-                    <b class="text-slate-800 text-xs mt-0.5 block flex items-center justify-center gap-1">
-                        🌡️ <span>24°C</span>
+                    <span class="text-[9px] text-slate-400 uppercase font-bold block" data-i18n="weather_air">Temp. Aria</span>
+                    <b class="text-slate-800 text-[11px] mt-0.5 block" id="live-air">
+                        ☀️ <span id="live-air-val">--°C</span>
+                    </b>
+                </div>
+                <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
+                    <span class="text-[9px] text-slate-400 uppercase font-bold block" data-i18n="weather_water">Temp. Acqua</span>
+                    <b class="text-slate-800 text-[11px] mt-0.5 block" id="live-water">
+                        🌡️ <span id="live-water-val">--°C</span>
                     </b>
                 </div>
             </div>
 
             <p class="text-[10px] text-cyan-800 bg-cyan-50 p-2 rounded-lg border border-cyan-100 font-medium" data-i18n="weather_tip">
-                💡 <b>Consiglio di Bordo:</b> Mare calmo perfetto per la navigazione costiera.
+                💡 <b>Consiglio di Bordo:</b> Condizioni ideali per la navigazione costiera tra Isola di Dino ed Arco Magno.
             </p>
         </div>
 
@@ -390,11 +396,10 @@
                 weather_title: "Meteo & Condizioni Mare Live",
                 weather_status: "Favorevole",
                 weather_sea: "Stato Mare",
-                weather_sea_val: "Calmo (0.2m)",
                 weather_wind: "Vento",
-                weather_wind_val: "NW • 5 kts",
-                weather_temp: "Temp. Acqua",
-                weather_tip: "💡 <b>Consiglio di Bordo:</b> Mare calmo perfetto per la navigazione costiera.",
+                weather_air: "Temp. Aria",
+                weather_water: "Temp. Acqua",
+                weather_tip: "💡 <b>Consiglio di Bordo:</b> Condizioni ideali per la navigazione costiera tra Isola di Dino ed Arco Magno.",
                 tab_dest: "Destinazioni",
                 tab_itineraries: "Itinerari",
                 tab_map: "Mappa GPS",
@@ -739,6 +744,59 @@
             document.getElementById('poi-detail-card').classList.add('hidden');
         }
 
+        // INTEGRAZIONE METEO MARINO REALE OPEN-METEO PER PRAIA A MARE
+        async function caricaMeteoRealeOpenMeteo() {
+            const LAT = 39.8981;
+            const LON = 15.7772;
+
+            try {
+                // 1. Dati Atmosfera (Temperatura aria e Vento in Nodi)
+                const resMeteo = await fetch(
+                    `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,wind_speed_10m&wind_speed_unit=kn`
+                );
+                const dataMeteo = await resMeteo.json();
+
+                // 2. Dati Marini (Altezza Onde)
+                const resMarine = await fetch(
+                    `https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wave_height`
+                );
+                const dataMarine = await resMarine.json();
+
+                // Estrazione parametri
+                const tempAria = Math.round(dataMeteo.current.temperature_2m);
+                const ventoNodi = Math.round(dataMeteo.current.wind_speed_10m);
+                const altezzaOnde = (dataMarine.current && dataMarine.current.wave_height !== undefined) 
+                    ? dataMarine.current.wave_height.toFixed(1) 
+                    : "0.2";
+
+                // Calcolo coordinato per la temperatura dell'acqua di Praia a Mare in base alla stagione reale
+                const mese = new Date().getMonth(); // 0 = Gen, 9 = Ott
+                let tempMareEstima = 22;
+                if (mese >= 5 && mese <= 8) tempMareEstima = 25;      // Estate (Giugno-Settembre)
+                else if (mese === 9) tempMareEstima = 21;             // Ottobre
+                else if (mese >= 10 || mese <= 4) tempMareEstima = 16; // Inverno / Primavera
+
+                // Determina stato del mare
+                let statoMare = "Calmo";
+                if (altezzaOnde > 0.5 && altezzaOnde <= 1.25) statoMare = "Poco Mosso";
+                else if (altezzaOnde > 1.25) statoMare = "Mosso";
+
+                // Aggiornamento DOM
+                const seaValEl = document.getElementById('live-sea-val');
+                const windValEl = document.getElementById('live-wind-val');
+                const airValEl = document.getElementById('live-air-val');
+                const waterValEl = document.getElementById('live-water-val');
+
+                if (seaValEl) seaValEl.innerText = `${statoMare} (${altezzaOnde}m)`;
+                if (windValEl) windValEl.innerText = `${ventoNodi} kts`;
+                if (airValEl) airValEl.innerText = `${tempAria}°C`;
+                if (waterValEl) waterValEl.innerText = `${tempMareEstima}°C`;
+
+            } catch (err) {
+                console.error("Errore caricamento Open-Meteo:", err);
+            }
+        }
+
         // CARICAMENTO ESCLUSIVO DAL CMS SUPABASE
         async function caricaCMSGuestDinamico() {
             if (typeof _supabase === 'undefined') return;
@@ -917,6 +975,7 @@
             initMapNav();
             setLanguage(savedLang);
             caricaCMSGuestDinamico();
+            caricaMeteoRealeOpenMeteo();
         });
     </script>
 </body>
