@@ -135,43 +135,43 @@
             </p>
         </div>
 
-        <!-- TAB NAVIGAZIONE INTERNA -->
-        <div class="flex bg-slate-200 p-1 rounded-xl text-xs font-bold text-slate-600 gap-1 shadow-inner">
-            <button onclick="switchTab('destinazioni')" id="tab-destinazioni" class="tab-btn flex-1 py-2.5 rounded-lg bg-white text-slate-900 shadow flex items-center justify-center gap-1.5">
+        <!-- TAB NAVIGAZIONE INTERNA (DESTINAZIONI SINGOLE vs ITINERARI TOUR) -->
+        <div class="flex bg-slate-200 p-1 rounded-xl text-[11px] font-bold text-slate-600 gap-1 shadow-inner">
+            <button onclick="switchTab('destinazioni')" id="tab-destinazioni" class="tab-btn flex-1 py-2.5 rounded-lg bg-white text-slate-900 shadow flex items-center justify-center gap-1">
                 <i class="fa-solid fa-location-dot text-cyan-600"></i> <span data-i18n="tab_dest">Destinazioni</span>
             </button>
-            <button onclick="switchTab('navigatore')" id="tab-navigatore" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900 flex items-center justify-center gap-1.5">
+            <button onclick="switchTab('itinerari')" id="tab-itinerari" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900 flex items-center justify-center gap-1">
+                <i class="fa-solid fa-route text-purple-600"></i> <span data-i18n="tab_itineraries">Itinerari</span>
+            </button>
+            <button onclick="switchTab('navigatore')" id="tab-navigatore" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900 flex items-center justify-center gap-1">
                 <i class="fa-solid fa-compass text-cyan-600"></i> <span data-i18n="tab_map">Mappa GPS</span>
             </button>
-            <button onclick="switchTab('tips')" id="tab-tips" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900 flex items-center justify-center gap-1.5">
+            <button onclick="switchTab('tips')" id="tab-tips" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900 flex items-center justify-center gap-1">
                 <i class="fa-solid fa-lightbulb"></i> Tips
-            </button>
-            <button onclick="switchTab('regole')" id="tab-regole" class="tab-btn flex-1 py-2.5 rounded-lg hover:text-slate-900 flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-ban text-red-500"></i> <span data-i18n="tab_rules">Divieti</span>
             </button>
         </div>
 
-        <!-- SEZIONE 1: LISTA PUNTI ESATTI DI NAVIGAZIONE CON FILTRO TEMPO ITINERARIO -->
+        <!-- SEZIONE 1: LISTA DESTINAZIONI SINGOLE -->
         <div id="sec-destinazioni" class="tab-content space-y-3">
-            <div class="flex justify-between items-center">
-                <h3 class="font-black text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5 px-1">
-                    <i class="fa-solid fa-map-pin text-cyan-600"></i> <span data-i18n="dest_section_title">Seleziona la Destinazione di Oggi</span>
-                </h3>
-            </div>
-
-            <!-- SELETTORE ITINERARI PER TEMPO DISPONIBILE -->
-            <div class="bg-slate-200/80 p-1 rounded-xl grid grid-cols-3 gap-1 text-[10px] font-extrabold text-slate-600 text-center">
-                <button onclick="filtraItinerario('tutti')" id="btn-it-tutti" class="bg-white text-cyan-800 py-1.5 rounded-lg shadow">Tutte le Mete</button>
-                <button onclick="filtraItinerario('2h')" id="btn-it-2h" class="py-1.5 rounded-lg hover:text-slate-900">⏱️ Tour 2 Ore</button>
-                <button onclick="filtraItinerario('4h')" id="btn-it-4h" class="py-1.5 rounded-lg hover:text-slate-900">⏱️ Tour 4 Ore</button>
-            </div>
-
-            <p class="text-xs text-slate-500 px-1" data-i18n="dest_section_desc">Clicca su uno dei punti esatti per avviare il navigatore GPS in tempo reale verso la meta.</p>
+            <h3 class="font-black text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5 px-1">
+                <i class="fa-solid fa-map-pin text-cyan-600"></i> <span data-i18n="dest_section_title">Destinazioni Singole & Punti GPS</span>
+            </h3>
+            <p class="text-xs text-slate-500 px-1" data-i18n="dest_section_desc">Scegli una meta specifica per avviare il navigatore GPS diretto verso la posizione esatta.</p>
 
             <div id="punti-esatti-lista" class="space-y-3 pt-1"></div>
         </div>
 
-        <!-- SEZIONE 2: NAVIGATORE GPS SMART CON ASSISTENTE GUIDA & AUDIOGUIDA -->
+        <!-- SEZIONE 2: LISTA ITINERARI & TOUR A TEMPO RAGGRUPPATI -->
+        <div id="sec-itinerari" class="tab-content hidden space-y-3">
+            <h3 class="font-black text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5 px-1">
+                <i class="fa-solid fa-route text-purple-600"></i> <span data-i18n="itin_section_title">Itinerari Consigliati in Base al Tempo</span>
+            </h3>
+            <p class="text-xs text-slate-500 px-1" data-i18n="itin_section_desc">Tour raggruppati che collegano 2 o più destinazioni per sfruttare al meglio il tuo tempo a bordo.</p>
+
+            <div id="itinerari-lista" class="space-y-3 pt-1"></div>
+        </div>
+
+        <!-- SEZIONE 3: NAVIGATORE GPS SMART CON ASSISTENTE GUIDA & AUDIOGUIDA -->
         <div id="sec-navigatore" class="tab-content hidden space-y-3">
             
             <!-- Telemetria GPS Base con Tempo Arrivo Stimato (ETA) -->
@@ -240,7 +240,7 @@
 
         </div>
 
-        <!-- SEZIONE 3: TIPS GUIDA BARCA -->
+        <!-- SEZIONE 4: TIPS GUIDA BARCA -->
         <div id="sec-tips" class="tab-content hidden space-y-3">
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2 text-sm">
@@ -275,7 +275,7 @@
             </div>
         </div>
 
-        <!-- SEZIONE 4: DIVIETI DA NON INFRANGERE -->
+        <!-- SEZIONE 5: DIVIETI DA NON INFRANGERE -->
         <div id="sec-regole" class="tab-content hidden space-y-3">
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <h3 class="font-bold text-red-600 flex items-center gap-2 border-b pb-2 text-sm">
@@ -373,10 +373,13 @@
                 weather_temp: "Temp. Acqua",
                 weather_tip: "💡 <b>Consiglio di Bordo:</b> Mare calmo perfetto per l'Isola di Dino e l'Arco Magno. Nel pomeriggio brezza da Nord.",
                 tab_dest: "Destinazioni",
+                tab_itineraries: "Itinerari",
                 tab_map: "Mappa GPS",
                 tab_rules: "Divieti",
-                dest_section_title: "Seleziona la Destinazione di Oggi",
-                dest_section_desc: "Clicca su uno dei punti esatti per avviare il navigatore GPS in tempo reale verso la meta.",
+                dest_section_title: "Destinazioni Singole & Punti GPS",
+                dest_section_desc: "Scegli una meta specifica per avviare il navigatore GPS diretto verso la posizione esatta.",
+                itin_section_title: "Itinerari Consigliati in Base al Tempo",
+                itin_section_desc: "Tour raggruppati che collegano 2 o più destinazioni per sfruttare al meglio il tuo tempo a bordo.",
                 btn_start_gps: "Avvia Navigatore GPS",
                 telemetry_speed: "Velocità",
                 telemetry_dist: "Distanza",
@@ -427,10 +430,13 @@
                 weather_temp: "Water Temp.",
                 weather_tip: "💡 <b>Captain Tip:</b> Perfect calm sea for Dino Island & Arco Magno. Afternoon light breeze from North.",
                 tab_dest: "Destinations",
+                tab_itineraries: "Itineraries",
                 tab_map: "GPS Map",
                 tab_rules: "Rules",
-                dest_section_title: "Select Today's Destination",
-                dest_section_desc: "Click on one of the exact spots to start real-time GPS navigation.",
+                dest_section_title: "Single Destinations & GPS Points",
+                dest_section_desc: "Choose a specific spot to start direct real-time GPS navigation.",
+                itin_section_title: "Recommended Tour Itineraries",
+                itin_section_desc: "Grouped tours connecting 2 or more destinations based on your available time.",
                 btn_start_gps: "Start GPS Navigation",
                 telemetry_speed: "Speed",
                 telemetry_dist: "Distance",
@@ -481,10 +487,13 @@
                 weather_temp: "Temp. Agua",
                 weather_tip: "💡 <b>Consejo de Bordo:</b> Mar en calma ideal para la Isla de Dino y el Arco Magno.",
                 tab_dest: "Destinos",
+                tab_itineraries: "Itinerarios",
                 tab_map: "Mapa GPS",
                 tab_rules: "Reglas",
-                dest_section_title: "Selecciona el Destino de Hoy",
-                dest_section_desc: "Haz clic en uno de los puntos exactos para iniciar la navegación GPS en tiempo real.",
+                dest_section_title: "Destinos Individuales y Puntos GPS",
+                dest_section_desc: "Elige un punto específico para iniciar navegación directa en tiempo real.",
+                itin_section_title: "Itinerarios Recomendados",
+                itin_section_desc: "Rutas agrupadas con 2 o más destinos para aprovechar al máximo tu tiempo.",
                 btn_start_gps: "Iniciar Navegador GPS",
                 telemetry_speed: "Velocidad",
                 telemetry_dist: "Distancia",
@@ -521,6 +530,7 @@
             }
         };
 
+        // DESTINAZIONI SINGOLE PREDEFINITE
         const puntiEsattiMultilang = {
             it: [
                 { id: "arcomagno", nome: "Arco Magno (San Nicola Arcella)", cat: "Baia Naturale", desc: "Famoso arco di roccia su baia incantata. Mantenere la distanza di sicurezza dalle spiagge.", lat: 39.8456, lng: 15.7889, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80", audio: "Benvenuto all'Arco Magno. Questo passaggio naturale era usato nel medioevo dalle navi saracene. Ammira la laguna incastonato nella roccia." },
@@ -530,6 +540,37 @@
                 { id: "secca_castrocucco", nome: "Secca di Castrocucco (Maratea)", cat: "Secca & Fondali", desc: "Prima insenature della costa di Maratea verso nord. Acque trasparenti ricche di pesci.", lat: 39.9000, lng: 15.7500, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", audio: "Sei giunto alla Secca di Castrocucco, inizio della costa di Maratea. Un paradiso per lo snorkeling." }
             ]
         };
+
+        // ITINERARI & TOUR RAGGRUPPATI IN BASE AL TEMPO DISPONIBILE
+        const itinerariMultilang = [
+            {
+                id: "tour_2h",
+                titolo: "Tour Express Isola di Dino (2 Ore)",
+                durata: "2 Ore",
+                desc: "Raggruppa le 3 tappe imperdibili dell'Isola di Dino per chi ha poco tempo a disposizione.",
+                tappe: ["Isola di Dino", "Grotta Azzurra", "Grotta del Leone"],
+                lat: 39.8731, lng: 15.7735,
+                img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: "tour_4h",
+                titolo: "Tour Classico Riviera dei Cedri (4 Ore)",
+                durata: "4 Ore",
+                desc: "Il tour più richiesto: circumnavigazione dell'Isola di Dino ed esplorazione della laguna dell'Arco Magno.",
+                tappe: ["Isola di Dino", "Grotta Azzurra", "Arco Magno", "Grotta del Saraceno"],
+                lat: 39.8456, lng: 15.7889,
+                img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                id: "tour_full",
+                titolo: "Tour VIP Costa Lucana & Maratea (Giornata Intera)",
+                durata: "Giornata Intera",
+                desc: "Itinerario completo: Isola di Dino, Arco Magno e risalita della Costa di Maratea fino alle spiagge nere e al Cristo Redentore.",
+                tappe: ["Isola di Dino", "Arco Magno", "Secca di Castrocucco", "Cristo Redentore"],
+                lat: 39.9000, lng: 15.7500,
+                img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80"
+            }
+        ];
 
         let currentLang = 'it';
         let map, userMarker, markersGroup, routePolyline;
@@ -576,6 +617,7 @@
             });
 
             generaListaPunti();
+            generaListaItinerari();
         }
 
         function filtraItinerario(tipo) {
@@ -593,6 +635,7 @@
 
         function generaListaPunti() {
             const container = document.getElementById('punti-esatti-lista');
+            if (!container) return;
             container.innerHTML = '';
             let list = puntiEsattiMultilang[currentLang] || puntiEsattiMultilang['it'];
 
@@ -622,6 +665,51 @@
                     </div>
                 `;
             });
+        }
+
+        function generaListaItinerari() {
+            const container = document.getElementById('itinerari-lista');
+            if (!container) return;
+            container.innerHTML = '';
+
+            itinerariMultilang.forEach(itin => {
+                const badgeDurata = itin.durata === '2 Ore' ? 'bg-amber-100 text-amber-800' : (itin.durata === '4 Ore' ? 'bg-cyan-100 text-cyan-800' : 'bg-purple-100 text-purple-800');
+                const tappeBadges = itin.tappe.map(t => `<span class="bg-slate-100 text-slate-700 text-[9px] font-bold px-2 py-0.5 rounded-md border border-slate-200">📍 ${t}</span>`).join(' ');
+
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-purple-200 border-l-4 border-l-purple-600 space-y-2">
+                        <img src="${itin.img}" alt="${itin.titolo}" class="w-full h-36 object-cover">
+                        <div class="p-4 space-y-2">
+                            <div class="flex justify-between items-start">
+                                <span class="${badgeDurata} text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">⏱️ ${itin.durata}</span>
+                            </div>
+                            <h4 class="font-extrabold text-slate-900 text-base">${itin.titolo}</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">${itin.desc}</p>
+                            
+                            <div class="pt-1 flex flex-wrap gap-1">
+                                ${tappeBadges}
+                            </div>
+
+                            <button onclick="avviaItinerarioTour('${itin.id}')" class="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
+                                <i class="fa-solid fa-route"></i> Avvia Tour (${itin.durata})
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function avviaItinerarioTour(idItin) {
+            const itin = itinerariMultilang.find(i => i.id === idItin);
+            if (itin) {
+                destinazioneSelezionata = {
+                    id: itin.id,
+                    nome: itin.titolo,
+                    lat: itin.lat,
+                    lng: itin.lng
+                };
+                confermaAvvioNavigazione();
+            }
         }
 
         function switchTab(tab) {
@@ -748,7 +836,7 @@
                           <div class="drop-shadow-2xl">
                               <svg width="34" height="48" viewBox="0 0 34 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                                   <path d="M17 2C10 12 4 22 4 36C4 42 8 45 17 45C26 45 30 42 30 36C30 22 24 12 17 2Z" fill="#0f172a" stroke="#06b6d4" stroke-width="2.5"/>
-                                  <path d="M17 8C13 15 9 22 9 32C9 38 12 40 17 40C22 40 25 38 25 32C25 22 21 15 17 8Z" fill="#06b6d4" opacity="0.8"/>
+                                  <path d="M17 8C13 15 9 22 9 32C25 38 25 32C25 22 21 15 17 8Z" fill="#06b6d4" opacity="0.8"/>
                                   <path d="M12 24H22V27H12V24Z" fill="#ffffff"/>
                                   <path d="M17 11L20 18H14L17 11Z" fill="#ffffff"/>
                               </svg>
@@ -977,6 +1065,32 @@
                                     </div>
                                 </div>
                             ` + listContainer.innerHTML;
+                        });
+                    }
+                }
+
+                // Carica itinerari dinamici se presenti nel CMS
+                const itinerariCMS = data.filter(item => item.categoria === 'itinerari');
+                if (itinerariCMS.length > 0) {
+                    const itinContainer = document.getElementById('itinerari-lista');
+                    if (itinContainer) {
+                        itinerariCMS.forEach(itin => {
+                            const img = itin.immagine_url || 'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80';
+                            itinContainer.innerHTML = `
+                                <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-purple-200 border-l-4 border-l-purple-600 space-y-2">
+                                    <img src="${img}" alt="${itin.titolo}" class="w-full h-36 object-cover">
+                                    <div class="p-4 space-y-2">
+                                        <div class="flex justify-between items-start">
+                                            <span class="bg-purple-100 text-purple-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">${itin.sottotitolo || 'Tour Custom'}</span>
+                                        </div>
+                                        <h4 class="font-extrabold text-slate-900 text-base">${itin.titolo}</h4>
+                                        <p class="text-xs text-slate-600 leading-relaxed">${itin.descrizione}</p>
+                                        <button onclick="selezionaDestinazione(${itin.latitudine || 39.8731}, ${itin.longitudine || 15.7735}, '${itin.titolo.replace(/'/g, "\\'")}')" class="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl shadow transition flex justify-center items-center gap-2 text-xs">
+                                            <i class="fa-solid fa-route"></i> Avvia Questo Tour
+                                        </button>
+                                    </div>
+                                </div>
+                            ` + itinContainer.innerHTML;
                         });
                     }
                 }
