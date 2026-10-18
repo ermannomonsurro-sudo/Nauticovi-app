@@ -224,7 +224,30 @@
                 </div>
             </div>
 
-            <!-- BOX GUIDA FACILE PER NON ESPERTI & AUDIO GUIDA PROSSIMITÀ -->
+            <!-- BANNER POP-UP PROSSIMITÀ 200m AUDIOGUIDA AUTOMATICA -->
+            <div id="proximity-audio-banner" class="hidden bg-gradient-to-r from-cyan-600 via-emerald-600 to-slate-900 text-white p-4 rounded-2xl shadow-2xl border-2 border-cyan-300 space-y-3 animate-pulse">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-white/20 p-2 rounded-xl text-lg"><i class="fa-solid fa-headphones-simple"></i></span>
+                        <div>
+                            <span class="text-[9px] font-bold uppercase text-cyan-200 block tracking-wider">Sei arrivato nei pressi della destinazione!</span>
+                            <h4 class="text-sm font-black text-white" id="banner-poi-title">Nome Destinazione</h4>
+                        </div>
+                    </div>
+                    <button onclick="nascondiBannerProssimita()" class="text-white/60 hover:text-white p-1">
+                        <i class="fa-solid fa-xmark text-base"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-cyan-50 leading-relaxed" id="banner-poi-msg">
+                    Sei a meno di 200 metri! Ascolta la guida vocale per scoprire le curiosità e i segreti di questo posto.
+                </p>
+                <button onclick="riproduciAudioguida(); nascondiBannerProssimita();" class="w-full bg-white text-slate-900 hover:bg-cyan-50 font-black py-3 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs transition active:scale-95">
+                    <i class="fa-solid fa-circle-play text-cyan-600 text-base"></i>
+                    <span>ASCOLTA ORA L'AUDIOGUIDA DI BORDO</span>
+                </button>
+            </div>
+
+            <!-- BOX GUIDA FACILE PER NON ESPERTI -->
             <div id="guidance-box" onclick="gestisciClickAssistente()" class="bg-slate-900 border-2 border-cyan-500 p-3.5 rounded-2xl shadow-xl text-white flex items-center justify-between transition-all cursor-pointer">
                 <div class="flex items-center gap-3">
                     <div id="guidance-icon-bg" class="w-11 h-11 bg-cyan-600/30 border border-cyan-400 rounded-xl flex items-center justify-center text-cyan-400 text-xl font-bold">
@@ -236,7 +259,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-1">
-                    <!-- PULSANTE RIPRODUZIONE AUDIOGUIDA MP3 -->
+                    <!-- PULSANTE RIPRODUZIONE AUDIOGUIDA MP3 MANUAL -->
                     <button id="btn-audio-guide" onclick="event.stopPropagation(); riproduciAudioguida();" class="hidden bg-cyan-500 hover:bg-cyan-400 text-slate-900 p-2 rounded-xl text-xs font-black shadow flex items-center gap-1 border border-white/20">
                         <i class="fa-solid fa-volume-high"></i> <span class="hidden sm:inline">Ascolta</span>
                     </button>
@@ -445,6 +468,7 @@
         let lastLng = null;
         let currentMovementHeading = 0;
         let audioPlayer = null;
+        let bannerMostratoPerPoi = false;
 
         function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
             const R = 6371000;
@@ -526,6 +550,15 @@
             window.open(urlWa, '_blank');
         }
 
+        function nascondiBannerProssimita() {
+            document.getElementById('proximity-audio-banner').classList.add('hidden');
+        }
+
+        function mostraBannerProssimita(poi) {
+            document.getElementById('banner-poi-title').innerText = poi.titolo;
+            document.getElementById('proximity-audio-banner').classList.remove('hidden');
+        }
+
         function riproduciAudioguida() {
             if (!destinazioneAttiva) return;
 
@@ -572,6 +605,8 @@
         function confermaAvvioNavigazione() {
             chiudiModale();
             destinazioneAttiva = destinazioneSelezionata;
+            bannerMostratoPerPoi = false;
+            nascondiBannerProssimita();
             switchTab('navigatore');
 
             document.getElementById('target-poi-name').innerText = destinazioneAttiva.titolo;
@@ -588,6 +623,9 @@
 
         function annullaNavigazione() {
             destinazioneAttiva = null;
+            bannerMostratoPerPoi = false;
+            nascondiBannerProssimita();
+
             document.getElementById('target-poi-name').innerText = translations[currentLang].target_none;
             document.getElementById('live-dist').innerText = "---";
             document.getElementById('live-eta').innerText = "--- min";
@@ -678,6 +716,12 @@
                             const etaMinutes = Math.ceil(etaSeconds / 60);
                             document.getElementById('live-eta').innerText = `~${etaMinutes} min`;
 
+                            // === CONTROLLO PROSSIMITÀ 200 METRI ===
+                            if (distToTarget <= 200 && !bannerMostratoPerPoi) {
+                                bannerMostratoPerPoi = true;
+                                mostraBannerProssimita(destinazioneAttiva);
+                            }
+
                             const targetBearing = calculateBearing(lat, lng, destinazioneAttiva.latitudine, destinazioneAttiva.longitudine);
                             let angleDiff = (targetBearing - currentMovementHeading + 360) % 360;
                             if (angleDiff > 180) angleDiff -= 360;
@@ -690,10 +734,10 @@
                                 guidanceBg.className = "w-11 h-11 bg-emerald-500/30 border border-emerald-400 rounded-xl flex items-center justify-center text-emerald-400 text-xl font-bold animate-bounce";
                                 guidanceIcon.className = "fa-solid fa-flag-checkered";
                                 guidanceMsg.innerText = translations[currentLang].msg_arrived;
-                            } else if (distToTarget < 100) {
-                                guidanceBg.className = "w-11 h-11 bg-amber-500/40 border border-amber-400 rounded-xl flex items-center justify-center text-amber-300 text-xl font-bold animate-pulse";
-                                guidanceIcon.className = "fa-solid fa-triangle-exclamation";
-                                guidanceMsg.innerText = translations[currentLang].msg_near_100m;
+                            } else if (distToTarget <= 200) {
+                                guidanceBg.className = "w-11 h-11 bg-cyan-500/40 border border-cyan-400 rounded-xl flex items-center justify-center text-cyan-200 text-xl font-bold animate-pulse";
+                                guidanceIcon.className = "fa-solid fa-headphones";
+                                guidanceMsg.innerText = "Sei a meno di 200m! Premi in alto per ascoltare l'audioguida.";
                             } else if (Math.abs(angleDiff) <= 25) {
                                 guidanceBg.className = "w-11 h-11 bg-emerald-500/30 border border-emerald-400 rounded-xl flex items-center justify-center text-emerald-400 text-xl font-bold";
                                 guidanceIcon.className = "fa-solid fa-arrow-up";
