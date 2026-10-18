@@ -151,17 +151,27 @@
             </button>
         </div>
 
-        <!-- SEZIONE 1: LISTA PUNTI ESATTI DI NAVIGAZIONE -->
+        <!-- SEZIONE 1: LISTA PUNTI ESATTI DI NAVIGAZIONE CON FILTRO TEMPO ITINERARIO -->
         <div id="sec-destinazioni" class="tab-content space-y-3">
-            <h3 class="font-black text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5 px-1">
-                <i class="fa-solid fa-map-pin text-cyan-600"></i> <span data-i18n="dest_section_title">Seleziona la Destinazione di Oggi</span>
-            </h3>
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5 px-1">
+                    <i class="fa-solid fa-map-pin text-cyan-600"></i> <span data-i18n="dest_section_title">Seleziona la Destinazione di Oggi</span>
+                </h3>
+            </div>
+
+            <!-- SELETTORE ITINERARI PER TEMPO DISPONIBILE -->
+            <div class="bg-slate-200/80 p-1 rounded-xl grid grid-cols-3 gap-1 text-[10px] font-extrabold text-slate-600 text-center">
+                <button onclick="filtraItinerario('tutti')" id="btn-it-tutti" class="bg-white text-cyan-800 py-1.5 rounded-lg shadow">Tutte le Mete</button>
+                <button onclick="filtraItinerario('2h')" id="btn-it-2h" class="py-1.5 rounded-lg hover:text-slate-900">⏱️ Tour 2 Ore</button>
+                <button onclick="filtraItinerario('4h')" id="btn-it-4h" class="py-1.5 rounded-lg hover:text-slate-900">⏱️ Tour 4 Ore</button>
+            </div>
+
             <p class="text-xs text-slate-500 px-1" data-i18n="dest_section_desc">Clicca su uno dei punti esatti per avviare il navigatore GPS in tempo reale verso la meta.</p>
 
             <div id="punti-esatti-lista" class="space-y-3 pt-1"></div>
         </div>
 
-        <!-- SEZIONE 2: NAVIGATORE GPS SMART CON ASSISTENTE GUIDA -->
+        <!-- SEZIONE 2: NAVIGATORE GPS SMART CON ASSISTENTE GUIDA & AUDIOGUIDA -->
         <div id="sec-navigatore" class="tab-content hidden space-y-3">
             
             <!-- Telemetria GPS Base con Tempo Arrivo Stimato (ETA) -->
@@ -184,7 +194,7 @@
                 </div>
             </div>
 
-            <!-- BOX GUIDA FACILE PER NON ESPERTI (CLICCABILE QUANDO NESSUNA DESTINAZIONE È ATTIVA) -->
+            <!-- BOX GUIDA FACILE PER NON ESPERTI & AUDIO GUIDA PROSSIMITÀ -->
             <div id="guidance-box" onclick="gestisciClickAssistente()" class="bg-slate-900 border-2 border-cyan-500 p-3.5 rounded-2xl shadow-xl text-white flex items-center justify-between transition-all cursor-pointer">
                 <div class="flex items-center gap-3">
                     <div id="guidance-icon-bg" class="w-11 h-11 bg-cyan-600/30 border border-cyan-400 rounded-xl flex items-center justify-center text-cyan-400 text-xl font-bold">
@@ -195,9 +205,15 @@
                         <h4 class="text-sm font-extrabold text-white leading-tight" id="guidance-msg" data-i18n="assistant_select_prompt">Seleziona una destinazione per iniziare</h4>
                     </div>
                 </div>
-                <button id="btn-stop-nav-top" onclick="event.stopPropagation(); annullaNavigazione();" class="hidden bg-red-500/20 hover:bg-red-500/40 text-red-300 p-2 rounded-lg text-xs font-bold border border-red-500/30">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                <div class="flex items-center gap-1">
+                    <!-- PULSANTE RIPRODUZIONE AUDIOGUIDA -->
+                    <button id="btn-audio-guide" onclick="event.stopPropagation(); riproduciAudioguida();" class="hidden bg-cyan-500 hover:bg-cyan-400 text-slate-900 p-2 rounded-xl text-xs font-black shadow flex items-center gap-1 border border-white/20">
+                        <i class="fa-solid fa-volume-high"></i> <span class="hidden sm:inline">Ascolta</span>
+                    </button>
+                    <button id="btn-stop-nav-top" onclick="event.stopPropagation(); annullaNavigazione();" class="hidden bg-red-500/20 hover:bg-red-500/40 text-red-300 p-2 rounded-lg text-xs font-bold border border-red-500/30">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Mappa GPS Live -->
@@ -388,7 +404,7 @@
                 modal_sub: "Confermi di voler avviare la navigazione in tempo reale verso:",
                 btn_cancel: "Annulla",
                 btn_start_confirm: "Sì, Avvia!",
-                msg_photo_spot: "📸 Sei vicino all'Arco Magno! Momento perfetto per una foto ricordo!",
+                msg_photo_spot: "📸 Sei vicino all'Arco Magno! Momento perfetto per una foto!",
                 msg_keep_course: "Sei sulla rotta giusta! Prosegui diritto.",
                 msg_turn_right: "Gira a DESTRA per rimetterti in rotta!",
                 msg_turn_left: "Gira a SINISTRA per rimetterti in rotta!",
@@ -507,25 +523,11 @@
 
         const puntiEsattiMultilang = {
             it: [
-                { id: "arcomagno", nome: "Arco Magno (San Nicola Arcella)", cat: "Baia Naturale", desc: "Famoso arco di roccia su baia incantata. Mantenere la distanza di sicurezza dalle spiagge.", lat: 39.8456, lng: 15.7889, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" },
-                { id: "anchor_dino", nome: "⚓ Ancoraggio Sabbia - Isola di Dino", cat: "Fondale Sabbioso", desc: "Area di ancoraggio sicura su sabbia a 4m di profondità. Zero rischio incastro ancora.", lat: 39.8705, lng: 15.7710, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" },
-                { id: "grotta_leone", nome: "Grotta del Leone & Snorkeling", cat: "Grotta & Snorkeling", desc: "Roccia immersa con sagoma a leone. Fondale sabbioso eccezionale per l'ancoraggio e tuffi.", lat: 39.8695, lng: 15.7720, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
-                { id: "grotta_azzurra", nome: "Grotta Azzurra (Isola di Dino)", cat: "Grotta Marina", desc: "Grotta principale dell'Isola di Dino. Entrare esclusivamente a motore al minimo o a remi.", lat: 39.8731, lng: 15.7735, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" },
-                { id: "secca_castrocucco", nome: "Secca di Castrocucco (Maratea)", cat: "Secca & Fondali", desc: "Prima insenature della costa di Maratea verso nord. Acque trasparenti ricche di pesci.", lat: 39.9000, lng: 15.7500, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" }
-            ],
-            en: [
-                { id: "arcomagno", nome: "Arco Magno (San Nicola Arcella)", cat: "Natural Bay", desc: "Famous rock arch over an enchanted bay. Keep safe distance from beaches.", lat: 39.8456, lng: 15.7889, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" },
-                { id: "anchor_dino", nome: "⚓ Safe Sand Anchor - Dino Island", cat: "Sandy Bottom", desc: "Safe anchoring area on clear sand at 4m depth. No risk of stuck anchor.", lat: 39.8705, lng: 15.7710, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" },
-                { id: "grotta_leone", nome: "Lion's Cave & Snorkeling", cat: "Cave & Snorkeling", desc: "Submerged rock with a lion silhouette. Exceptional sandy bottom for anchoring.", lat: 39.8695, lng: 15.7720, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
-                { id: "grotta_azzurra", nome: "Blue Grotto (Dino Island)", cat: "Sea Cave", desc: "Main sea cave on Dino Island. Enter strictly with engine at idle or rowing.", lat: 39.8731, lng: 15.7735, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" },
-                { id: "secca_castrocucco", nome: "Castrocucco Reef (Maratea)", cat: "Reef & Seabed", desc: "First cove of the Maratea coast facing north. Crystal clear waters full of fish.", lat: 39.9000, lng: 15.7500, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" }
-            ],
-            es: [
-                { id: "arcomagno", nome: "Arco Magno (San Nicola Arcella)", cat: "Bahía Natural", desc: "Famoso arco de roca sobre una bahía encantada. Mantener distancia de seguridad.", lat: 39.8456, lng: 15.7889, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" },
-                { id: "anchor_dino", nome: "⚓ Fondeo de Arena - Isla de Dino", cat: "Fondo de Arena", desc: "Zona segura para fondear sobre arena a 4m de profundidad.", lat: 39.8705, lng: 15.7710, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" },
-                { id: "grotta_leone", nome: "Cueva del León y Snorkel", cat: "Cueva y Snorkel", desc: "Roca sumergida con silueta de león. Fondo de arena excelente para fondear.", lat: 39.8695, lng: 15.7720, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
-                { id: "grotta_azzurra", nome: "Cueva Azul (Isla de Dino)", cat: "Cueva Marina", desc: "Cueva principal de la Isla de Dino. Entrar únicamente con motor al mínimo o a remos.", lat: 39.8731, lng: 15.7735, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" },
-                { id: "secca_castrocucco", nome: "Bajo de Castrocucco (Maratea)", cat: "Bajo y Fondos", desc: "Primera cala de la costa de Maratea hacia el norte. Aguas cristalinas.", lat: 39.9000, lng: 15.7500, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" }
+                { id: "arcomagno", nome: "Arco Magno (San Nicola Arcella)", cat: "Baia Naturale", desc: "Famoso arco di roccia su baia incantata. Mantenere la distanza di sicurezza dalle spiagge.", lat: 39.8456, lng: 15.7889, img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80", audio: "Benvenuto all'Arco Magno. Questo passaggio naturale era usato nel medioevo dalle navi saracene. Ammira la laguna incastonato nella roccia." },
+                { id: "anchor_dino", nome: "⚓ Ancoraggio Sabbia - Isola di Dino", cat: "Fondale Sabbioso", desc: "Area di ancoraggio sicura su sabbia a 4m di profondità. Zero rischio incastro ancora.", lat: 39.8705, lng: 15.7710, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80", audio: "Sei giunto all'area di ancoraggio sicuro su sabbia. Cala la cima per tre volte la profondità." },
+                { id: "grotta_leone", nome: "Grotta del Leone & Snorkeling", cat: "Grotta & Snorkeling", desc: "Roccia immersa con sagoma a leone. Fondale sabbioso eccezionale per l'ancoraggio e tuffi.", lat: 39.8695, lng: 15.7720, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", audio: "Ti trovi alla Grotta del Leone. Osserva la roccia naturale a forma di leone ruggente a guardia dell'isola." },
+                { id: "grotta_azzurra", nome: "Grotta Azzurra (Isola di Dino)", cat: "Grotta Marina", desc: "Grotta principale dell'Isola di Dino. Entrare esclusivamente a motore al minimo o a remi.", lat: 39.8731, lng: 15.7735, img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80", audio: "Ti trovi all'Isola di Dino. La Grotta Azzurra è celebre per i giochi di luce creati dal sole che si riflette sui fondali sabbiosi." },
+                { id: "secca_castrocucco", nome: "Secca di Castrocucco (Maratea)", cat: "Secca & Fondali", desc: "Prima insenature della costa di Maratea verso nord. Acque trasparenti ricche di pesci.", lat: 39.9000, lng: 15.7500, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", audio: "Sei giunto alla Secca di Castrocucco, inizio della costa di Maratea. Un paradiso per lo snorkeling." }
             ]
         };
 
@@ -533,6 +535,7 @@
         let map, userMarker, markersGroup, routePolyline;
         let destinazioneSelezionata = null;
         let destinazioneAttiva = null;
+        let filtroItinerarioAttivo = 'tutti';
         
         let lastLat = null;
         let lastLng = null;
@@ -575,10 +578,30 @@
             generaListaPunti();
         }
 
+        function filtraItinerario(tipo) {
+            filtroItinerarioAttivo = tipo;
+            ['tutti', '2h', '4h'].forEach(t => {
+                const btn = document.getElementById(`btn-it-${t}`);
+                if (t === tipo) {
+                    btn.className = "bg-white text-cyan-800 py-1.5 rounded-lg shadow font-extrabold";
+                } else {
+                    btn.className = "py-1.5 rounded-lg hover:text-slate-900";
+                }
+            });
+            generaListaPunti();
+        }
+
         function generaListaPunti() {
             const container = document.getElementById('punti-esatti-lista');
             container.innerHTML = '';
-            const list = puntiEsattiMultilang[currentLang] || puntiEsattiMultilang['it'];
+            let list = puntiEsattiMultilang[currentLang] || puntiEsattiMultilang['it'];
+
+            if (filtroItinerarioAttivo === '2h') {
+                list = list.filter(p => p.id === 'grotta_azzurra' || p.id === 'grotta_leone' || p.id === 'anchor_dino');
+            } else if (filtroItinerarioAttivo === '4h') {
+                list = list.filter(p => p.id === 'grotta_azzurra' || p.id === 'arcomagno' || p.id === 'grotta_leone');
+            }
+
             const btnText = translations[currentLang].btn_start_gps;
 
             list.forEach(poi => {
@@ -640,6 +663,16 @@
             window.open(urlWa, '_blank');
         }
 
+        function riproduciAudioguida() {
+            if (!destinazioneAttiva || !destinazioneAttiva.audio) return;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const msg = new SpeechSynthesisUtterance(destinazioneAttiva.audio);
+                msg.lang = currentLang === 'en' ? 'en-US' : (currentLang === 'es' ? 'es-ES' : 'it-IT');
+                window.speechSynthesis.speak(msg);
+            }
+        }
+
         function chiediConfermaNavigazione(idPoi) {
             const list = puntiEsattiMultilang[currentLang] || puntiEsattiMultilang['it'];
             destinazioneSelezionata = list.find(p => p.id === idPoi);
@@ -661,6 +694,12 @@
             document.getElementById('target-poi-name').innerText = destinazioneAttiva.nome;
             document.getElementById('btn-stop-nav-top').classList.remove('hidden');
 
+            if (destinazioneAttiva.audio) {
+                document.getElementById('btn-audio-guide').classList.remove('hidden');
+            } else {
+                document.getElementById('btn-audio-guide').classList.add('hidden');
+            }
+
             tracciaRottaSullaMappa();
         }
 
@@ -670,11 +709,13 @@
             document.getElementById('live-dist').innerText = "---";
             document.getElementById('live-eta').innerText = "--- min";
             document.getElementById('btn-stop-nav-top').classList.add('hidden');
+            document.getElementById('btn-audio-guide').classList.add('hidden');
             
             document.getElementById('guidance-icon-bg').className = "w-11 h-11 bg-cyan-600/30 border border-cyan-400 rounded-xl flex items-center justify-center text-cyan-400 text-xl font-bold";
             document.getElementById('guidance-icon').className = "fa-solid fa-location-dot";
             document.getElementById('guidance-msg').innerText = translations[currentLang].assistant_select_prompt;
 
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
             if(routePolyline) map.removeLayer(routePolyline);
         }
 
