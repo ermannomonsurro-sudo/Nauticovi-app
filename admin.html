@@ -1,898 +1,1733 @@
 <!DOCTYPE html>
+
 <html lang="it">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>NAUTICOVI - Gestione Admin & Dashboard Cloud</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
     <!-- Supabase Client JS SDK -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 </head>
+
 <body class="bg-slate-100 text-slate-800 font-sans pb-12">
 
+
+
     <!-- SCHERMATA LOGIN ADMIN -->
+
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+
         <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200 max-w-sm w-full space-y-4 text-center">
+
             <div class="flex flex-col items-center justify-center gap-2">
+
                 <img src="logo.png" alt="Nauticovi Logo" class="h-16 w-auto object-contain">
+
                 <h1 class="text-lg font-black text-slate-900 tracking-wider">NAUTICOVI ADMIN</h1>
+
             </div>
+
             <p class="text-xs text-slate-500">Accedi con le credenziali riservate per aprire il gestionale cloud</p>
+
             <a href="index.html" class="inline-block text-xs text-cyan-600 font-bold hover:underline my-1">
+
                 <i class="fa-solid fa-arrow-left"></i> Torna alla Home
+
             </a>
 
+
+
             <form onsubmit="eseguiLogin(event); return false;" class="space-y-3 pt-2">
-                <input type="email" id="admin-email" placeholder="Email (Opzionale per Supabase)" autocomplete="username" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+
+                <input type="email" id="admin-email" placeholder="Email" autocomplete="username" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none" required>
+
                 <input type="password" id="admin-pass" placeholder="Password" autocomplete="current-password" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none" required>
+
                 <button type="submit" id="btn-login" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-xs cursor-pointer active:scale-95">
+
                     Accedi al Gestionale
+
                 </button>
+
             </form>
+
             <p id="login-error" class="text-xs text-red-500 hidden font-bold">Credenziali errate!</p>
+
         </div>
+
     </div>
 
+
+
     <!-- PANNELLO DOCK ADMIN -->
+
     <div id="admin-panel" style="display: none;">
+
         <!-- Header Navbar -->
+
         <nav class="bg-slate-900 text-white p-4 shadow-xl border-b border-cyan-500/30 flex justify-between items-center sticky top-0 z-50">
+
             <div class="flex items-center space-x-3">
+
                 <div class="flex items-center gap-2">
+
                     <img src="logo.png" alt="Nauticovi" class="h-8 w-auto object-contain">
+
                     <span class="text-lg font-black tracking-widest text-cyan-400">NAUTICOVI</span>
+
                 </div>
+
                 <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-bold uppercase flex items-center gap-1">
+
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> SUPABASE CLOUD LIVE
+
                 </span>
+
             </div>
+
             <div class="flex gap-3 items-center">
+
                 <a href="index.html" class="text-xs text-cyan-400 hover:text-white font-bold"><i class="fa-solid fa-house"></i> Home</a>
+
                 <button onclick="logout()" class="text-xs text-slate-400 hover:text-white">Esci</button>
+
             </div>
+
         </nav>
+
+
 
         <div class="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
 
+
+
             <!-- 1. DASHBOARD RISULTATI KPI IN TEMPO REALE -->
+
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
+
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-3">
+
                     <div>
+
                         <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+
                             <i class="fa-solid fa-chart-line text-cyan-600"></i> Dashboard Monitoraggio Risultati
+
                         </h2>
+
                         <p class="text-xs text-slate-500">Statistiche e fatturato sincronizzati direttamente dal database cloud Supabase</p>
+
                     </div>
+
                     <select id="filtroPeriodo" onchange="caricaDatiCloud()" class="p-2 border rounded-lg bg-slate-50 font-bold text-xs text-slate-700 outline-none">
+
                         <option value="tutto">Tutti i Noleggi</option>
+
                         <option value="oggi">Oggi</option>
+
                         <option value="mese">Mese Corrente</option>
+
                     </select>
+
                 </div>
+
+
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
                     <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-cyan-500 flex justify-between items-center">
+
                         <div>
+
                             <p class="text-[10px] text-slate-400 font-bold uppercase">Fatturato Incassato</p>
+
                             <h3 class="text-2xl font-black text-cyan-400 mt-0.5" id="kpiFatturato">€0</h3>
+
                         </div>
+
                         <i class="fa-solid fa-euro-sign text-2xl text-slate-700"></i>
+
                     </div>
+
+
 
                     <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-emerald-500 flex justify-between items-center">
+
                         <div>
+
                             <p class="text-[10px] text-slate-400 font-bold uppercase">Noleggi Registrati</p>
+
                             <h3 class="text-2xl font-black text-emerald-400 mt-0.5" id="kpiNoleggi">0</h3>
+
                         </div>
+
                         <i class="fa-solid fa-ship text-2xl text-slate-700"></i>
+
                     </div>
+
+
 
                     <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-amber-500 flex justify-between items-center">
+
                         <div>
+
                             <p class="text-[10px] text-slate-400 font-bold uppercase">Web Check-in</p>
+
                             <h3 class="text-2xl font-black text-amber-400 mt-0.5" id="kpiCheckin">0 / 0</h3>
+
                         </div>
+
                         <i class="fa-solid fa-id-card text-2xl text-slate-700"></i>
+
                     </div>
+
+
 
                     <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-purple-500 flex justify-between items-center">
+
                         <div>
+
                             <p class="text-[10px] text-slate-400 font-bold uppercase">Incasso Medio / Barca</p>
+
                             <h3 class="text-2xl font-black text-purple-400 mt-0.5" id="kpiMedio">€0</h3>
+
                         </div>
+
                         <i class="fa-solid fa-calculator text-2xl text-slate-700"></i>
+
                     </div>
+
                 </div>
+
             </div>
 
-            <!-- 2. SEZIONE CMS - GESTIONE CONTENUTI, DESTINAZIONI, PERICOLI, BASE & ITINERARI -->
+
+
+            <!-- 2. SEZIONE CMS - GESTIONE CONTENUTI, DESTINAZIONI, PERICOLI & ITINERARI -->
+
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
+
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 gap-2">
+
                     <div>
+
                         <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group text-cyan-600"></i> CMS — Gestione Contenuti, Base, Pericoli & Flotta
+
+                            <i class="fa-solid fa-layer-group text-cyan-600"></i> CMS — Gestione Contenuti, Pericoli & Flotta
+
                         </h2>
-                        <p class="text-xs text-slate-500">Gestisci le destinazioni, il punto Base Nauticovi, i segnali di pericolo sulla mappa, gli itinerari e la flotta</p>
+
+                        <p class="text-xs text-slate-500">Gestisci le destinazioni, i segnali di pericolo sulla mappa, gli itinerari, la flotta ed i divieti</p>
+
                     </div>
+
                 </div>
+
+
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+
                         <h3 class="text-xs font-extrabold uppercase text-slate-700 flex items-center gap-1.5">
+
                             <i class="fa-solid fa-plus-circle text-cyan-600"></i> Aggiungi / Modifica Elemento
+
                         </h3>
 
+
+
                         <form id="cmsForm" onsubmit="salvaContenutoCMS(event)" class="space-y-3 text-xs">
+
                             <input type="hidden" id="cms_edit_id" value="">
+
                             <div>
+
                                 <div class="flex justify-between items-center mb-1">
+
                                     <label class="block font-bold text-slate-600 uppercase">Categoria CMS</label>
+
                                     <button type="button" onclick="gestisciNuovaCategoria()" class="text-[10px] text-cyan-600 font-bold hover:underline">+ Nuova Categoria</button>
+
                                 </div>
+
                                 <select id="cms_categoria" onchange="toggleCampiCMS()" class="w-full p-2 border rounded-lg bg-white font-semibold outline-none">
+
                                     <option value="destinazioni">📍 Destinazione Singola / Punto GPS</option>
-                                    <option value="base">⚓ Base / Banchina Nauticovi (Logo Mappa)</option>
+
                                     <option value="pericoli">⚠️ Segnale di Pericolo (Solo Mappa GPS)</option>
+
                                     <option value="itinerari">🧭 Itinerario / Tour Raggruppato</option>
+
                                     <option value="flotta">🚤 Barca / Flotta</option>
+
                                     <option value="tips">💡 Tip / Consiglio di Guida</option>
+
                                     <option value="divieti">🚫 Regola / Divieto di Bordo</option>
+
                                 </select>
+
                             </div>
 
+
+
                             <div>
+
                                 <label class="block font-bold text-slate-600 uppercase">Titolo</label>
-                                <input type="text" id="cms_titolo" required placeholder="Es. Banchina Nauticovi o Scogli Affioranti" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+
+                                <input type="text" id="cms_titolo" required placeholder="Es. Scogli Affioranti o Grotta Azzurra" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+
                             </div>
 
-                            <div>
-                                <label class="block font-bold text-slate-600 uppercase">Sottotitolo / Dettaglio (es. Punto Rientro)</label>
-                                <input type="text" id="cms_sottotitolo" placeholder="Es. Banchina Principale o Pericolo Secca" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
-                            </div>
+
 
                             <div>
+
+                                <label class="block font-bold text-slate-600 uppercase">Sottotitolo / Dettaglio (es. Attenzione Secca)</label>
+
+                                <input type="text" id="cms_sottotitolo" placeholder="Es. Pericolo Scogliera • Mantenere Distanza" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+
+                            </div>
+
+
+
+                            <div>
+
                                 <label class="block font-bold text-slate-600 uppercase">Descrizione / Avviso / Dettagli</label>
+
                                 <textarea id="cms_descrizione" required rows="2" placeholder="Inserisci la descrizione o la nota di sicurezza..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none"></textarea>
+
                             </div>
+
+
 
                             <!-- CAMPO PER ITINERARI: SELEZIONE DESTINAZIONI RAGGRUPPATE -->
+
                             <div id="box-itinerario-cms" class="hidden p-3 bg-purple-50 border border-purple-200 rounded-xl space-y-2">
+
                                 <b class="block text-purple-900 font-bold uppercase text-[10px]">🧭 Dettagli Itinerario / Tour</b>
+
                                 <div>
+
                                     <label class="block text-[9px] font-bold text-slate-600 uppercase">Durata Consigliata</label>
+
                                     <select id="cms_itinerario_durata" class="w-full p-1.5 border rounded bg-white text-xs font-semibold">
+
                                         <option value="2h">2 Ore (Tour Express)</option>
+
                                         <option value="4h">4 Ore (Tour Classico)</option>
+
                                         <option value="giornata">Giornata Intera (Tour VIP)</option>
+
                                     </select>
+
                                 </div>
+
                                 <div>
+
                                     <label class="block text-[9px] font-bold text-slate-600 uppercase">Destinazioni Incluse (Separate da virgola)</label>
+
                                     <input type="text" id="cms_itinerario_tappe" placeholder="Isola di Dino, Grotta Azzurra, Arco Magno" class="w-full p-1.5 border rounded bg-white text-xs">
+
                                 </div>
+
                             </div>
 
-                            <!-- CAMPI COORDINATE GPS ED AUDIOGUIDA PER DESTINAZIONI, BASE E PERICOLI -->
+
+
+                            <!-- CAMPI COORDINATE GPS ED AUDIOGUIDA PER DESTINAZIONI E PERICOLI -->
+
                             <div id="box-gps-cms" class="p-3 bg-cyan-50/60 border border-cyan-200 rounded-xl space-y-2">
+
                                 <b class="block text-cyan-900 font-bold uppercase text-[10px]">📍 Coordinate GPS sulla Mappa</b>
+
                                 <div class="grid grid-cols-2 gap-2">
+
                                     <div>
+
                                         <label class="block text-[9px] font-bold text-slate-600 uppercase">Latitudine</label>
-                                        <input type="number" step="any" id="cms_lat" placeholder="Es. 39.8820" class="w-full p-1.5 border rounded bg-white font-mono">
+
+                                        <input type="number" step="any" id="cms_lat" placeholder="Es. 39.8731" class="w-full p-1.5 border rounded bg-white font-mono">
+
                                     </div>
+
                                     <div>
+
                                         <label class="block text-[9px] font-bold text-slate-600 uppercase">Longitudine</label>
-                                        <input type="number" step="any" id="cms_lng" placeholder="Es. 15.7760" class="w-full p-1.5 border rounded bg-white font-mono">
+
+                                        <input type="number" step="any" id="cms_lng" placeholder="Es. 15.7735" class="w-full p-1.5 border rounded bg-white font-mono">
+
                                     </div>
+
                                 </div>
+
                                 <div id="subbox-audio-cms" class="space-y-2 pt-1 border-t border-cyan-200/60">
+
                                     <div>
+
                                         <label class="block text-[9px] font-bold text-slate-600 uppercase">Testo Audioguida (Letto all'arrivo)</label>
-                                        <textarea id="cms_audioguida" rows="2" placeholder="Benvenuto..." class="w-full p-1.5 border rounded bg-white text-[11px]"></textarea>
+
+                                        <textarea id="cms_audioguida" rows="2" placeholder="Benvenuto alla Grotta Azzurra..." class="w-full p-1.5 border rounded bg-white text-[11px]"></textarea>
+
                                     </div>
+
                                     <div>
+
                                         <label class="block text-[9px] font-bold text-slate-600 uppercase">URL File Audio MP3</label>
-                                        <input type="url" id="cms_audio_url" placeholder="https://.../audio.mp3" class="w-full p-1.5 border rounded bg-white text-xs">
+
+                                        <input type="url" id="cms_audio_url" placeholder="https://.../grotta_azzurra.mp3" class="w-full p-1.5 border rounded bg-white text-xs">
+
                                     </div>
+
                                 </div>
+
                             </div>
+
+
 
                             <div>
+
                                 <label class="block font-bold text-slate-600 uppercase">URL Immagine (Foto Reale)</label>
+
                                 <input type="url" id="cms_immagine_url" placeholder="https://..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+
                             </div>
+
+
 
                             <!-- CAMPI PREZZI PERSONALIZZATI PER BARCHE -->
+
                             <div id="box-prezzi-cms" class="hidden p-3 bg-cyan-50 border border-cyan-200 rounded-xl space-y-2">
+
                                 <b class="block text-cyan-900 font-bold uppercase text-[10px]">💶 Prezzi Personalizzati (€)</b>
+
                                 <div class="grid grid-cols-2 gap-2">
+
                                     <div>
+
                                         <label class="block text-[9px] font-bold text-slate-600 uppercase">Bassa Mezza (€)</label>
+
                                         <input type="number" id="cms_bassa_mezza" placeholder="120" class="w-full p-1.5 border rounded bg-white">
+
                                     </div>
+
                                     <div>
+
                                         <label class="block text-[9px] font-bold text-slate-600 uppercase">Bassa Intera (€)</label>
+
                                         <input type="number" id="cms_bassa_intera" placeholder="200" class="w-full p-1.5 border rounded bg-white">
+
                                     </div>
+
                                 </div>
+
                                 <div class="grid grid-cols-2 gap-2">
+
                                     <div>
+
                                         <label class="block text-[9px] font-bold text-slate-600 uppercase">Alta Mezza (€)</label>
+
                                         <input type="number" id="cms_alta_mezza" placeholder="150" class="w-full p-1.5 border rounded bg-white">
+
                                     </div>
+
                                     <div>
+
                                         <label class="block text-[9px] font-bold text-slate-600 uppercase">Alta Intera (€)</label>
+
                                         <input type="number" id="cms_alta_intera" placeholder="220" class="w-full p-1.5 border rounded bg-white">
+
                                     </div>
+
                                 </div>
+
                             </div>
+
+
 
                             <div class="flex gap-2">
+
                                 <button type="submit" id="btn-salva-cms" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg shadow transition flex justify-center items-center gap-2">
+
                                     <i class="fa-solid fa-floppy-disk"></i> <span id="btn-salva-cms-text">Salva Contenuto su Cloud</span>
+
                                 </button>
+
                                 <button type="button" id="btn-annulla-edit-cms" onclick="resetFormCMS()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2.5 rounded-lg transition" title="Annulla Modifica">
+
                                     Annulla
+
                                 </button>
+
                             </div>
+
                         </form>
+
                     </div>
+
+
 
                     <div class="lg:col-span-2 space-y-3">
+
                         <div class="flex justify-between items-center border-b pb-2">
+
                             <h3 class="text-xs font-extrabold uppercase text-slate-700">Contenuti Attivi su Cloud</h3>
+
                             <button onclick="caricaContenutiCMS()" class="text-xs font-bold text-cyan-600 hover:underline">
+
                                 <i class="fa-solid fa-arrows-rotate"></i> Aggiorna
+
                             </button>
+
                         </div>
+
+
 
                         <div id="cmsListaContenuti" class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+
                             <p class="text-xs text-slate-400 italic">Caricamento contenuti in corso...</p>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
+
+
 
             <!-- 3. REGISTRO CLIENTE & TABELLA CLOUD -->
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
+
+
                 <div class="lg:col-span-1 bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
+
                     <h2 class="text-md font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+
                         <i class="fa-solid fa-user-plus text-cyan-600"></i> Nuovo Noleggio su Cloud
+
                     </h2>
 
+
+
                     <form id="crmForm" onsubmit="registraNoleggioCloud(event)" class="space-y-3 text-xs">
+
                         <div>
+
                             <label class="block font-bold text-slate-600 uppercase">Nome e Cognome Cliente</label>
+
                             <input type="text" id="nome" required placeholder="Mario Rossi" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+
                         </div>
+
+
 
                         <div>
+
                             <label class="block font-bold text-slate-600 uppercase">Telefono (WhatsApp)</label>
+
                             <input type="tel" id="telefono" required placeholder="+39 333..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+
                         </div>
 
+
+
                         <div class="grid grid-cols-2 gap-2">
+
                             <div>
+
                                 <label class="block font-bold text-slate-600 uppercase">Barca Assegnata</label>
+
                                 <select id="barca" class="w-full mt-1 p-2 border rounded-lg bg-white outline-none font-semibold">
+
                                     <option>Marlin 1</option>
+
                                     <option>Marlin 2</option>
+
                                     <option>Poseidon 1</option>
+
                                     <option>Poseidon 2</option>
+
                                     <option>Lancia 30CV</option>
+
                                 </select>
+
                             </div>
+
                             <div>
+
                                 <label class="block font-bold text-slate-600 uppercase">Importo Totale (€)</label>
+
                                 <input type="number" id="importo" required placeholder="150" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+
                             </div>
+
                         </div>
 
+
+
                         <div class="grid grid-cols-2 gap-2">
+
                             <div>
+
                                 <label class="block font-bold text-slate-600 uppercase">Caparra (€)</label>
+
                                 <input type="number" id="caparra" required placeholder="75" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+
                             </div>
+
                             <div>
+
                                 <label class="block font-bold text-slate-600 uppercase">Data Noleggio</label>
+
                                 <input type="date" id="data_noleggio" required class="w-full mt-1 p-2 border rounded-lg outline-none">
+
                             </div>
+
                         </div>
+
+
 
                         <button type="submit" id="btn-salva-noleggio" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2.5 rounded-lg shadow transition flex justify-center items-center gap-2">
+
                             <i class="fa-solid fa-cloud-arrow-up"></i> Salva Noleggio in Cloud
+
                         </button>
+
                     </form>
+
                 </div>
+
+
 
                 <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-md border border-slate-200">
+
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b pb-2 gap-2">
+
                         <h2 class="text-md font-bold text-slate-800 flex items-center gap-2">
+
                             <i class="fa-solid fa-users text-cyan-600"></i> Anagrafica Noleggi & Web Check-in
+
                         </h2>
+
                         <button onclick="esportaCSV('noleggi')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold shadow flex items-center gap-1.5">
+
                             <i class="fa-solid fa-file-excel"></i> Esporta Excel / Fatture in Cloud
+
                         </button>
+
                     </div>
 
+
+
                     <div class="overflow-x-auto">
+
                         <table class="w-full text-left border-collapse text-xs">
+
                             <thead>
+
                                 <tr class="bg-slate-100 border-b text-slate-700 font-bold uppercase text-[10px]">
+
                                     <th class="p-2">Cliente</th>
+
                                     <th class="p-2">Barca</th>
+
                                     <th class="p-2">Data</th>
+
                                     <th class="p-2">Importo</th>
+
                                     <th class="p-2">Stato Check-in</th>
+
                                     <th class="p-2">Azioni WhatsApp & Fattura</th>
+
                                 </tr>
+
                             </thead>
+
                             <tbody id="clientiTable" class="divide-y">
+
                             </tbody>
+
                         </table>
+
                     </div>
+
                 </div>
+
+
 
             </div>
 
+
+
         </div>
+
     </div>
 
+
+
     <!-- SCRIPT SUPABASE & CRM ADMIN LOGIC -->
+
     <script>
+
         const SUPABASE_URL = "https://cbvpixcfhmedbapnvfmw.supabase.co";
+
         const SUPABASE_ANON_KEY = "sb_publishable_V0B06YxZ1oW6tqg_6yx5og_OgbhxlUo";
+
         let _supabase;
 
+
+
         try {
+
             _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         } catch (err) {
+
             console.error("Supabase init error:", err);
+
         }
+
+
 
         function mostraPannello() {
+
             document.getElementById('login-screen').style.display = 'none';
+
             document.getElementById('admin-panel').style.display = 'block';
+
             caricaDatiCloud();
+
             caricaContenutiCMS();
+
         }
+
+
 
         function mostraLogin() {
+
             document.getElementById('login-screen').style.display = 'flex';
+
             document.getElementById('admin-panel').style.display = 'none';
+
         }
+
+
 
         async function eseguiLogin(e) {
+
             if (e) e.preventDefault();
+
             const btn = document.getElementById('btn-login');
+
             const errorEl = document.getElementById('login-error');
-            const emailEl = document.getElementById('admin-email');
-            const passEl = document.getElementById('admin-pass');
 
-            const email = emailEl ? emailEl.value.trim() : '';
-            const password = passEl ? passEl.value : '';
+            const email = document.getElementById('admin-email').value.trim();
 
-            if (!password) return;
+            const password = document.getElementById('admin-pass').value;
+
+
+
+            if (!email || !password) return;
+
+
 
             btn.disabled = true;
+
             btn.innerText = "Accesso in corso...";
 
-            // 1. Controllo Master Password diretta "nauticovi2026"
-            if (password === 'nauticovi2026') {
-                sessionStorage.setItem('nauticovi_admin_auth', 'true');
-                if (errorEl) errorEl.classList.add('hidden');
-                if (passEl) passEl.value = '';
+
+
+            try {
+
+                const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+
+                
+
+                if (error) {
+
+                    errorEl.classList.remove('hidden');
+
+                    errorEl.innerText = "Credenziali errate o account non verificato.";
+
+                    btn.disabled = false;
+
+                    btn.innerText = "Accedi al Gestionale";
+
+                    return;
+
+                }
+
+
+
+                errorEl.classList.add('hidden');
+
+                document.getElementById('admin-pass').value = '';
+
                 mostraPannello();
+
+            } catch (err) {
+
+                console.error("Errore imprevisto:", err);
+
                 btn.disabled = false;
+
                 btn.innerText = "Accedi al Gestionale";
-                return;
+
             }
 
-            // 2. Controllo tramite Supabase Auth (se inserita la mail)
-            if (email && _supabase) {
-                try {
-                    const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-                    if (!error && data.session) {
-                        if (errorEl) errorEl.classList.add('hidden');
-                        if (passEl) passEl.value = '';
-                        mostraPannello();
-                        btn.disabled = false;
-                        btn.innerText = "Accedi al Gestionale";
-                        return;
-                    }
-                } catch (err) {}
-            }
-
-            if (errorEl) {
-                errorEl.classList.remove('hidden');
-                errorEl.innerText = "Credenziali errate! Prova con la password principale.";
-            }
-            btn.disabled = false;
-            btn.innerText = "Accedi al Gestionale";
         }
+
+
 
         async function logout() {
+
             await _supabase.auth.signOut();
+
             mostraLogin();
+
         }
+
+
 
         window.addEventListener('DOMContentLoaded', async () => {
+
             const { data: { session } } = await _supabase.auth.getSession();
+
             if (session) {
+
                 mostraPannello();
+
             } else {
+
                 mostraLogin();
+
             }
+
+
 
             _supabase.auth.onAuthStateChange((event, sessione) => {
+
                 if (!sessione) mostraLogin();
+
             });
+
         });
 
-        // CMS LOGIC CON PERICOLI, BASE, EDITING E MODIFICA CONTENUTI ESISTENTI
+
+
+        // CMS LOGIC CON PERICOLI, EDITING E MODIFICA CONTENUTI ESISTENTI
+
         let listaCMSCache = [];
 
+
+
         async function caricaContenutiCMS() {
+
             const container = document.getElementById('cmsListaContenuti');
+
             if(!container || !_supabase) return;
 
+
+
             try {
+
                 const { data, error } = await _supabase.from('cms_contenuti').select('*').order('created_at', { ascending: false });
 
+
+
                 if (error || !data || data.length === 0) {
+
                     listaCMSCache = [];
+
                     container.innerHTML = `<p class="text-xs text-slate-400 italic">Nessun contenuto CMS presente. Aggiungi il primo dal form!</p>`;
+
                     return;
+
                 }
+
+
 
                 listaCMSCache = data;
+
                 container.innerHTML = '';
+
                 data.forEach(item => {
+
                     const badgeColor = item.categoria === 'destinazioni' ? 'bg-cyan-100 text-cyan-800'
-                                     : (item.categoria === 'base' || item.categoria === 'banchina' ? 'bg-slate-900 text-cyan-300 border border-cyan-500/50 font-bold'
+
                                      : (item.categoria === 'pericoli' ? 'bg-red-100 text-red-800 font-bold border border-red-300'
+
                                      : (item.categoria === 'itinerari' ? 'bg-purple-100 text-purple-800'
+
                                      : (item.categoria === 'flotta' ? 'bg-emerald-100 text-emerald-800'
-                                     : (item.categoria === 'tips' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800')))));
+
+                                     : (item.categoria === 'tips' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'))));
+
+
 
                     let extraInfo = '';
-                    if ((item.categoria === 'destinazioni' || item.categoria === 'base' || item.categoria === 'banchina' || item.categoria === 'pericoli') && (item.latitudine || item.sottotitolo)) {
-                        extraInfo = `<span class="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-mono">GPS: ${item.latitudine || ''}, ${item.longitudine || ''}</span>`;
+
+                    if ((item.categoria === 'destinazioni' || item.categoria === 'pericoli') && item.latitudine) {
+
+                        extraInfo = `<span class="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-mono">GPS: ${item.latitudine}, ${item.longitudine}</span>`;
+
                     } else if (item.categoria === 'itinerari' && item.sottotitolo) {
+
                         extraInfo = `<span class="text-[9px] bg-purple-200 text-purple-900 px-1.5 py-0.5 rounded font-bold">${item.sottotitolo}</span>`;
+
                     }
 
-                    const catLabel = item.categoria === 'base' || item.categoria === 'banchina' ? '⚓ BASE NAUTICOVI' 
-                                   : (item.categoria === 'pericoli' ? '⚠️ PERICOLO' : item.categoria.toUpperCase());
+
+
+                    const catLabel = item.categoria === 'pericoli' ? '⚠️ PERICOLO' : item.categoria.toUpperCase();
+
+
 
                     container.innerHTML += `
+
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-start text-xs gap-3">
+
                             <div class="space-y-1">
+
                                 <div class="flex items-center gap-2 flex-wrap">
+
                                     <span class="${badgeColor} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">${catLabel}</span>
+
                                     <b class="text-slate-800 text-xs">${item.titolo}</b>
+
                                     ${extraInfo}
+
                                 </div>
+
                                 <p class="text-slate-600 text-[11px]">${item.descrizione}</p>
+
                             </div>
+
                             <div class="flex items-center gap-1">
+
                                 <button onclick="caricaInModificaCMS('${item.id}')" class="text-cyan-600 hover:text-cyan-800 p-1 font-bold text-xs" title="Modifica">
+
                                     <i class="fa-solid fa-pen-to-square"></i>
+
                                 </button>
+
                                 <button onclick="eliminaContenutoCMS('${item.id}')" class="text-red-400 hover:text-red-600 p-1" title="Elimina">
+
                                     <i class="fa-solid fa-trash"></i>
+
                                 </button>
+
                             </div>
+
                         </div>
+
                     `;
+
                 });
+
             } catch (err) {
+
                 console.error("Errore CMS:", err);
+
             }
+
         }
+
+
 
         function gestisciNuovaCategoria() {
+
             const nuovaCat = prompt("Inserisci il nome della nuova Categoria (es. 'eventi', 'offerte'):");
+
             if (nuovaCat && nuovaCat.trim() !== '') {
+
                 const select = document.getElementById('cms_categoria');
+
                 const option = document.createElement('option');
+
                 const valClean = nuovaCat.trim().toLowerCase().replace(/\s+/g, '_');
+
                 option.value = valClean;
+
                 option.text = '📌 ' + nuovaCat.trim();
+
                 select.add(option);
+
                 select.value = valClean;
+
                 toggleCampiCMS();
+
             }
+
         }
+
+
 
         function toggleCampiCMS() {
+
             const cat = document.getElementById('cms_categoria').value;
+
             const boxPrezzi = document.getElementById('box-prezzi-cms');
+
             const boxGps = document.getElementById('box-gps-cms');
+
             const subboxAudio = document.getElementById('subbox-audio-cms');
+
             const boxItinerario = document.getElementById('box-itinerario-cms');
+
             
+
             boxPrezzi.classList.add('hidden');
+
             boxGps.classList.add('hidden');
+
             if (subboxAudio) subboxAudio.classList.add('hidden');
+
             boxItinerario.classList.add('hidden');
 
+
+
             if (cat === 'flotta') {
+
                 boxPrezzi.classList.remove('hidden');
+
             } else if (cat === 'destinazioni') {
+
                 boxGps.classList.remove('hidden');
+
                 if (subboxAudio) subboxAudio.classList.remove('hidden');
-            } else if (cat === 'base' || cat === 'banchina' || cat === 'pericoli') {
+
+            } else if (cat === 'pericoli') {
+
                 boxGps.classList.remove('hidden');
+
             } else if (cat === 'itinerari') {
+
                 boxItinerario.classList.remove('hidden');
+
             }
+
         }
+
+
 
         function caricaInModificaCMS(id) {
+
             const item = listaCMSCache.find(i => String(i.id) === String(id));
+
             if (!item) return;
 
+
+
             document.getElementById('cms_edit_id').value = item.id;
+
             document.getElementById('cms_categoria').value = item.categoria || 'destinazioni';
+
             toggleCampiCMS();
+
+
 
             document.getElementById('cms_titolo').value = item.titolo || '';
+
             document.getElementById('cms_sottotitolo').value = item.sottotitolo || '';
+
             document.getElementById('cms_descrizione').value = item.descrizione || '';
+
             document.getElementById('cms_immagine_url').value = item.immagine_url || '';
 
-            if (item.categoria === 'destinazioni' || item.categoria === 'base' || item.categoria === 'banchina' || item.categoria === 'pericoli') {
+
+
+            if (item.categoria === 'destinazioni' || item.categoria === 'pericoli') {
+
                 document.getElementById('cms_lat').value = item.latitudine || '';
+
                 document.getElementById('cms_lng').value = item.longitudine || '';
+
                 if (item.categoria === 'destinazioni') {
+
                     document.getElementById('cms_audioguida').value = item.testo_audioguida || '';
+
                     if (document.getElementById('cms_audio_url')) document.getElementById('cms_audio_url').value = item.audio_url || '';
+
                 }
+
             } else if (item.categoria === 'flotta') {
+
                 document.getElementById('cms_bassa_mezza').value = item.prezzo_bassa_mezza || '';
+
                 document.getElementById('cms_bassa_intera').value = item.prezzo_bassa_intera || '';
+
                 document.getElementById('cms_alta_mezza').value = item.prezzo_alta_mezza || '';
+
                 document.getElementById('cms_alta_intera').value = item.prezzo_alta_intera || '';
+
             }
+
+
 
             document.getElementById('btn-salva-cms-text').innerText = 'Aggiorna Contenuto';
+
             document.getElementById('btn-annulla-edit-cms').classList.remove('hidden');
+
             document.getElementById('cmsForm').scrollIntoView({ behavior: 'smooth' });
+
         }
+
+
 
         function resetFormCMS() {
+
             document.getElementById('cmsForm').reset();
+
             document.getElementById('cms_edit_id').value = '';
+
             document.getElementById('btn-salva-cms-text').innerText = 'Salva Contenuto su Cloud';
+
             document.getElementById('btn-annulla-edit-cms').classList.add('hidden');
+
             toggleCampiCMS();
+
         }
+
+
 
         async function salvaContenutoCMS(e) {
+
             e.preventDefault();
+
             const btn = document.getElementById('btn-salva-cms');
+
             btn.disabled = true;
 
+
+
             const editId = document.getElementById('cms_edit_id').value;
+
             const cat = document.getElementById('cms_categoria').value;
 
-            const isGpsCat = (cat === 'destinazioni' || cat === 'base' || cat === 'banchina' || cat === 'pericoli');
+
 
             const itemData = {
+
                 categoria: cat,
+
                 titolo: document.getElementById('cms_titolo').value,
+
                 sottotitolo: cat === 'itinerari' ? `Durata: ${document.getElementById('cms_itinerario_durata').value.toUpperCase()}` : document.getElementById('cms_sottotitolo').value,
+
                 descrizione: document.getElementById('cms_descrizione').value,
+
                 immagine_url: document.getElementById('cms_immagine_url').value,
-                latitudine: isGpsCat ? (parseFloat(document.getElementById('cms_lat').value) || null) : null,
-                longitudine: isGpsCat ? (parseFloat(document.getElementById('cms_lng').value) || null) : null,
+
+                latitudine: (cat === 'destinazioni' || cat === 'pericoli') ? (parseFloat(document.getElementById('cms_lat').value) || null) : null,
+
+                longitudine: (cat === 'destinazioni' || cat === 'pericoli') ? (parseFloat(document.getElementById('cms_lng').value) || null) : null,
+
                 testo_audioguida: cat === 'destinazioni' ? document.getElementById('cms_audioguida').value : null,
+
                 audio_url: cat === 'destinazioni' ? (document.getElementById('cms_audio_url').value || null) : null,
+
                 prezzo_bassa_mezza: cat === 'flotta' ? (parseFloat(document.getElementById('cms_bassa_mezza').value) || 120) : null,
+
                 prezzo_bassa_intera: cat === 'flotta' ? (parseFloat(document.getElementById('cms_bassa_intera').value) || 200) : null,
+
                 prezzo_alta_mezza: cat === 'flotta' ? (parseFloat(document.getElementById('cms_alta_mezza').value) || 150) : null,
+
                 prezzo_alta_intera: cat === 'flotta' ? (parseFloat(document.getElementById('cms_alta_intera').value) || 220) : null
+
             };
+
+
 
             let error;
+
             if (editId) {
+
                 const result = await _supabase.from('cms_contenuti').update(itemData).eq('id', editId);
+
                 error = result.error;
+
             } else {
+
                 const result = await _supabase.from('cms_contenuti').insert([itemData]);
+
                 error = result.error;
+
             }
+
+
 
             if (error) {
+
                 alert("Errore nel salvataggio CMS: " + error.message);
+
             } else {
+
                 resetFormCMS();
+
                 caricaContenutiCMS();
+
             }
+
             btn.disabled = false;
+
         }
+
+
 
         async function eliminaContenutoCMS(id) {
+
             if (confirm("Sei sicuro di voler eliminare questo contenuto dal CMS?")) {
+
                 await _supabase.from('cms_contenuti').delete().eq('id', id);
+
                 caricaContenutiCMS();
+
             }
+
         }
 
+
+
         // FATTURE IN CLOUD INTEGRATION
+
         const VAT_ID_FORFETTARIO = 66;
+
         const GESTISCI_BOLLO = false;
 
+
+
         async function generaFatturaInCloud(noleggioId) {
+
             const noleggio = listaNoleggi.find(n => String(n.id) === String(noleggioId));
+
             if (!noleggio) {
+
                 alert("Noleggio non trovato. Ricarica la pagina e riprova.");
+
                 return;
+
             }
+
+
 
             const { data: { session } } = await _supabase.auth.getSession();
+
             if (!session) {
+
                 alert("Sessione scaduta. Effettua di nuovo l'accesso.");
+
                 mostraLogin();
+
                 return;
+
             }
+
+
 
             let clienteData = {
+
                 nome_cognome: noleggio.nome_cliente,
+
                 cf_piva: "",
+
                 email: "",
+
                 indirizzo: "Praia a Mare",
+
                 cap: "87028",
+
                 citta: "Praia a Mare"
+
             };
+
+
 
             try {
+
                 const { data: checkinData } = await _supabase
+
                     .from('checkin').select('*').eq('noleggio_id', noleggioId).maybeSingle();
+
                 if (checkinData && checkinData.nome_cognome) {
+
                     clienteData = { ...clienteData, ...checkinData };
+
                 }
+
             } catch (err) {}
 
+
+
             const importoTotale = Math.round(parseFloat(noleggio.importo) * 100) / 100;
+
             if (!importoTotale || importoTotale <= 0) {
+
                 alert("Importo non valido per questo noleggio.");
+
                 return;
+
             }
+
+
 
             const conferma = confirm(`Vuoi generare la BOZZA di fattura per ${clienteData.nome_cognome} (€${importoTotale}) su Fatture in Cloud?`);
+
             if (!conferma) return;
 
+
+
             const entityData = {
+
                 name: (clienteData.nome_cognome || noleggio.nome_cliente).trim(),
+
                 country: "Italia"
+
             };
+
+
 
             if (clienteData.indirizzo && String(clienteData.indirizzo).trim() !== "") entityData.address_street = String(clienteData.indirizzo).trim();
+
             if (clienteData.cap && String(clienteData.cap).trim() !== "") entityData.address_postal_code = String(clienteData.cap).trim();
+
             if (clienteData.citta && String(clienteData.citta).trim() !== "") entityData.address_city = String(clienteData.citta).trim();
 
+
+
             if (clienteData.cf_piva && String(clienteData.cf_piva).trim() !== "") {
+
                 const cfClean = String(clienteData.cf_piva).trim();
+
                 if (cfClean.length === 11 && /^\d+$/.test(cfClean)) {
+
                     entityData.vat_number = cfClean;
+
                 } else if (cfClean.length >= 11) {
+
                     entityData.tax_code = cfClean;
+
                 }
+
             }
+
+
 
             if (clienteData.email && String(clienteData.email).trim() !== "") {
+
                 entityData.email = String(clienteData.email).trim();
+
             }
 
+
+
             const bollo = (GESTISCI_BOLLO && importoTotale > 77.47) ? 2 : 0;
+
             const totaleDaPagare = Math.round((importoTotale + bollo) * 100) / 100;
 
+
+
             const documento = {
+
                 type: "invoice",
+
                 entity: entityData,
+
                 date: noleggio.data_noleggio,
+
                 is_draft: true,
+
                 use_gross_prices: false,
+
                 items_list: [
+
                     {
+
                         name: `Noleggio imbarcazione ${noleggio.barca} - Data: ${noleggio.data_noleggio}`,
+
                         qty: 1,
+
                         net_price: importoTotale,
+
                         vat: { id: VAT_ID_FORFETTARIO }
+
                     }
+
                 ],
+
                 payments_list: [
+
                     {
+
                         amount: totaleDaPagare,
+
                         due_date: noleggio.data_noleggio,
+
                         status: "not_paid"
+
                     }
+
                 ]
+
             };
+
             if (bollo > 0) documento.stamp_duty = bollo;
+
+
 
             const payload = { data: documento };
 
+
+
             try {
+
                 const res = await fetch("/api/fattura", {
+
                     method: "POST",
+
                     headers: {
+
                         "Content-Type": "application/json",
+
                         "Authorization": `Bearer ${session.access_token}`
+
                     },
+
                     body: JSON.stringify({ payload })
+
                 });
+
+
 
                 const data = await res.json();
 
-                if (res.ok && data.data) {
-                    alert(`BOZZA CREATA SU FATTURE IN CLOUD!
 
-ID Bozza: ${data.data.id}
-Il documento è nella sezione "Bozze" del tuo account.`);
+
+                if (res.ok && data.data) {
+
+                    alert(`BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${data.data.id}\nIl documento è nella sezione "Bozze" del tuo account.`);
+
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
+
                     caricaDatiCloud();
+
                 } else {
-                    alert("Errore Fatture in Cloud:
-" + JSON.stringify(data.error || data, null, 2));
+
+                    alert("Errore Fatture in Cloud:\n" + JSON.stringify(data.error || data, null, 2));
+
                 }
+
             } catch (err) {
+
                 alert("Errore di rete: " + err.message);
+
             }
+
         }
+
+
 
         let listaNoleggi = [];
 
+
+
         async function caricaDatiCloud() {
+
             const filtro = document.getElementById('filtroPeriodo').value;
+
             if(!_supabase) return;
 
+
+
             try {
+
                 let query = _supabase.from('noleggi').select('*').order('data_noleggio', { ascending: false });
 
+
+
                 const adesso = new Date();
+
                 const oggi = adesso.toISOString().split('T')[0];
 
+
+
                 if (filtro === 'oggi') {
+
                     query = query.eq('data_noleggio', oggi);
+
                 } else if (filtro === 'mese') {
+
                     const anno = adesso.getFullYear();
+
                     const mese = String(adesso.getMonth() + 1).padStart(2, '0');
+
                     const primoGiorno = `${anno}-${mese}-01`;
+
                     const ultimoGiorno = new Date(anno, adesso.getMonth() + 1, 0).toISOString().split('T')[0];
+
                     query = query.gte('data_noleggio', primoGiorno).lte('data_noleggio', ultimoGiorno);
+
                 }
+
+
 
                 const { data, error } = await query;
+
                 if (!error) {
+
                     listaNoleggi = data || [];
+
                     aggiornaDashboardKPI(listaNoleggi);
+
                     renderTable(listaNoleggi);
+
                 }
+
             } catch(err) {
+
                 console.error("Errore di rete:", err);
+
             }
+
         }
+
+
 
         function aggiornaDashboardKPI(noleggi) {
+
             let totaleFatturato = 0;
+
             let checkinCompletati = 0;
 
+
+
             noleggi.forEach(n => {
+
                 totaleFatturato += parseFloat(n.importo || 0);
+
                 if (n.stato_checkin === 'completato') checkinCompletati++;
+
             });
+
+
 
             const numNoleggi = noleggi.length;
+
             const mediaIncasso = numNoleggi > 0 ? (totaleFatturato / numNoleggi).toFixed(0) : 0;
 
+
+
             document.getElementById('kpiFatturato').innerText = `€${totaleFatturato.toLocaleString('it-IT')}`;
+
             document.getElementById('kpiNoleggi').innerText = numNoleggi;
+
             document.getElementById('kpiCheckin').innerText = `${checkinCompletati} / ${numNoleggi}`;
+
             document.getElementById('kpiMedio').innerText = `€${mediaIncasso}`;
+
         }
+
+
 
         function renderTable(noleggi) {
+
             const tbody = document.getElementById('clientiTable');
+
             if(!tbody) return;
+
             tbody.innerHTML = '';
 
+
+
             if(noleggi.length === 0) {
+
                 tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Nessun noleggio trovato per questo periodo.</td></tr>`;
+
                 return;
+
             }
 
+
+
             noleggi.forEach((n) => {
+
                 const checkinLink = `${window.location.origin}/checkin.html?id=${n.id}`;
+
                 const guestLink = `${window.location.origin}/guest.html?cliente=${encodeURIComponent(n.nome_cliente)}&barca=${encodeURIComponent(n.barca)}&date=${n.data_noleggio}`;
+
                 const telefonoWa = String(n.telefono || '').replace(/\D/g, '');
 
-                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).
 
-⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}
 
-🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
+                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).\n\n⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}\n\n🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
+
+
 
                 const badgeCheckin = n.stato_checkin === 'completato'
+
                     ? `<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">✓ Completato</span>`
+
                     : `<span class="bg-amber-100 text-amber-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">⌛ In Attesa</span>`;
 
+
+
                 const btnFattura = `<button onclick="generaFatturaInCloud('${n.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] flex items-center gap-1 shadow">
+
                     <i class="fa-solid fa-file-invoice-dollar"></i> Genera FIC
+
                    </button>`;
 
+
+
                 tbody.innerHTML += `
+
                     <tr>
+
                         <td class="p-2 font-bold text-slate-800">${n.nome_cliente}</td>
+
                         <td class="p-2 font-semibold text-cyan-700">${n.barca}</td>
+
                         <td class="p-2 font-mono text-slate-600">${n.data_noleggio}</td>
+
                         <td class="p-2 font-bold text-emerald-600">€${n.importo}</td>
+
                         <td class="p-2">${badgeCheckin}</td>
+
                         <td class="p-2 flex gap-2 items-center">
+
                             <a href="https://wa.me/${telefonoWa}?text=${msgWhatsApp}" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] flex items-center gap-1 shadow" title="Invia Link WhatsApp">
+
                                 <i class="fa-brands fa-whatsapp text-xs"></i> Invia Link
+
                             </a>
+
                             ${btnFattura}
+
                             <button onclick="eliminaNoleggio('${n.id}')" class="text-red-400 hover:text-red-600 p-1" title="Elimina">
+
                                 <i class="fa-solid fa-trash"></i>
+
                             </button>
+
                         </td>
+
                     </tr>
+
                 `;
+
             });
+
         }
 
+
+
         async function registraNoleggioCloud(e) {
+
             e.preventDefault();
+
             const btn = document.getElementById('btn-salva-noleggio');
+
             btn.disabled = true;
 
+
+
             const nuovo = {
+
                 nome_cliente: document.getElementById('nome').value,
+
                 telefono: document.getElementById('telefono').value,
+
                 barca: document.getElementById('barca').value,
+
                 importo: parseFloat(document.getElementById('importo').value),
+
                 caparra: parseFloat(document.getElementById('caparra').value),
+
                 data_noleggio: document.getElementById('data_noleggio').value,
+
                 stato_checkin: 'in_attesa'
+
             };
+
+
 
             const { data, error } = await _supabase.from('noleggi').insert([nuovo]);
 
+
+
             if (error) {
+
                 alert("Errore nel salvataggio su Cloud: " + error.message);
+
             } else {
+
                 document.getElementById('crmForm').reset();
+
                 caricaDatiCloud();
+
             }
+
             btn.disabled = false;
+
         }
+
+
 
         async function eliminaNoleggio(id) {
+
             if(confirm("Sei sicuro di voler eliminare questo noleggio dal database cloud?")) {
+
                 await _supabase.from('noleggi').delete().eq('id', id);
+
                 caricaDatiCloud();
+
             }
+
         }
 
+
+
         function esportaCSV() {
-            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin
-";
+
+            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin\n";
+
             listaNoleggi.forEach(n => {
-                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"
-`;
+
+                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"\n`;
+
             });
+
             const blob = new Blob([csv], { type: 'text/csv' });
+
             const url = window.URL.createObjectURL(blob);
+
             const a = document.createElement('a');
+
             a.setAttribute('href', url);
+
             a.setAttribute('download', 'noleggi_nauticovi_cloud.csv');
+
             a.click();
+
         }
+
     </script>
+
 </body>
+
 </html>
