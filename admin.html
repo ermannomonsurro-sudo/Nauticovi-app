@@ -106,14 +106,14 @@
                 </div>
             </div>
 
-            <!-- 2. SEZIONE CMS - GESTIONE CONTENUTI, DESTINAZIONI, PERICOLI & ITINERARI -->
+            <!-- 2. SEZIONE CMS - GESTIONE CONTENUTI, DESTINAZIONI, PERICOLI, BASE & ITINERARI -->
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 gap-2">
                     <div>
                         <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group text-cyan-600"></i> CMS — Gestione Contenuti, Pericoli & Flotta
+                            <i class="fa-solid fa-layer-group text-cyan-600"></i> CMS — Gestione Contenuti, Base, Pericoli & Flotta
                         </h2>
-                        <p class="text-xs text-slate-500">Gestisci le destinazioni, i segnali di pericolo sulla mappa, gli itinerari, la flotta ed i divieti</p>
+                        <p class="text-xs text-slate-500">Gestisci le destinazioni, il punto Base Nauticovi, i segnali di pericolo sulla mappa, gli itinerari e la flotta</p>
                     </div>
                 </div>
 
@@ -132,6 +132,7 @@
                                 </div>
                                 <select id="cms_categoria" onchange="toggleCampiCMS()" class="w-full p-2 border rounded-lg bg-white font-semibold outline-none">
                                     <option value="destinazioni">📍 Destinazione Singola / Punto GPS</option>
+                                    <option value="base">⚓ Base / Banchina Nauticovi (Logo Mappa)</option>
                                     <option value="pericoli">⚠️ Segnale di Pericolo (Solo Mappa GPS)</option>
                                     <option value="itinerari">🧭 Itinerario / Tour Raggruppato</option>
                                     <option value="flotta">🚤 Barca / Flotta</option>
@@ -142,12 +143,12 @@
 
                             <div>
                                 <label class="block font-bold text-slate-600 uppercase">Titolo</label>
-                                <input type="text" id="cms_titolo" required placeholder="Es. Scogli Affioranti o Grotta Azzurra" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                                <input type="text" id="cms_titolo" required placeholder="Es. Banchina Nauticovi o Scogli Affioranti" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
                             </div>
 
                             <div>
-                                <label class="block font-bold text-slate-600 uppercase">Sottotitolo / Dettaglio (es. Attenzione Secca)</label>
-                                <input type="text" id="cms_sottotitolo" placeholder="Es. Pericolo Scogliera • Mantenere Distanza" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                                <label class="block font-bold text-slate-600 uppercase">Sottotitolo / Dettaglio (es. Punto Rientro)</label>
+                                <input type="text" id="cms_sottotitolo" placeholder="Es. Banchina Principale o Pericolo Secca" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
                             </div>
 
                             <div>
@@ -172,27 +173,27 @@
                                 </div>
                             </div>
 
-                            <!-- CAMPI COORDINATE GPS ED AUDIOGUIDA PER DESTINAZIONI E PERICOLI -->
+                            <!-- CAMPI COORDINATE GPS ED AUDIOGUIDA PER DESTINAZIONI, BASE E PERICOLI -->
                             <div id="box-gps-cms" class="p-3 bg-cyan-50/60 border border-cyan-200 rounded-xl space-y-2">
                                 <b class="block text-cyan-900 font-bold uppercase text-[10px]">📍 Coordinate GPS sulla Mappa</b>
                                 <div class="grid grid-cols-2 gap-2">
                                     <div>
                                         <label class="block text-[9px] font-bold text-slate-600 uppercase">Latitudine</label>
-                                        <input type="number" step="any" id="cms_lat" placeholder="Es. 39.8731" class="w-full p-1.5 border rounded bg-white font-mono">
+                                        <input type="number" step="any" id="cms_lat" placeholder="Es. 39.8820" class="w-full p-1.5 border rounded bg-white font-mono">
                                     </div>
                                     <div>
                                         <label class="block text-[9px] font-bold text-slate-600 uppercase">Longitudine</label>
-                                        <input type="number" step="any" id="cms_lng" placeholder="Es. 15.7735" class="w-full p-1.5 border rounded bg-white font-mono">
+                                        <input type="number" step="any" id="cms_lng" placeholder="Es. 15.7760" class="w-full p-1.5 border rounded bg-white font-mono">
                                     </div>
                                 </div>
                                 <div id="subbox-audio-cms" class="space-y-2 pt-1 border-t border-cyan-200/60">
                                     <div>
                                         <label class="block text-[9px] font-bold text-slate-600 uppercase">Testo Audioguida (Letto all'arrivo)</label>
-                                        <textarea id="cms_audioguida" rows="2" placeholder="Benvenuto alla Grotta Azzurra..." class="w-full p-1.5 border rounded bg-white text-[11px]"></textarea>
+                                        <textarea id="cms_audioguida" rows="2" placeholder="Benvenuto..." class="w-full p-1.5 border rounded bg-white text-[11px]"></textarea>
                                     </div>
                                     <div>
                                         <label class="block text-[9px] font-bold text-slate-600 uppercase">URL File Audio MP3</label>
-                                        <input type="url" id="cms_audio_url" placeholder="https://.../grotta_azzurra.mp3" class="w-full p-1.5 border rounded bg-white text-xs">
+                                        <input type="url" id="cms_audio_url" placeholder="https://.../audio.mp3" class="w-full p-1.5 border rounded bg-white text-xs">
                                     </div>
                                 </div>
                             </div>
@@ -414,7 +415,7 @@
             });
         });
 
-        // CMS LOGIC CON PERICOLI, EDITING E MODIFICA CONTENUTI ESISTENTI
+        // CMS LOGIC CON PERICOLI, BASE, EDITING E MODIFICA CONTENUTI ESISTENTI
         let listaCMSCache = [];
 
         async function caricaContenutiCMS() {
@@ -434,19 +435,21 @@
                 container.innerHTML = '';
                 data.forEach(item => {
                     const badgeColor = item.categoria === 'destinazioni' ? 'bg-cyan-100 text-cyan-800'
+                                     : (item.categoria === 'base' || item.categoria === 'banchina' ? 'bg-slate-900 text-cyan-300 border border-cyan-500/50 font-bold'
                                      : (item.categoria === 'pericoli' ? 'bg-red-100 text-red-800 font-bold border border-red-300'
                                      : (item.categoria === 'itinerari' ? 'bg-purple-100 text-purple-800'
                                      : (item.categoria === 'flotta' ? 'bg-emerald-100 text-emerald-800'
-                                     : (item.categoria === 'tips' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'))));
+                                     : (item.categoria === 'tips' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800')))));
 
                     let extraInfo = '';
-                    if ((item.categoria === 'destinazioni' || item.categoria === 'pericoli') && item.latitudine) {
-                        extraInfo = `<span class="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-mono">GPS: ${item.latitudine}, ${item.longitudine}</span>`;
+                    if ((item.categoria === 'destinazioni' || item.categoria === 'base' || item.categoria === 'banchina' || item.categoria === 'pericoli') && (item.latitudine || item.sottotitolo)) {
+                        extraInfo = `<span class="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-mono">GPS: ${item.latitudine || ''}, ${item.longitudine || ''}</span>`;
                     } else if (item.categoria === 'itinerari' && item.sottotitolo) {
                         extraInfo = `<span class="text-[9px] bg-purple-200 text-purple-900 px-1.5 py-0.5 rounded font-bold">${item.sottotitolo}</span>`;
                     }
 
-                    const catLabel = item.categoria === 'pericoli' ? '⚠️ PERICOLO' : item.categoria.toUpperCase();
+                    const catLabel = item.categoria === 'base' || item.categoria === 'banchina' ? '⚓ BASE NAUTICOVI' 
+                                   : (item.categoria === 'pericoli' ? '⚠️ PERICOLO' : item.categoria.toUpperCase());
 
                     container.innerHTML += `
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-start text-xs gap-3">
@@ -505,7 +508,7 @@
             } else if (cat === 'destinazioni') {
                 boxGps.classList.remove('hidden');
                 if (subboxAudio) subboxAudio.classList.remove('hidden');
-            } else if (cat === 'pericoli') {
+            } else if (cat === 'base' || cat === 'banchina' || cat === 'pericoli') {
                 boxGps.classList.remove('hidden');
             } else if (cat === 'itinerari') {
                 boxItinerario.classList.remove('hidden');
@@ -525,7 +528,7 @@
             document.getElementById('cms_descrizione').value = item.descrizione || '';
             document.getElementById('cms_immagine_url').value = item.immagine_url || '';
 
-            if (item.categoria === 'destinazioni' || item.categoria === 'pericoli') {
+            if (item.categoria === 'destinazioni' || item.categoria === 'base' || item.categoria === 'banchina' || item.categoria === 'pericoli') {
                 document.getElementById('cms_lat').value = item.latitudine || '';
                 document.getElementById('cms_lng').value = item.longitudine || '';
                 if (item.categoria === 'destinazioni') {
@@ -560,14 +563,16 @@
             const editId = document.getElementById('cms_edit_id').value;
             const cat = document.getElementById('cms_categoria').value;
 
+            const isGpsCat = (cat === 'destinazioni' || cat === 'base' || cat === 'banchina' || cat === 'pericoli');
+
             const itemData = {
                 categoria: cat,
                 titolo: document.getElementById('cms_titolo').value,
                 sottotitolo: cat === 'itinerari' ? `Durata: ${document.getElementById('cms_itinerario_durata').value.toUpperCase()}` : document.getElementById('cms_sottotitolo').value,
                 descrizione: document.getElementById('cms_descrizione').value,
                 immagine_url: document.getElementById('cms_immagine_url').value,
-                latitudine: (cat === 'destinazioni' || cat === 'pericoli') ? (parseFloat(document.getElementById('cms_lat').value) || null) : null,
-                longitudine: (cat === 'destinazioni' || cat === 'pericoli') ? (parseFloat(document.getElementById('cms_lng').value) || null) : null,
+                latitudine: isGpsCat ? (parseFloat(document.getElementById('cms_lat').value) || null) : null,
+                longitudine: isGpsCat ? (parseFloat(document.getElementById('cms_lng').value) || null) : null,
                 testo_audioguida: cat === 'destinazioni' ? document.getElementById('cms_audioguida').value : null,
                 audio_url: cat === 'destinazioni' ? (document.getElementById('cms_audio_url').value || null) : null,
                 prezzo_bassa_mezza: cat === 'flotta' ? (parseFloat(document.getElementById('cms_bassa_mezza').value) || 120) : null,
@@ -709,11 +714,15 @@
                 const data = await res.json();
 
                 if (res.ok && data.data) {
-                    alert(`BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${data.data.id}\nIl documento è nella sezione "Bozze" del tuo account.`);
+                    alert(`BOZZA CREATA SU FATTURE IN CLOUD!
+
+ID Bozza: ${data.data.id}
+Il documento è nella sezione "Bozze" del tuo account.`);
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
-                    alert("Errore Fatture in Cloud:\n" + JSON.stringify(data.error || data, null, 2));
+                    alert("Errore Fatture in Cloud:
+" + JSON.stringify(data.error || data, null, 2));
                 }
             } catch (err) {
                 alert("Errore di rete: " + err.message);
@@ -786,7 +795,11 @@
                 const guestLink = `${window.location.origin}/guest.html?cliente=${encodeURIComponent(n.nome_cliente)}&barca=${encodeURIComponent(n.barca)}&date=${n.data_noleggio}`;
                 const telefonoWa = String(n.telefono || '').replace(/\D/g, '');
 
-                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).\n\n⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}\n\n🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
+                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).
+
+⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}
+
+🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
 
                 const badgeCheckin = n.stato_checkin === 'completato'
                     ? `<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">✓ Completato</span>`
@@ -851,9 +864,11 @@
         }
 
         function esportaCSV() {
-            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin\n";
+            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin
+";
             listaNoleggi.forEach(n => {
-                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"\n`;
+                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"
+`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
