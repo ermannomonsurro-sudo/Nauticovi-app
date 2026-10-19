@@ -1162,24 +1162,42 @@
             }
         }
 
-        function inviaSOSPosizioneGPS() {
+                function inviaSOSPosizioneGPS() {
             const urlParams = new URLSearchParams(window.location.search);
             const barcaNome = urlParams.get('barca') || 'Barca Nauticovi';
             const clienteNome = urlParams.get('cliente') || 'Cliente';
 
-            let msg = `🆘 SOS Assistenza in mare! Ho bisogno di supporto a bordo della barca ${barcaNome} (${clienteNome}).`;
-            if (lastLat && lastLng) {
-                msg += `
+            function apriWhatsApp(lat, lng) {
+                let msg = `🆘 SOS Assistenza in mare! Ho bisogno di supporto a bordo della barca ${barcaNome} (${clienteNome}).`;
+                if (lat && lng) {
+                    msg += `\n\nMia Posizione GPS Attuale: https://maps.google.com/?q=${lat},${lng}`;
+                } else {
+                    msg += `\n\n(Geolocalizzazione in acquisizione, verifica che il GPS dello smartphone sia attivo).`;
+                }
 
-Mia Posizione GPS Attuale: https://maps.google.com/?q=${lastLat},${lastLng}`;
-            } else {
-                msg += `
-
-(Geolocalizzazione in acquisizione, verifica che il GPS dello smartphone sia attivo).`;
+                const urlWa = `https://wa.me/393484364498?text=${encodeURIComponent(msg)}`;
+                window.open(urlWa, '_blank');
             }
 
-            const urlWa = `https://wa.me/393484364498?text=${encodeURIComponent(msg)}`;
-            window.open(urlWa, '_blank');
+            if (lastLat && lastLng) {
+                apriWhatsApp(lastLat, lastLng);
+            } else if ("geolocation" in navigator) {
+                // Tentativo istantaneo se non era ancora stata salvata la posizione
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        lastLat = pos.coords.latitude;
+                        lastLng = pos.coords.longitude;
+                        apriWhatsApp(lastLat, lastLng);
+                    },
+                    err => {
+                        console.warn("Errore lettura GPS immediata SOS:", err);
+                        apriWhatsApp(null, null);
+                    },
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 10000 }
+                );
+            } else {
+                apriWhatsApp(null, null);
+            }
         }
 
         function nascondiBannerProssimita() {
@@ -1494,6 +1512,10 @@ Mia Posizione GPS Attuale: https://maps.google.com/?q=${lastLat},${lastLng}`;
         window.addEventListener('DOMContentLoaded', async () => {
             if(!verificaScadenzaAccesso()) return;
             const savedLang = localStorage.getItem('nauticovi_lang') || 'it';
+            
+            // Avvia la geolocalizzazione GPS subito in background all'apertura della pagina
+            avviaGeolocalizzazione();
+
             await caricaCMSGuestDinamico();
             setLanguage(savedLang);
             caricaMeteoRealeOpenMeteo();
