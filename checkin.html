@@ -221,53 +221,65 @@
             });
         }
 
-        async function inviaCheckin(e) {
-            e.preventDefault();
-            
-            const btn = document.getElementById('btn-submit-checkin');
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Invio in corso...`;
+       async function inviaCheckin(e) {
+    e.preventDefault();
+    
+    const btn = document.getElementById('btn-submit-checkin');
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Invio in corso...`;
 
-            // Recupera l'ID del noleggio dall'URL se presente (es. ?id=UUID)
-            const urlParams = new URLSearchParams(window.location.search);
-            const noleggioId = urlParams.get('id') || null;
+    // Recupera l'ID del noleggio dall'URL se presente (es. ?id=UUID)
+    const urlParams = new URLSearchParams(window.location.search);
+    const noleggioId = urlParams.get('id') || null;
 
-            const datiCheckin = {
-                noleggio_id: noleggioId,
-                nome_cognome: document.getElementById('checkin-nome').value.trim(),
-                cf_piva: document.getElementById('checkin-cf').value.trim().toUpperCase(),
-                telefono: document.getElementById('checkin-tel').value.trim(),
-                email: document.getElementById('checkin-email').value.trim(),
-                indirizzo: document.getElementById('checkin-indirizzo').value.trim(),
-                cap: document.getElementById('checkin-cap').value.trim(),
-                citta: document.getElementById('checkin-citta').value.trim(),
-                numero_documento: document.getElementById('checkin-doc').value.trim().toUpperCase(),
-                firma_digitale: 'contratto_cartaceo' // Segnaposto: la firma fisica avviene sul contratto cartaceo in banchina
-            };
+    if (!noleggioId) {
+        alert("Attenzione: Link Check-in non valido o ID noleggio mancante. Contatta l'assistenza Nauticovi.");
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-check-circle text-base"></i> CONFERMA WEB CHECK-IN`;
+        return;
+    }
 
-            try {
-                if (_supabase) {
-                    // 1. Salva la scheda Check-in nel database Cloud
-                    const { data, error } = await _supabase.from('checkin').insert([datiCheckin]);
-                    
-                    if (error) {
-                        console.error("Errore salvataggio check-in:", error);
-                    }
+    const datiCheckin = {
+        nome_cognome: document.getElementById('checkin-nome').value.trim(),
+        cf_piva: document.getElementById('checkin-cf').value.trim().toUpperCase(),
+        telefono: document.getElementById('checkin-tel').value.trim(),
+        email: document.getElementById('checkin-email').value.trim(),
+        indirizzo: document.getElementById('checkin-indirizzo').value.trim(),
+        cap: document.getElementById('checkin-cap').value.trim(),
+        citta: document.getElementById('checkin-citta').value.trim(),
+        numero_documento: document.getElementById('checkin-doc').value.trim().toUpperCase(),
+        firma_digitale: 'contratto_cartaceo' // Firma olografa apposta in banchina sul contratto cartaceo
+    };
 
-                    // 2. Se è legato a un noleggio, aggiorna lo stato check-in in 'completato'
-                    if (noleggioId) {
-                        await _supabase.from('noleggi').update({ stato_checkin: 'completato' }).eq('id', noleggioId);
-                    }
-                }
-            } catch (err) {
-                console.error("Eccezione durante il salvataggio:", err);
+    try {
+        if (_supabase) {
+            // Invocazione sicura della Stored Procedure 'invia_checkin' via RPC
+            const { error } = await _supabase.rpc('invia_checkin', {
+                p_noleggio_id: noleggioId,
+                p_dati: datiCheckin
+            });
+
+            if (error) {
+                console.error("Errore salvataggio check-in via RPC:", error);
+                alert("Si è verificato un errore durante la registrazione: " + error.message);
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-check-circle text-base"></i> CONFERMA WEB CHECK-IN`;
+                return;
             }
-
-            // Mostra la schermata di successo
-            document.getElementById('checkin-form').classList.add('hidden');
-            document.getElementById('checkin-success').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+    } catch (err) {
+        console.error("Eccezione durante il salvataggio:", err);
+        alert("Errore di connessione. Riprova tra qualche istante.");
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-check-circle text-base"></i> CONFERMA WEB CHECK-IN`;
+        return;
+    }
+
+    // Mostra la schermata di successo
+    document.getElementById('checkin-form').classList.add('hidden');
+    document.getElementById('checkin-success').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedLang = localStorage.getItem('nauticovi_lang') || 'it';
