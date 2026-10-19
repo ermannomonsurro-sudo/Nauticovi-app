@@ -23,7 +23,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans pb-12">
 
-    <!-- SCHERMATA LOGIN ADMIN (Interfaccia diretta, pulita e priva di form nativi che causano blocchi) -->
+    <!-- SCHERMATA LOGIN ADMIN (Contenitore div isolato per prevenire submit HTML nativi) -->
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200 max-w-sm w-full space-y-4 text-center">
             <div class="flex flex-col items-center justify-center gap-2">
@@ -35,7 +35,7 @@
                 <i class="fa-solid fa-arrow-left"></i> Torna alla Home
             </a>
 
-            <!-- Contenitore isolato -->
+            <!-- Contenitore isolato per input -->
             <div class="space-y-3 pt-2 text-left">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Email Admin</label>
@@ -125,7 +125,7 @@
                 </div>
             </div>
 
-            <!-- 2. SEZIONE CMS STRUTTURATA IN MACRO-SCHEDE DINAMICHE -->
+            <!-- 2. SEZIONE CMS ESTRUTTURATA IN MACRO-SCHEDE DINAMICHE -->
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-5">
 
                 <!-- HEADER SEZIONE CMS & MACRO TAB NAVIGATORE -->
@@ -480,6 +480,12 @@
             await _supabase.auth.signOut();
             mostraLogin();
         }
+
+        // Esposizione esplicita su window per garantire la risoluzione degli onclick inline
+        window.eseguiLogin = eseguiLogin;
+        window.mostraPannello = mostraPannello;
+        window.mostraLogin = mostraLogin;
+        window.logout = logout;
 
         window.addEventListener('DOMContentLoaded', async () => {
             if (!_supabase) return;
@@ -838,6 +844,16 @@
             }
         }
 
+        window.selezionaMacroTab = selezionaMacroTab;
+        window.toggleCampiCMS = toggleCampiCMS;
+        window.uploadFotoSupabaseStorage = uploadFotoSupabaseStorage;
+        window.caricaContenutiCMS = caricaContenutiCMS;
+        window.gestisciNuovaCategoria = gestisciNuovaCategoria;
+        window.caricaInModificaCMS = caricaInModificaCMS;
+        window.resetFormCMS = resetFormCMS;
+        window.salvaContenutoCMS = salvaContenutoCMS;
+        window.eliminaContenutoCMS = eliminaContenutoCMS;
+
         // -----------------------------------------------------------------------------
         // FATTURE IN CLOUD INTEGRATION
         // -----------------------------------------------------------------------------
@@ -952,7 +968,8 @@
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
-                    alert("Errore Fatture in Cloud:\n" + JSON.stringify(data.error || data, null, 2));
+                    alert("Errore Fatture in Cloud:
+" + JSON.stringify(data.error || data, null, 2));
                 }
             } catch (err) {
                 alert("Errore di rete: " + err.message);
@@ -1112,6 +1129,12 @@
             a.setAttribute('download', 'noleggi_nauticovi_cloud.csv');
             a.click();
         }
+
+        window.generaFatturaInCloud = generaFatturaInCloud;
+        window.caricaDatiCloud = caricaDatiCloud;
+        window.registraNoleggioCloud = registraNoleggioCloud;
+        window.eliminaNoleggio = eliminaNoleggio;
+        window.esportaCSV = esportaCSV;
     </script>
 </body>
 </html>
