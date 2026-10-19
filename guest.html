@@ -983,7 +983,40 @@
             });
         }
 
-        function initMapNav() {
+        
+       // LAYER POLIGONALE FASCIA DI RISPETTO 200M BAGNANTI (PRAIA A MARE)
+       let fascia200mPolygon;
+
+       function disegnaFascia200mCosta() {
+           if (!map) return;
+
+           const coordsFascia200m = [
+               [39.8980, 15.7780], // Punto Nord Spiaggia
+               [39.8980, 15.7755], // 200m al largo Nord
+               [39.8700, 15.7725], // 200m al largo Centro
+               [39.8450, 15.7860], // 200m al largo Sud (Arco Magno)
+               [39.8450, 15.7885]  // Punto Sud Costa
+           ];
+
+           if (fascia200mPolygon) map.removeLayer(fascia200mPolygon);
+
+           fascia200mPolygon = L.polygon(coordsFascia200m, {
+               color: '#ef4444',
+               weight: 2,
+               dashArray: '6, 6',
+               fillColor: '#ef4444',
+               fillOpacity: 0.20
+           }).addTo(map);
+
+           fascia200mPolygon.bindPopup(`
+               <div class="text-xs p-1 text-center font-sans">
+                   <b class="text-red-600 block text-sm">🚫 ZONA DI RISPETTO 200M</b>
+                   <p class="text-slate-600 mt-1">Fascia riservata ai bagnanti. Navigazione a motore strictly VIETATA entro questa area.</p>
+               </div>
+           `);
+       }
+
+       function initMapNav() {
             const mapContainer = document.getElementById('map');
             if (!mapContainer) return;
 
@@ -1000,6 +1033,7 @@
 
             disegnaMarkerMappa();
             disegnaSegnaliPericoloMappa();
+           disegnaFascia200mCosta();
 
             avviaGeolocalizzazione();
         }
@@ -1428,6 +1462,7 @@
                 if (map) {
                     disegnaMarkerMappa();
                     disegnaSegnaliPericoloMappa();
+           disegnaFascia200mCosta();
                 }
             } catch(e) {}
         }
