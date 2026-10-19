@@ -8,6 +8,18 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Supabase Client JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .macro-tab-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .macro-tab-btn.active {
+            background-color: #0f172a;
+            color: #38bdf8;
+            border-color: #38bdf8;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+        }
+    </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans pb-12">
 
@@ -106,74 +118,107 @@
                 </div>
             </div>
 
-            <!-- 2. SEZIONE CMS - GESTIONE CONTENUTI, DESTINAZIONI, PERICOLI, BASE & ITINERARI CON UPLOAD FOTO -->
-            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 gap-2">
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group text-cyan-600"></i> CMS — Gestione Contenuti, Base, Pericoli & Flotta
-                        </h2>
-                        <p class="text-xs text-slate-500">Gestisci le destinazioni, la base, i pericoli, gli itinerari, la flotta e carica direttamente le foto su Supabase Storage</p>
+            <!-- 2. SEZIONE CMS ESTRUTTURATA IN MACRO-SCHEDE DINAMICHE -->
+            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-5">
+                
+                <!-- HEADER SEZIONE CMS & MACRO TAB NAVIGATORE -->
+                <div class="space-y-3 border-b pb-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-layer-group text-cyan-600"></i> CMS — Gestione Contenuti & Vetrina
+                            </h2>
+                            <p class="text-xs text-slate-500">Seleziona la sezione del sito per filtrare il modulo di inserimento e i contenuti attivi su Cloud</p>
+                        </div>
+                    </div>
+
+                    <!-- MACRO-TAB NAVIGATOR BAR -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs font-extrabold pt-2">
+                        <button onclick="selezionaMacroTab('guest')" id="macro-tab-guest" class="macro-tab-btn active p-3 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-compass text-cyan-500"></i> 1. Guest Portal (guest.html)
+                        </button>
+                        <button onclick="selezionaMacroTab('catalogo')" id="macro-tab-catalogo" class="macro-tab-btn p-3 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-ship text-emerald-500"></i> 2. Catalogo Flotta (catalogo.html)
+                        </button>
+                        <button onclick="selezionaMacroTab('home')" id="macro-tab-home" class="macro-tab-btn p-3 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-house text-amber-500"></i> 3. Home Page (index.html)
+                        </button>
+                        <button onclick="selezionaMacroTab('destinazioni')" id="macro-tab-destinazioni" class="macro-tab-btn p-3 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-map-location-dot text-purple-500"></i> 4. Destinazioni (destinazioni.html)
+                        </button>
                     </div>
                 </div>
 
+                <!-- CORPO CMS: FORM DINAMICO + LISTA FILTRATA -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- FORM DINAMICO (COLONNA SINISTRA) -->
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-                        <h3 class="text-xs font-extrabold uppercase text-slate-700 flex items-center gap-1.5">
-                            <i class="fa-solid fa-plus-circle text-cyan-600"></i> Aggiungi / Modifica Elemento
+                        <h3 class="text-xs font-extrabold uppercase text-slate-700 flex items-center justify-between">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-pen-to-square text-cyan-600"></i> Form Inserimento / Modifica</span>
+                            <span id="macro-tab-label-badge" class="bg-cyan-100 text-cyan-800 text-[9px] px-2 py-0.5 rounded-full font-bold">GUEST PORTAL</span>
                         </h3>
 
                         <form id="cmsForm" onsubmit="salvaContenutoCMS(event)" class="space-y-3 text-xs">
                             <input type="hidden" id="cms_edit_id" value="">
+                            
+                            <!-- SELETTORE SOTTO-CATEGORIA (CAMBIA IN BASE ALLA MACRO TAB ATTIVA) -->
                             <div>
-                                <div class="flex justify-between items-center mb-1">
-                                    <label class="block font-bold text-slate-600 uppercase">Categoria CMS</label>
-                                    <button type="button" onclick="gestisciNuovaCategoria()" class="text-[10px] text-cyan-600 font-bold hover:underline">+ Nuova Categoria</button>
-                                </div>
-                                <select id="cms_categoria" onchange="toggleCampiCMS()" class="w-full p-2 border rounded-lg bg-white font-semibold outline-none">
-                                    <option value="destinazioni">📍 Destinazione Singola / Punto GPS</option>
-                                    <option value="base">⚓ Base / Banchina Nauticovi (Logo Mappa)</option>
-                                    <option value="pericoli">⚠️ Segnale di Pericolo (Solo Mappa GPS)</option>
-                                    <option value="itinerari">🧭 Itinerario / Tour Raggruppato</option>
-                                    <option value="flotta">🚤 Barca / Flotta</option>
-                                    <option value="tips">💡 Tip / Consiglio di Guida</option>
-                                    <option value="divieti">🚫 Regola / Divieto di Bordo</option>
+                                <label class="block font-bold text-slate-600 uppercase mb-1">Tipologia Elemento</label>
+                                <select id="cms_categoria" onchange="toggleCampiCMS()" class="w-full p-2 border rounded-lg bg-white font-semibold outline-none focus:ring-2 focus:ring-cyan-500">
+                                    <!-- Opzioni popolate dinamicamente da JS -->
                                 </select>
                             </div>
 
+                            <!-- CAMPO TITOLO / DOMANDA FAQ -->
                             <div>
-                                <label class="block font-bold text-slate-600 uppercase">Titolo</label>
-                                <input type="text" id="cms_titolo" required placeholder="Es. Banchina Nauticovi, Scogli Affioranti o Grotta Azzurra" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                                <label id="label-cms-titolo" class="block font-bold text-slate-600 uppercase">Titolo Elemento</label>
+                                <input type="text" id="cms_titolo" required placeholder="Inserisci il titolo..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none bg-white">
                             </div>
 
-                            <div>
-                                <label class="block font-bold text-slate-600 uppercase">Sottotitolo / Dettaglio (es. Punto Rientro)</label>
-                                <input type="text" id="cms_sottotitolo" placeholder="Es. Banchina Principale o Pericolo Secca" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                            <!-- CAMPO SOTTOTITOLO / DETTAGLIO -->
+                            <div id="box-sottotitolo-cms">
+                                <label id="label-cms-sottotitolo" class="block font-bold text-slate-600 uppercase">Sottotitolo / Dettaglio (es. Punto Rientro)</label>
+                                <input type="text" id="cms_sottotitolo" placeholder="Es. Banchina Principale o Max 6 Persone" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none bg-white">
                             </div>
 
+                            <!-- CAMPO DESCRIZIONE / RISPOSTA FAQ -->
                             <div>
-                                <label class="block font-bold text-slate-600 uppercase">Descrizione / Avviso / Dettagli</label>
-                                <textarea id="cms_descrizione" required rows="2" placeholder="Inserisci la descrizione o la nota di sicurezza..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none"></textarea>
+                                <label id="label-cms-descrizione" class="block font-bold text-slate-600 uppercase">Descrizione / Dettagli</label>
+                                <textarea id="cms_descrizione" required rows="2" placeholder="Inserisci il testo dettagliato..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none bg-white"></textarea>
                             </div>
 
-                            <!-- CAMPO PER ITINERARI -->
-                            <div id="box-itinerario-cms" class="hidden p-3 bg-purple-50 border border-purple-200 rounded-xl space-y-2">
-                                <b class="block text-purple-900 font-bold uppercase text-[10px]">🧭 Dettagli Itinerario / Tour</b>
+                            <!-- BOX CARICAMENTO IMMAGINI (FOTO PRINCIPALE + GALLERIA FOTO 2 & FOTO 3) -->
+                            <div id="box-foto-cms" class="space-y-2 p-3 bg-slate-100 rounded-xl border border-slate-200">
+                                <b class="block text-slate-800 font-bold uppercase text-[10px]"><i class="fa-solid fa-image text-cyan-600"></i> Immagine di Copertina / Foto Reale</b>
                                 <div>
-                                    <label class="block text-[9px] font-bold text-slate-600 uppercase">Durata Consigliata</label>
-                                    <select id="cms_itinerario_durata" class="w-full p-1.5 border rounded bg-white text-xs font-semibold">
-                                        <option value="2h">2 Ore (Tour Express)</option>
-                                        <option value="4h">4 Ore (Tour Classico)</option>
-                                        <option value="giornata">Giornata Intera (Tour VIP)</option>
-                                    </select>
+                                    <label class="block text-[9px] font-bold text-slate-600 uppercase">1. Upload File da Dispositivo (Supabase Storage)</label>
+                                    <input type="file" id="cms_file_upload" accept="image/*" onchange="uploadFotoSupabaseStorage(this, 'cms_immagine_url')" class="w-full mt-1 text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700 cursor-pointer border border-slate-300 rounded-lg p-1 bg-white">
                                 </div>
                                 <div>
-                                    <label class="block text-[9px] font-bold text-slate-600 uppercase">Destinazioni Incluse (Separate da virgola)</label>
-                                    <input type="text" id="cms_itinerario_tappe" placeholder="Isola di Dino, Grotta Azzurra, Arco Magno" class="w-full p-1.5 border rounded bg-white text-xs">
+                                    <label class="block text-[9px] font-bold text-slate-600 uppercase">Oppure Incolla URL Foto Principale</label>
+                                    <input type="url" id="cms_immagine_url" placeholder="https://..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none text-xs bg-white">
+                                </div>
+
+                                <!-- GALLERIA IMMAGINI SUPPLEMENTARI (PER DESTINAZIONI E FLOTTA) -->
+                                <div id="box-galleria-extra" class="pt-2 border-t border-slate-200/80 space-y-2 hidden">
+                                    <b class="block text-purple-900 font-bold uppercase text-[10px]">📸 Galleria Fotografica Aggiuntiva (Carosello 3 Foto)</b>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">Foto 2 (Seconda Slide Carosello)</label>
+                                        <input type="url" id="cms_foto_2" placeholder="https://.../foto2.jpg" class="w-full p-1.5 border rounded bg-white text-xs">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">Foto 3 (Terza Slide Carosello)</label>
+                                        <input type="url" id="cms_foto_3" placeholder="https://.../foto3.jpg" class="w-full p-1.5 border rounded bg-white text-xs">
+                                    </div>
+                                </div>
+
+                                <div id="upload_spinner" class="hidden text-xs text-cyan-700 font-bold flex items-center gap-2 pt-1">
+                                    <i class="fa-solid fa-spinner animate-spin"></i> Caricamento file su Supabase Storage (`cms-media`)...
                                 </div>
                             </div>
 
-                            <!-- CAMPI COORDINATE GPS ED AUDIOGUIDA -->
+                            <!-- CAMPI COORDINATE GPS ED AUDIOGUIDA (PER DESTINAZIONI, BASE E PERICOLI) -->
                             <div id="box-gps-cms" class="p-3 bg-cyan-50/60 border border-cyan-200 rounded-xl space-y-2">
                                 <b class="block text-cyan-900 font-bold uppercase text-[10px]">📍 Coordinate GPS sulla Mappa</b>
                                 <div class="grid grid-cols-2 gap-2">
@@ -188,29 +233,9 @@
                                 </div>
                                 <div id="subbox-audio-cms" class="space-y-2 pt-1 border-t border-cyan-200/60">
                                     <div>
-                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">Testo Audioguida (Letto all'arrivo)</label>
+                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">Testo Audioguida (Letto all'arrivo ai 200m)</label>
                                         <textarea id="cms_audioguida" rows="2" placeholder="Benvenuto alla Grotta Azzurra..." class="w-full p-1.5 border rounded bg-white text-[11px]"></textarea>
                                     </div>
-                                    <div>
-                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">URL File Audio MP3</label>
-                                        <input type="url" id="cms_audio_url" placeholder="https://.../grotta_azzurra.mp3" class="w-full p-1.5 border rounded bg-white text-xs">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- BOX CARICAMENTO FOTO CON SUPABASE STORAGE -->
-                            <div class="space-y-2 p-3 bg-slate-100 rounded-xl border border-slate-200">
-                                <b class="block text-slate-800 font-bold uppercase text-[10px]"><i class="fa-solid fa-image text-cyan-600"></i> Immagine di Copertina / Foto Reale</b>
-                                <div>
-                                    <label class="block text-[9px] font-bold text-slate-600 uppercase">1. Scegli file dal dispositivo (Upload Supabase Storage)</label>
-                                    <input type="file" id="cms_file_upload" accept="image/*" onchange="uploadFotoSupabaseStorage(this)" class="w-full mt-1 text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700 cursor-pointer border border-slate-300 rounded-lg p-1 bg-white">
-                                </div>
-                                <div>
-                                    <label class="block text-[9px] font-bold text-slate-600 uppercase">2. Oppure Incolla URL Immagine Esterno</label>
-                                    <input type="url" id="cms_immagine_url" placeholder="https://..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none text-xs bg-white">
-                                </div>
-                                <div id="upload_spinner" class="hidden text-xs text-cyan-700 font-bold flex items-center gap-2 pt-1">
-                                    <i class="fa-solid fa-spinner animate-spin"></i> Caricamento immagine su Supabase Storage in corso...
                                 </div>
                             </div>
 
@@ -239,9 +264,9 @@
                                 </div>
                             </div>
 
-                            <div class="flex gap-2">
+                            <div class="flex gap-2 pt-1">
                                 <button type="submit" id="btn-salva-cms" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg shadow transition flex justify-center items-center gap-2">
-                                    <i class="fa-solid fa-floppy-disk"></i> <span id="btn-salva-cms-text">Salva Contenuto su Cloud</span>
+                                    <i class="fa-solid fa-floppy-disk"></i> <span id="btn-salva-cms-text">Salva in Cloud</span>
                                 </button>
                                 <button type="button" id="btn-annulla-edit-cms" onclick="resetFormCMS()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2.5 rounded-lg transition" title="Annulla Modifica">
                                     Annulla
@@ -250,15 +275,18 @@
                         </form>
                     </div>
 
+                    <!-- COLONNA CONTENUTI ATTIVI FILTRATI (COLONNA DESTRA) -->
                     <div class="lg:col-span-2 space-y-3">
                         <div class="flex justify-between items-center border-b pb-2">
-                            <h3 class="text-xs font-extrabold uppercase text-slate-700">Contenuti Attivi su Cloud</h3>
+                            <h3 class="text-xs font-extrabold uppercase text-slate-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-server text-cyan-600"></i> Contenuti Attivi in <span id="col-categoria-attiva" class="text-cyan-600 uppercase font-black">Guest Portal</span>
+                            </h3>
                             <button onclick="caricaContenutiCMS()" class="text-xs font-bold text-cyan-600 hover:underline">
-                                <i class="fa-solid fa-arrows-rotate"></i> Aggiorna
+                                <i class="fa-solid fa-arrows-rotate"></i> Aggiorna Lista
                             </button>
                         </div>
 
-                        <div id="cmsListaContenuti" class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+                        <div id="cmsListaContenuti" class="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
                             <p class="text-xs text-slate-400 italic">Caricamento contenuti in corso...</p>
                         </div>
                     </div>
@@ -351,7 +379,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT SUPABASE & CRM ADMIN LOGIC -->
+    <!-- SCRIPT SUPABASE & CMS MACRO-TAB LOGIC -->
     <script>
         const SUPABASE_URL = "https://cbvpixcfhmedbapnvfmw.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_V0B06YxZ1oW6tqg_6yx5og_OgbhxlUo";
@@ -367,7 +395,7 @@
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('admin-panel').style.display = 'block';
             caricaDatiCloud();
-            caricaContenutiCMS();
+            selezionaMacroTab('guest');
         }
 
         function mostraLogin() {
@@ -443,14 +471,124 @@
             }
         });
 
-        // CMS LOGIC CON UPLOAD FOTO SUPABASE STORAGE E FALLBACK BASE64
+        // -----------------------------------------------------------------------------
+        // LOGICA MACRO-TAB CMS & FORM DINAMICO
+        // -----------------------------------------------------------------------------
+        let currentMacroTab = 'guest';
         let listaCMSCache = [];
+
+        const MACRO_CONFIG = {
+            guest: {
+                label: "Guest Portal",
+                badge: "GUEST PORTAL (guest.html)",
+                categorie: [
+                    { value: "destinazioni", text: "📍 Destinazione Singola / Punto GPS" },
+                    { value: "base", text: "⚓ Base / Banchina Nauticovi (Mappa GPS)" },
+                    { value: "pericoli", text: "⚠️ Segnale di Pericolo (Mappa GPS)" },
+                    { value: "tips", text: "💡 Tip / Consiglio di Bordo" },
+                    { value: "divieti", text: "🚫 Regola / Divieto di Bordo" }
+                ]
+            },
+            catalogo: {
+                label: "Catalogo Flotta",
+                badge: "CATALOGO FLOTTA (catalogo.html)",
+                categorie: [
+                    { value: "flotta", text: "🚤 Barca / Flotta / SUP" }
+                ]
+            },
+            home: {
+                label: "Home Page",
+                badge: "HOME PAGE (index.html)",
+                categorie: [
+                    { value: "index_slot", text: "⭐ Slot Vetrina Meraviglie" },
+                    { value: "index_faq", text: "❓ Domanda e Risposta (FAQ)" }
+                ]
+            },
+            destinazioni: {
+                label: "Guida Destinazioni",
+                badge: "GUIDA DESTINAZIONI (destinazioni.html)",
+                categorie: [
+                    { value: "destinazioni", text: "📸 Scheda Destinazione con Galleria" }
+                ]
+            }
+        };
+
+        function selezionaMacroTab(tabKey) {
+            currentMacroTab = tabKey;
+            
+            // Aggiorna stile dei pulsanti Tab
+            document.querySelectorAll('.macro-tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`macro-tab-${tabKey}`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            // Aggiorna Badge e Label
+            const config = MACRO_CONFIG[tabKey];
+            document.getElementById('macro-tab-label-badge').innerText = config.label.toUpperCase();
+            document.getElementById('col-categoria-attiva').innerText = config.label;
+
+            // Popola la select delle categorie per la tab scelta
+            const selectCat = document.getElementById('cms_categoria');
+            selectCat.innerHTML = '';
+            config.categorie.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.value;
+                opt.text = c.text;
+                selectCat.appendChild(opt);
+            });
+
+            resetFormCMS();
+            caricaContenutiCMS();
+        }
 
         function isCategoriaGPS(cat) {
             return cat === 'destinazioni' || cat === 'base' || cat === 'banchina' || cat === 'pericoli';
         }
 
-        async function uploadFotoSupabaseStorage(inputEl) {
+        function toggleCampiCMS() {
+            const cat = document.getElementById('cms_categoria').value;
+            const boxPrezzi = document.getElementById('box-prezzi-cms');
+            const boxGps = document.getElementById('box-gps-cms');
+            const boxFoto = document.getElementById('box-foto-cms');
+            const boxGalleriaExtra = document.getElementById('box-galleria-extra');
+            const boxSottotitolo = document.getElementById('box-sottotitolo-cms');
+
+            const labelTitolo = document.getElementById('label-cms-titolo');
+            const labelSottotitolo = document.getElementById('label-cms-sottotitolo');
+            const labelDescrizione = document.getElementById('label-cms-descrizione');
+
+            // Reset visibilità
+            boxPrezzi.classList.add('hidden');
+            boxGps.classList.add('hidden');
+            boxFoto.classList.remove('hidden');
+            boxGalleriaExtra.classList.add('hidden');
+            boxSottotitolo.classList.remove('hidden');
+
+            labelTitolo.innerText = "Titolo Elemento";
+            labelSottotitolo.innerText = "Sottotitolo / Dettaglio";
+            labelDescrizione.innerText = "Descrizione / Dettagli";
+
+            if (cat === 'flotta') {
+                boxPrezzi.classList.remove('hidden');
+                labelSottotitolo.innerText = "Capienza & Specifiche (es. Max 6 Persone)";
+            } else if (cat === 'destinazioni') {
+                boxGps.classList.remove('hidden');
+                if (currentMacroTab === 'destinazioni') {
+                    boxGalleriaExtra.classList.remove('hidden');
+                }
+            } else if (cat === 'base' || cat === 'banchina' || cat === 'pericoli') {
+                boxGps.classList.remove('hidden');
+            } else if (cat === 'index_faq') {
+                boxFoto.classList.add('hidden');
+                boxSottotitolo.classList.add('hidden');
+                labelTitolo.innerText = "Domanda Frequente (FAQ)";
+                labelDescrizione.innerText = "Risposta Dettagliata";
+            } else if (cat === 'index_slot') {
+                labelTitolo.innerText = "Nome Attrazione / Slot Vetrina";
+                labelSottotitolo.innerText = "Sottotitolo Promozionale";
+            }
+        }
+
+        async function uploadFotoSupabaseStorage(inputEl, targetInputId) {
             if (!inputEl.files || inputEl.files.length === 0) return;
             const file = inputEl.files[0];
             const spinner = document.getElementById('upload_spinner');
@@ -467,23 +605,23 @@
                 });
 
                 if (error) {
-                    console.warn("Upload Storage fallito/bucket non attivo, converto in Base64 Data URL localmente:", error.message);
+                    console.warn("Upload Storage fallito, converto in Base64 Data URL:", error.message);
                     const reader = new FileReader();
                     reader.onload = function (e) {
-                        document.getElementById('cms_immagine_url').value = e.target.result;
+                        document.getElementById(targetInputId).value = e.target.result;
                         if (spinner) spinner.classList.add('hidden');
                     };
                     reader.readAsDataURL(file);
                 } else {
                     const { data: publicUrlData } = _supabase.storage.from('cms-media').getPublicUrl(filePath);
-                    document.getElementById('cms_immagine_url').value = publicUrlData.publicUrl;
+                    document.getElementById(targetInputId).value = publicUrlData.publicUrl;
                     if (spinner) spinner.classList.add('hidden');
                 }
             } catch (err) {
                 console.error("Errore upload file:", err);
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    document.getElementById('cms_immagine_url').value = e.target.result;
+                    document.getElementById(targetInputId).value = e.target.result;
                     if (spinner) spinner.classList.add('hidden');
                 };
                 reader.readAsDataURL(file);
@@ -492,48 +630,58 @@
 
         async function caricaContenutiCMS() {
             const container = document.getElementById('cmsListaContenuti');
-            if(!container || !_supabase) return;
+            if (!container || !_supabase) return;
 
             try {
                 const { data, error } = await _supabase.from('cms_contenuti').select('*').order('created_at', { ascending: false });
 
                 if (error || !data || data.length === 0) {
                     listaCMSCache = [];
-                    container.innerHTML = `<p class="text-xs text-slate-400 italic">Nessun contenuto CMS presente. Aggiungi il primo dal form!</p>`;
+                    container.innerHTML = `<p class="text-xs text-slate-400 italic py-4 text-center">Nessun contenuto CMS presente in questa sezione.</p>`;
                     return;
                 }
 
                 listaCMSCache = data;
+
+                // Filtra i dati in base alla Macro-Tab attiva
+                const categorieTabAttiva = MACRO_CONFIG[currentMacroTab].categorie.map(c => c.value);
+                const filtrati = data.filter(item => categorieTabAttiva.includes(item.categoria));
+
+                if (filtrati.length === 0) {
+                    container.innerHTML = `<p class="text-xs text-slate-400 italic py-4 text-center">Nessun contenuto trovato per ${MACRO_CONFIG[currentMacroTab].label}. Aggiungi il primo!</p>`;
+                    return;
+                }
+
                 container.innerHTML = '';
-                data.forEach(item => {
+                filtrati.forEach(item => {
                     const isBase = item.categoria === 'base' || item.categoria === 'banchina';
 
-                    const badgeColor = item.categoria === 'destinazioni' ? 'bg-cyan-100 text-cyan-800'
+                    const badgeColor = item.categoria === 'destinazioni' ? 'bg-cyan-100 text-cyan-800 font-bold'
                                      : (isBase ? 'bg-slate-900 text-cyan-300 border border-cyan-500/50 font-bold'
                                      : (item.categoria === 'pericoli' ? 'bg-red-100 text-red-800 font-bold border border-red-300'
-                                     : (item.categoria === 'itinerari' ? 'bg-purple-100 text-purple-800'
-                                     : (item.categoria === 'flotta' ? 'bg-emerald-100 text-emerald-800'
-                                     : (item.categoria === 'tips' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800')))));
+                                     : (item.categoria === 'flotta' ? 'bg-emerald-100 text-emerald-800 font-bold'
+                                     : (item.categoria === 'index_faq' ? 'bg-amber-100 text-amber-900 font-bold'
+                                     : 'bg-slate-200 text-slate-800'))));
 
                     let extraInfo = '';
                     if (isCategoriaGPS(item.categoria) && item.latitudine) {
                         extraInfo = `<span class="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-mono">GPS: ${item.latitudine}, ${item.longitudine}</span>`;
-                    } else if (item.categoria === 'itinerari' && item.sottotitolo) {
-                        extraInfo = `<span class="text-[9px] bg-purple-200 text-purple-900 px-1.5 py-0.5 rounded font-bold">${item.sottotitolo}</span>`;
                     }
 
-                    const catLabel = isBase ? '⚓ BASE NAUTICOVI'
-                                   : (item.categoria === 'pericoli' ? '⚠️ PERICOLO' : item.categoria.toUpperCase());
+                    const imgThumb = item.immagine_url ? `<img src="${item.immagine_url}" class="w-10 h-10 object-cover rounded-lg border">` : '';
 
                     container.innerHTML += `
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-start text-xs gap-3">
-                            <div class="space-y-1">
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="${badgeColor} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">${catLabel}</span>
-                                    <b class="text-slate-800 text-xs">${item.titolo}</b>
-                                    ${extraInfo}
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center text-xs gap-3">
+                            <div class="flex items-center gap-3 space-y-1">
+                                ${imgThumb}
+                                <div>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="${badgeColor} text-[9px] px-2 py-0.5 rounded-full uppercase">${item.categoria.toUpperCase()}</span>
+                                        <b class="text-slate-800 text-xs">${item.titolo}</b>
+                                        ${extraInfo}
+                                    </div>
+                                    <p class="text-slate-600 text-[11px] mt-0.5">${item.descrizione}</p>
                                 </div>
-                                <p class="text-slate-600 text-[11px]">${item.descrizione}</p>
                             </div>
                             <div class="flex items-center gap-1">
                                 <button onclick="caricaInModificaCMS('${item.id}')" class="text-cyan-600 hover:text-cyan-800 p-1 font-bold text-xs" title="Modifica">
@@ -547,12 +695,12 @@
                     `;
                 });
             } catch (err) {
-                console.error("Errore CMS:", err);
+                console.error("Errore caricamento CMS:", err);
             }
         }
 
         function gestisciNuovaCategoria() {
-            const nuovaCat = prompt("Inserisci il nome della nuova Categoria (es. 'eventi', 'offerte'):");
+            const nuovaCat = prompt("Inserisci il nome della nuova Categoria (es. 'eventi', 'promozioni'):");
             if (nuovaCat && nuovaCat.trim() !== '') {
                 const select = document.getElementById('cms_categoria');
                 const option = document.createElement('option');
@@ -562,30 +710,6 @@
                 select.add(option);
                 select.value = valClean;
                 toggleCampiCMS();
-            }
-        }
-
-        function toggleCampiCMS() {
-            const cat = document.getElementById('cms_categoria').value;
-            const boxPrezzi = document.getElementById('box-prezzi-cms');
-            const boxGps = document.getElementById('box-gps-cms');
-            const subboxAudio = document.getElementById('subbox-audio-cms');
-            const boxItinerario = document.getElementById('box-itinerario-cms');
-
-            boxPrezzi.classList.add('hidden');
-            boxGps.classList.add('hidden');
-            if (subboxAudio) subboxAudio.classList.add('hidden');
-            boxItinerario.classList.add('hidden');
-
-            if (cat === 'flotta') {
-                boxPrezzi.classList.remove('hidden');
-            } else if (cat === 'destinazioni') {
-                boxGps.classList.remove('hidden');
-                if (subboxAudio) subboxAudio.classList.remove('hidden');
-            } else if (cat === 'base' || cat === 'banchina' || cat === 'pericoli') {
-                boxGps.classList.remove('hidden');
-            } else if (cat === 'itinerari') {
-                boxItinerario.classList.remove('hidden');
             }
         }
 
@@ -602,13 +726,13 @@
             document.getElementById('cms_descrizione').value = item.descrizione || '';
             document.getElementById('cms_immagine_url').value = item.immagine_url || '';
 
+            if (document.getElementById('cms_foto_2')) document.getElementById('cms_foto_2').value = item.foto_2 || '';
+            if (document.getElementById('cms_foto_3')) document.getElementById('cms_foto_3').value = item.foto_3 || '';
+
             if (isCategoriaGPS(item.categoria)) {
                 document.getElementById('cms_lat').value = item.latitudine || '';
                 document.getElementById('cms_lng').value = item.longitudine || '';
-                if (item.categoria === 'destinazioni') {
-                    document.getElementById('cms_audioguida').value = item.testo_audioguida || '';
-                    if (document.getElementById('cms_audio_url')) document.getElementById('cms_audio_url').value = item.audio_url || '';
-                }
+                if (document.getElementById('cms_audioguida')) document.getElementById('cms_audioguida').value = item.testo_audioguida || '';
             } else if (item.categoria === 'flotta') {
                 document.getElementById('cms_bassa_mezza').value = item.prezzo_bassa_mezza || '';
                 document.getElementById('cms_bassa_intera').value = item.prezzo_bassa_intera || '';
@@ -624,7 +748,7 @@
         function resetFormCMS() {
             document.getElementById('cmsForm').reset();
             document.getElementById('cms_edit_id').value = '';
-            document.getElementById('btn-salva-cms-text').innerText = 'Salva Contenuto su Cloud';
+            document.getElementById('btn-salva-cms-text').innerText = 'Salva in Cloud';
             document.getElementById('btn-annulla-edit-cms').classList.add('hidden');
             toggleCampiCMS();
         }
@@ -641,13 +765,14 @@
             const itemData = {
                 categoria: cat,
                 titolo: document.getElementById('cms_titolo').value,
-                sottotitolo: cat === 'itinerari' ? `Durata: ${document.getElementById('cms_itinerario_durata').value.toUpperCase()}` : document.getElementById('cms_sottotitolo').value,
+                sottotitolo: document.getElementById('cms_sottotitolo') ? document.getElementById('cms_sottotitolo').value : null,
                 descrizione: document.getElementById('cms_descrizione').value,
                 immagine_url: document.getElementById('cms_immagine_url').value,
+                foto_2: document.getElementById('cms_foto_2') ? document.getElementById('cms_foto_2').value : null,
+                foto_3: document.getElementById('cms_foto_3') ? document.getElementById('cms_foto_3').value : null,
                 latitudine: isGps ? (parseFloat(document.getElementById('cms_lat').value) || null) : null,
                 longitudine: isGps ? (parseFloat(document.getElementById('cms_lng').value) || null) : null,
-                testo_audioguida: cat === 'destinazioni' ? document.getElementById('cms_audioguida').value : null,
-                audio_url: cat === 'destinazioni' ? (document.getElementById('cms_audio_url').value || null) : null,
+                testo_audioguida: isGps ? document.getElementById('cms_audioguida').value : null,
                 prezzo_bassa_mezza: cat === 'flotta' ? (parseFloat(document.getElementById('cms_bassa_mezza').value) || 120) : null,
                 prezzo_bassa_intera: cat === 'flotta' ? (parseFloat(document.getElementById('cms_bassa_intera').value) || 200) : null,
                 prezzo_alta_mezza: cat === 'flotta' ? (parseFloat(document.getElementById('cms_alta_mezza').value) || 150) : null,
@@ -937,11 +1062,9 @@ Il documento è nella sezione "Bozze" del tuo account.`);
         }
 
         function esportaCSV() {
-            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin
-";
+            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin\n";
             listaNoleggi.forEach(n => {
-                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"
-`;
+                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
