@@ -71,10 +71,7 @@
 
     <main class="max-w-md mx-auto p-4 space-y-6 -mt-6 relative z-20">
 
-        <!-- CONTENITORE DINAMICO PER DESTINAZIONI PERSONALIZZATE DAL CMS -->
-        <div id="destinazioni-extra-cms" class="space-y-6"></div>
-
-        <!-- SCHEDA 1: ISOLA DI DINO -->
+        <!-- SCHEDA 1: ISOLA DI DINO (CON CAROSELLO DINAMICO A 3 FOTO) -->
         <article class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden space-y-3">
             <div class="relative h-48 group">
                 <div id="carousel-dino" class="w-full h-full relative">
@@ -87,7 +84,7 @@
                     <span class="text-[9px] bg-cyan-500 text-slate-900 font-black uppercase px-2 py-0.5 rounded w-max mb-1">
                         📍 Praia a Mare
                     </span>
-                    <h2 class="text-lg font-extrabold" data-i18n="dino_card_title">Isola di Dino & Le Sue Grotte</h2>
+                    <h2 id="dino-title-txt" class="text-lg font-extrabold" data-i18n="dino_card_title">Isola di Dino & Le Sue Grotte</h2>
                 </div>
 
                 <button onclick="prevImage('dino')" class="absolute left-2 top-1/2 -translate-y-1/2 bg-slate-900/60 hover:bg-slate-900 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs shadow border border-white/20">
@@ -129,7 +126,7 @@
             </div>
         </article>
 
-        <!-- SCHEDA 2: ARCO MAGNO -->
+        <!-- SCHEDA 2: ARCO MAGNO (CON CAROSELLO DINAMICO A 3 FOTO) -->
         <article class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden space-y-3">
             <div class="relative h-48 group">
                 <div id="carousel-arcomagno" class="w-full h-full relative">
@@ -142,7 +139,7 @@
                     <span class="text-[9px] bg-emerald-500 text-slate-900 font-black uppercase px-2 py-0.5 rounded w-max mb-1">
                         📍 San Nicola Arcella
                     </span>
-                    <h2 class="text-lg font-extrabold" data-i18n="arcomagno_card_title">Arco Magno & Grotta del Saraceno</h2>
+                    <h2 id="arcomagno-title-txt" class="text-lg font-extrabold" data-i18n="arcomagno_card_title">Arco Magno & Grotta del Saraceno</h2>
                 </div>
 
                 <button onclick="prevImage('arcomagno')" class="absolute left-2 top-1/2 -translate-y-1/2 bg-slate-900/60 hover:bg-slate-900 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs shadow border border-white/20">
@@ -175,6 +172,9 @@
                 </a>
             </div>
         </article>
+
+        <!-- CONTENITORE PER NUOVE DESTINAZIONI CREATE DAL CMS -->
+        <div id="destinazioni-extra-cms" class="space-y-6"></div>
 
     </main>
 
@@ -214,6 +214,7 @@
         function nextImage(dest) { showSlide(dest, currentSlide[dest] + 1); }
         function prevImage(dest) { showSlide(dest, currentSlide[dest] - 1); }
 
+        // SINCRONIZZAZIONE DINAMICA GALLERIA 3 FOTO DA SUPABASE (`immagine_url`, `foto_2`, `foto_3`)
         async function sincronizzaFotoCMS() {
             if (!_supabase) return;
             try {
@@ -225,25 +226,48 @@
 
                 data.forEach(item => {
                     const titoloLower = (item.titolo || '').toLowerCase();
-                    if (titoloLower.includes('dino') && item.immagine_url) {
-                        const img0 = document.getElementById('img-dino-0');
-                        if (img0) img0.src = item.immagine_url;
-                        if (item.descrizione) {
-                            const descEl = document.getElementById('dino-desc-txt');
-                            if (descEl) descEl.innerHTML = item.descrizione;
-                        }
-                    } else if (titoloLower.includes('arco') && item.immagine_url) {
-                        const imgArco = document.getElementById('img-arcomagno-0');
-                        if (imgArco) imgArco.src = item.immagine_url;
-                    } else if (item.immagine_url) {
-                        // Se è una nuova destinazione creata nel CMS, genera la scheda completa
+
+                    if (titoloLower.includes('dino')) {
+                        if (item.immagine_url) document.getElementById('img-dino-0').src = item.immagine_url;
+                        if (item.foto_2) document.getElementById('img-dino-1').src = item.foto_2;
+                        if (item.foto_3) document.getElementById('img-dino-2').src = item.foto_3;
+                        if (item.descrizione) document.getElementById('dino-desc-txt').innerHTML = item.descrizione;
+                    } else if (titoloLower.includes('arco')) {
+                        if (item.immagine_url) document.getElementById('img-arcomagno-0').src = item.immagine_url;
+                        if (item.foto_2) document.getElementById('img-arcomagno-1').src = item.foto_2;
+                        if (item.foto_3) document.getElementById('img-arcomagno-2').src = item.foto_3;
+                        if (item.descrizione) document.getElementById('arcomagno-desc-txt').innerHTML = item.descrizione;
+                    } else {
+                        // Schede nuove generate dal CMS
+                        const keyId = `cms-${item.id.substring(0, 6)}`;
+                        currentSlide[keyId] = 0;
+
+                        const img1 = item.immagine_url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80';
+                        const img2 = item.foto_2 || img1;
+                        const img3 = item.foto_3 || img1;
+
                         container.innerHTML += `
                             <article class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden space-y-3">
-                                <div class="relative h-48">
-                                    <img src="${item.immagine_url}" alt="${item.titolo}" class="w-full h-full object-cover">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent p-4 flex flex-col justify-end text-white">
-                                        <span class="text-[9px] bg-cyan-500 text-slate-900 font-black uppercase px-2 py-0.5 rounded w-max mb-1">📍 CMS Destinazione</span>
+                                <div class="relative h-48 group">
+                                    <div id="carousel-${keyId}" class="w-full h-full relative">
+                                        <img id="img-${keyId}-0" src="${img1}" class="w-full h-full object-cover transition-opacity duration-500 block">
+                                        <img id="img-${keyId}-1" src="${img2}" class="w-full h-full object-cover transition-opacity duration-500 hidden">
+                                        <img id="img-${keyId}-2" src="${img3}" class="w-full h-full object-cover transition-opacity duration-500 hidden">
+                                    </div>
+                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent p-4 flex flex-col justify-end text-white pointer-events-none">
+                                        <span class="text-[9px] bg-purple-500 text-white font-black uppercase px-2 py-0.5 rounded w-max mb-1">📍 Destinazione CMS</span>
                                         <h2 class="text-lg font-extrabold">${item.titolo}</h2>
+                                    </div>
+                                    <button onclick="prevImage('${keyId}')" class="absolute left-2 top-1/2 -translate-y-1/2 bg-slate-900/60 hover:bg-slate-900 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs shadow border border-white/20">
+                                        <i class="fa-solid fa-chevron-left"></i>
+                                    </button>
+                                    <button onclick="nextImage('${keyId}')" class="absolute right-2 top-1/2 -translate-y-1/2 bg-slate-900/60 hover:bg-slate-900 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs shadow border border-white/20">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </button>
+                                    <div class="absolute bottom-2 right-4 flex gap-1.5 z-10">
+                                        <span id="dot-${keyId}-0" class="dot active"></span>
+                                        <span id="dot-${keyId}-1" class="dot"></span>
+                                        <span id="dot-${keyId}-2" class="dot"></span>
                                     </div>
                                 </div>
                                 <div class="p-4 space-y-3 text-xs leading-relaxed text-slate-600">
