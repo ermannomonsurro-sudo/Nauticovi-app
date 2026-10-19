@@ -12,7 +12,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        #nav-map {
+        #map {
             height: 400px !important;
             width: 100% !important;
             border-radius: 1rem;
@@ -76,23 +76,6 @@
     </script>
 </head>
 <body class="bg-slate-100 text-slate-800 pb-20 font-sans">
-
-    <!-- Schermata Scadenza Accesso (Noleggio Terminato) -->
-    <div id="expired-screen" class="hidden fixed inset-0 z-50 bg-slate-900 text-white p-6 flex flex-col items-center justify-center text-center space-y-4">
-        <i class="fa-solid fa-clock-rotate-left text-5xl text-amber-400"></i>
-        <h2 class="text-2xl font-extrabold" data-i18n="exp_title">Noleggio Terminato</h2>
-        <p class="text-xs text-slate-300 max-w-xs leading-relaxed" data-i18n="exp_desc">
-            L'accesso al Guest Portal e al Navigatore GPS per questa imbarcazione è scaduto. Speriamo che la tua giornata a Praia a Mare sia stata indimenticabile!
-        </p>
-        <div class="pt-2 w-full max-w-xs space-y-3">
-            <a href="https://share.google/x81whRHwldPZQKUrw" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg">
-                <i class="fa-brands fa-google text-base"></i> <span data-i18n="exp_btn_review">Lasciaci una Recensione Google</span>
-            </a>
-            <a href="index.html" class="inline-block text-xs text-slate-400 hover:text-white underline" data-i18n="exp_btn_home">
-                Torna alla Home
-            </a>
-        </div>
-    </div>
 
     <!-- Header Brand con Pulsante Home e Bandiere -->
     <header class="bg-slate-900 text-white py-4 px-4 shadow-xl border-b-4 border-cyan-500 sticky top-0 z-50">
@@ -333,58 +316,19 @@
         <div id="sec-tips" class="tab-content hidden space-y-3">
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b pb-2 text-sm">
-                    <i class="fa-solid fa-lightbulb text-cyan-600"></i> <span data-i18n="tips_title">Consigli per la Navigazione</span>
+                    <i class="fa-solid fa-compass text-cyan-600"></i> <span data-i18n="tips_header">Consigli Pratici di Bordo</span>
                 </h3>
-
-                <div class="space-y-3 text-xs">
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
-                        <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">1</div>
-                        <div>
-                            <h4 class="font-bold text-slate-800 text-sm" data-i18n="tip1_h">Accensione Motore</h4>
-                            <p class="text-slate-600 mt-0.5" data-i18n="tip1_p">Mettere la leva in folle (N) e agganciare lo stacco di sicurezza prima di girare la chiave.</p>
-                        </div>
-                    </div>
-
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
-                        <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">2</div>
-                        <div>
-                            <h4 class="font-bold text-slate-800 text-sm" data-i18n="tip2_h">Ancoraggio Corretto</h4>
-                            <p class="text-slate-600 mt-0.5" data-i18n="tip2_p">Calare l'ancora sempre su fondale sabbioso di colore chiaro, mai sulla roccia o sulla posidonia.</p>
-                        </div>
-                    </div>
-
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
-                        <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">3</div>
-                        <div>
-                            <h4 class="font-bold text-slate-800 text-sm" data-i18n="tip3_h">Tendalino Parasole</h4>
-                            <p class="text-slate-600 mt-0.5" data-i18n="tip3_p">Fissare il tendalino solo a barca ferma o a velocità bassissima per evitare danni alla struttura.</p>
-                        </div>
-                    </div>
-                </div>
+                <div id="tips-container" class="space-y-3 text-xs"></div>
             </div>
         </div>
 
         <!-- SEZIONE 5: DIVIETI DA NON INFRANGERE -->
-        <div id="sec-regole" class="tab-content hidden space-y-3">
+        <div id="sec-divieti" class="tab-content hidden space-y-3">
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <h3 class="font-bold text-red-600 flex items-center gap-2 border-b pb-2 text-sm">
-                    <i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="rules_title">Regole Tassative di Bordo</span>
+                    <i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="rules_header">Regole Tassative di Bordo</span>
                 </h3>
-
-                <ul class="text-xs space-y-3 text-slate-700">
-                    <li class="flex items-start gap-2.5 p-2 bg-red-50 rounded-lg border border-red-100">
-                        <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
-                        <span data-i18n="rule1"><b>Distanza Bagnanti:</b> VIETATO avvicinarsi a meno di 200 metri dalle spiagge con bagnanti.</span>
-                    </li>
-                    <li class="flex items-start gap-2.5 p-2 bg-red-50 rounded-lg border border-red-100">
-                        <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
-                        <span data-i18n="rule2"><b>Velocità nelle Grotte:</b> VIETATO entrare veloci nelle grotte. Procedere solo a motore al minimo o a remi.</span>
-                    </li>
-                    <li class="flex items-start gap-2.5 p-2 bg-red-50 rounded-lg border border-red-100">
-                        <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
-                        <span data-i18n="rule3"><b>Protezione Fondali:</b> VIETATO gettare l'ancora sulle praterie protette di Posidonia oceanica.</span>
-                    </li>
-                </ul>
+                <div id="divieti-container" class="space-y-3 text-xs"></div>
             </div>
         </div>
 
@@ -446,12 +390,13 @@
 
         const translations = {
             it: {
-                header_sub: "GUEST PORTAL • NAVIGATORE GPS",
+                nav_sub: "GUEST PORTAL • NAVIGATORE GPS",
                 active_rental: "Noleggio Attivo",
                 welcome_title: "Benvenuto a Bordo!",
                 boat_label: "Barca:",
                 btn_return_base: "Torna in Banchina",
                 return_notice: "Rientro consigliato in banchina:",
+                return_time: "Ore 18:00",
                 weather_title: "Meteo & Condizioni Mare Live",
                 weather_status: "Favorevole",
                 weather_sea: "Stato Mare",
@@ -462,6 +407,7 @@
                 tab_dest: "Destinazioni",
                 tab_itineraries: "Itinerari",
                 tab_map: "Mappa GPS",
+                tab_tips: "Tips Barca",
                 tab_rules: "Divieti",
                 dest_section_title: "Destinazioni Singole & Punti GPS",
                 dest_section_desc: "Scegli una meta specifica gestita dal CMS per avviare il navigatore GPS diretto verso la posizione esatta.",
@@ -469,9 +415,7 @@
                 itin_section_desc: "Tour raggruppati che collegano 2 o più destinazioni per sfruttare al meglio il tuo tempo a bordo.",
                 btn_start_gps: "Avvia Navigatore GPS",
                 btn_start_tour: "Avvia Questo Tour",
-                loading_dest: "Caricamento destinazioni dal CMS...",
                 loading_itin: "Caricamento itinerari dal CMS...",
-                no_dest_cms: "Nessuna destinazione trovata nel CMS.",
                 no_itin_cms: "Nessun itinerario trovato nel CMS.",
                 telemetry_speed: "Velocità",
                 telemetry_dist: "Distanza",
@@ -540,9 +484,7 @@
                 itin_section_desc: "Grouped tours connecting 2 or more destinations to make the most of your time on board.",
                 btn_start_gps: "Start GPS Navigation",
                 btn_start_tour: "Start This Tour",
-                loading_dest: "Loading destinations from CMS...",
                 loading_itin: "Loading itineraries from CMS...",
-                no_dest_cms: "No destinations found in CMS.",
                 no_itin_cms: "No itineraries found in CMS.",
                 telemetry_speed: "Speed",
                 telemetry_dist: "Distance",
@@ -606,7 +548,6 @@
                 tab_tips: "Tips Barco",
                 tab_rules: "Prohibiciones",
                 dest_section_title: "Destinos Individuales y Puntos GPS",
-                dest_section_desc: "Elige un destino específico del CMS para iniciar el navegador GPS directo al punto exacto.",
                 itin_section_title: "Itinerarios Recomendados por Tiempo",
                 itin_section_desc: "Rutas agrupadas que conectan 2 o más destinos para aprovechar al máximo tu tiempo a bordo.",
                 btn_start_tour: "Iniciar Este Tour",
@@ -761,7 +702,7 @@
         }
 
         function renderPoiCards() {
-            const container = document.getElementById('punti-esatti-lista');
+            const container = document.getElementById('poi-cards-container');
             if (!container) return;
             container.innerHTML = '';
 
@@ -784,7 +725,7 @@
         }
 
         function renderItinerariCards() {
-            const container = document.getElementById('itinerari-lista');
+            const container = document.getElementById('itinerari-cards-container');
             if (!container) return;
             container.innerHTML = '';
 
@@ -896,6 +837,9 @@
                     pos => {
                         const lat = pos.coords.latitude;
                         const lng = pos.coords.longitude;
+                        lastLat = lat;
+                        lastLng = lng;
+                        
                         const rawSpeed = pos.coords.speed || 0;
                         const speedKts = (rawSpeed * 1.94384).toFixed(1);
 
@@ -906,12 +850,7 @@
                             const distMoved = calculateDistanceMeters(lastLat, lastLng, lat, lng);
                             if (distMoved > 2) {
                                 currentMovementHeading = calculateBearing(lastLat, lastLng, lat, lng);
-                                lastLat = lat;
-                                lastLng = lng;
                             }
-                        } else {
-                            lastLat = lat;
-                            lastLng = lng;
                         }
 
                         if (!userMarker) {
@@ -1012,24 +951,20 @@
             }
         }
 
-        function rottaRientroBanchina() {
-            destinazioneSelezionata = {
-                id: "banchina",
-                titolo: BANCHINA_PARTENZA.nome,
-                latitudine: BANCHINA_PARTENZA.latitudine,
-                longitudine: BANCHINA_PARTENZA.longitudine
-            };
-            confermaAvvioNavigazione();
-        }
-
         function inviaSOSPosizioneGPS() {
             const urlParams = new URLSearchParams(window.location.search);
             const barcaNome = urlParams.get('barca') || 'Barca Nauticovi';
             const clienteNome = urlParams.get('cliente') || 'Cliente';
 
-            let msg = `SOS Assistenza in mare! Ho bisogno di supporto a bordo della barca ${barcaNome} (${clienteNome}).`;
+            let msg = `🆘 SOS Assistenza in mare! Ho bisogno di supporto a bordo della barca ${barcaNome} (${clienteNome}).`;
             if (lastLat && lastLng) {
-                msg += ` Mia Posizione GPS Attuale: https://maps.google.com/?q=${lastLat},${lastLng}`;
+                msg += `
+
+Mia Posizione GPS Attuale: https://maps.google.com/?q=${lastLat},${lastLng}`;
+            } else {
+                msg += `
+
+(Geolocalizzazione in acquisizione, verifica che il GPS dello smartphone sia attivo).`;
             }
 
             const urlWa = `https://wa.me/393484364498?text=${encodeURIComponent(msg)}`;
