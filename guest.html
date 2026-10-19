@@ -984,130 +984,111 @@
         }
 
         
-       // LAYER POLIGONALE FASCIA DI RISPETTO 200M BAGNANTI (COSTA PRAIA & ANELLO ISOLA DI DINO PERFETTO)
-       let fascia200mPolygonCosta;
-       let fascia200mPolygonIsolaBuffer;
+       // LAYER GEOJSON MANUALE PER FASCIA 200M COSTA E ISOLA DI DINO
+       let fascia200mGeoJsonLayer;
+
+       // Oggetto GeoJSON strutturato (Pronto per essere aggiornato con le tue coordinate da geojson.io)
+       const geoJsonFascia200m = {
+           "type": "FeatureCollection",
+           "features": [
+               {
+                   "type": "Feature",
+                   "properties": { "nome": "Fascia 200m Spiaggia Praia a Mare", "tipo": "costa" },
+                   "geometry": {
+                       "type": "Polygon",
+                       "coordinates": [[
+                           [15.7725, 39.9050],
+                           [15.7740, 39.9020],
+                           [15.7752, 39.8990],
+                           [15.7760, 39.8970],
+                           [15.7775, 39.8930],
+                           [15.7785, 39.8890],
+                           [15.7792, 39.8870],
+                           [15.7800, 39.8830],
+                           [15.7804, 39.8810],
+                           [15.7815, 39.8770],
+                           [15.7830, 39.8740],
+                           [15.7805, 39.8740],
+                           [15.7788, 39.8770],
+                           [15.7775, 39.8830],
+                           [15.7760, 39.8890],
+                           [15.7748, 39.8930],
+                           [15.7732, 39.8970],
+                           [15.7700, 39.9050],
+                           [15.7725, 39.9050]
+                       ]]
+                   }
+               },
+               {
+                   "type": "Feature",
+                   "properties": { "nome": "Fascia 200m Isola di Dino", "tipo": "isola" },
+                   "geometry": {
+                       "type": "Polygon",
+                       "coordinates": [
+                           // Perimetro Esterno Fascia 200m
+                           [
+                               [15.7745, 39.8765],
+                               [15.7765, 39.8755],
+                               [15.7780, 39.8730],
+                               [15.7782, 39.8705],
+                               [15.7765, 39.8680],
+                               [15.7735, 39.8665],
+                               [15.7690, 39.8665],
+                               [15.7650, 39.8685],
+                               [15.7635, 39.8718],
+                               [15.7645, 39.8750],
+                               [15.7680, 39.8768],
+                               [15.7720, 39.8770],
+                               [15.7745, 39.8765]
+                           ],
+                           // Perimetro Interno Battigia Falesia (Foro)
+                           [
+                               [15.7745, 39.8742],
+                               [15.7755, 39.8732],
+                               [15.7760, 39.8718],
+                               [15.7752, 39.8702],
+                               [15.7730, 39.8690],
+                               [15.7700, 39.8684],
+                               [15.7675, 39.8690],
+                               [15.7661, 39.8708],
+                               [15.7663, 39.8728],
+                               [15.7680, 39.8742],
+                               [15.7705, 39.8751],
+                               [15.7730, 39.8752],
+                               [15.7745, 39.8742]
+                           ]
+                       ]
+                   }
+               }
+           ]
+       };
 
        function disegnaFascia200mCosta() {
            if (!map) return;
 
-           // 1. Poligono 200m Costa Praia a Mare (Aderente alla Spiaggia)
-           const coordsFasciaCosta = [
-               [39.905, 15.7725],
-               [39.903, 15.7733],
-               [39.901, 15.7742],
-               [39.899, 15.775],
-               [39.897, 15.7758],
-               [39.895, 15.7766],
-               [39.893, 15.7773],
-               [39.891, 15.7779],
-               [39.889, 15.7785],
-               [39.887, 15.779],
-               [39.885, 15.7794],
-               [39.883, 15.7798],
-               [39.881, 15.7802],
-               [39.879, 15.7806],
-               [39.877, 15.7812],
-               [39.8755, 15.782],
-               [39.874, 15.7828],
-               [39.874, 15.7803],
-               [39.8755, 15.7795],
-               [39.877, 15.7787],
-               [39.879, 15.7781],
-               [39.881, 15.7777],
-               [39.883, 15.7773],
-               [39.885, 15.7769],
-               [39.887, 15.7765],
-               [39.889, 15.776],
-               [39.891, 15.7754],
-               [39.893, 15.7748],
-               [39.895, 15.7741],
-               [39.897, 15.7733],
-               [39.899, 15.7725],
-               [39.901, 15.7717],
-               [39.903, 15.7708],
-               [39.905, 15.77]
-           ];
+           if (fascia200mGeoJsonLayer) map.removeLayer(fascia200mGeoJsonLayer);
 
-           // 2. Anello 200m Isola di Dino (Formato Ciambella Vettoriale: Perimetro Esterno - Perimetro Interno)
-           const coordsIsolaBuffer = [
-               [39.8765, 15.7745],
-               [39.876, 15.7762],
-               [39.8745, 15.7778],
-               [39.8728, 15.7785],
-               [39.871, 15.7783],
-               [39.8692, 15.7772],
-               [39.868, 15.7755],
-               [39.8672, 15.7735],
-               [39.8668, 15.7712],
-               [39.8668, 15.7688],
-               [39.8674, 15.7668],
-               [39.8685, 15.765],
-               [39.87, 15.7638],
-               [39.8718, 15.7635],
-               [39.8735, 15.764],
-               [39.875, 15.7652],
-               [39.876, 15.767],
-               [39.8768, 15.7692],
-               [39.877, 15.7718]
-           ];
-           const coordsIsolaBattigia = [
-               [39.8742, 15.7745],
-               [39.8735, 15.7752],
-               [39.8725, 15.7758],
-               [39.8715, 15.776],
-               [39.8705, 15.7755],
-               [39.8698, 15.7745],
-               [39.8692, 15.7735],
-               [39.8688, 15.772],
-               [39.8685, 15.7705],
-               [39.8688, 15.769],
-               [39.8695, 15.7678],
-               [39.8705, 15.7668],
-               [39.8715, 15.7662],
-               [39.8725, 15.7665],
-               [39.8735, 15.7672],
-               [39.8742, 15.7682],
-               [39.8748, 15.7695],
-               [39.8752, 15.771],
-               [39.8753, 15.7725],
-               [39.875, 15.7738]
-           ];
-
-           if (fascia200mPolygonCosta) map.removeLayer(fascia200mPolygonCosta);
-           if (fascia200mPolygonIsolaBuffer) map.removeLayer(fascia200mPolygonIsolaBuffer);
-
-           // Disegno Poligono Spiaggia
-           fascia200mPolygonCosta = L.polygon(coordsFasciaCosta, {
-               color: '#ef4444',
-               weight: 2,
-               dashArray: '6, 6',
-               fillColor: '#ef4444',
-               fillOpacity: 0.22
+           fascia200mGeoJsonLayer = L.geoJSON(geoJsonFascia200m, {
+               style: function(feature) {
+                   return {
+                       color: '#ef4444',
+                       weight: 2,
+                       dashArray: '6, 6',
+                       fillColor: '#ef4444',
+                       fillOpacity: 0.22
+                   };
+               },
+               onEachFeature: function(feature, layer) {
+                   if (feature.properties && feature.properties.nome) {
+                       layer.bindPopup(`
+                           <div class="text-xs p-1 text-center font-sans">
+                               <b class="text-red-600 block text-sm">🚫 ${feature.properties.nome.toUpperCase()}</b>
+                               <p class="text-slate-600 mt-1">Zona di rispetto balneazione. Navigazione a motore strictly VIETATA entro questa area.</p>
+                           </div>
+                       `);
+                   }
+               }
            }).addTo(map);
-
-           fascia200mPolygonCosta.bindPopup(`
-               <div class="text-xs p-1 text-center font-sans">
-                   <b class="text-red-600 block text-sm">🚫 ZONA DI RISPETTO 200M BAGNANTI (SPIAGGIA)</b>
-                   <p class="text-slate-600 mt-1">Litorale Praia a Mare: Navigazione a motore strictly VIETATA entro questa fascia.</p>
-               </div>
-           `);
-
-           // Disegno Anello Poligonale Isola di Dino (Ciambella a 2 anelli)
-           fascia200mPolygonIsolaBuffer = L.polygon([coordsIsolaBuffer, coordsIsolaBattigia], {
-               color: '#ef4444',
-               weight: 2,
-               dashArray: '6, 6',
-               fillColor: '#ef4444',
-               fillOpacity: 0.22
-           }).addTo(map);
-
-           fascia200mPolygonIsolaBuffer.bindPopup(`
-               <div class="text-xs p-1 text-center font-sans">
-                   <b class="text-red-600 block text-sm">🚫 FASCIA 200M ISOLA DI DINO</b>
-                   <p class="text-slate-600 mt-1">Fascia di rispetto della costa rocciosa. Procedere al minimo o a motore spento vicino alle grotte.</p>
-               </div>
-           `);
        }
 
        function initMapNav() {
