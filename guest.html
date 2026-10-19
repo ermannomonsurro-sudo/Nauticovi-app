@@ -984,83 +984,54 @@
         }
 
         
-       // LAYER GEOJSON MANUALE PER FASCIA 200M COSTA E ISOLA DI DINO
+       // LAYER GEOJSON PERSONALIZZATO DISENIATO A MANO
        let fascia200mGeoJsonLayer;
 
-       // Oggetto GeoJSON strutturato (Pronto per essere aggiornato con le tue coordinate da geojson.io)
        const geoJsonFascia200m = {
-           "type": "FeatureCollection",
-           "features": [
-               {
-                   "type": "Feature",
-                   "properties": { "nome": "Fascia 200m Spiaggia Praia a Mare", "tipo": "costa" },
-                   "geometry": {
-                       "type": "Polygon",
-                       "coordinates": [[
-                           [15.7725, 39.9050],
-                           [15.7740, 39.9020],
-                           [15.7752, 39.8990],
-                           [15.7760, 39.8970],
-                           [15.7775, 39.8930],
-                           [15.7785, 39.8890],
-                           [15.7792, 39.8870],
-                           [15.7800, 39.8830],
-                           [15.7804, 39.8810],
-                           [15.7815, 39.8770],
-                           [15.7830, 39.8740],
-                           [15.7805, 39.8740],
-                           [15.7788, 39.8770],
-                           [15.7775, 39.8830],
-                           [15.7760, 39.8890],
-                           [15.7748, 39.8930],
-                           [15.7732, 39.8970],
-                           [15.7700, 39.9050],
-                           [15.7725, 39.9050]
-                       ]]
-                   }
-               },
-               {
-                   "type": "Feature",
-                   "properties": { "nome": "Fascia 200m Isola di Dino", "tipo": "isola" },
-                   "geometry": {
-                       "type": "Polygon",
-                       "coordinates": [
-                           // Perimetro Esterno Fascia 200m
-                           [
-                               [15.7745, 39.8765],
-                               [15.7765, 39.8755],
-                               [15.7780, 39.8730],
-                               [15.7782, 39.8705],
-                               [15.7765, 39.8680],
-                               [15.7735, 39.8665],
-                               [15.7690, 39.8665],
-                               [15.7650, 39.8685],
-                               [15.7635, 39.8718],
-                               [15.7645, 39.8750],
-                               [15.7680, 39.8768],
-                               [15.7720, 39.8770],
-                               [15.7745, 39.8765]
-                           ],
-                           // Perimetro Interno Battigia Falesia (Foro)
-                           [
-                               [15.7745, 39.8742],
-                               [15.7755, 39.8732],
-                               [15.7760, 39.8718],
-                               [15.7752, 39.8702],
-                               [15.7730, 39.8690],
-                               [15.7700, 39.8684],
-                               [15.7675, 39.8690],
-                               [15.7661, 39.8708],
-                               [15.7663, 39.8728],
-                               [15.7680, 39.8742],
-                               [15.7705, 39.8751],
-                               [15.7730, 39.8752],
-                               [15.7745, 39.8742]
-                           ]
-                       ]
-                   }
-               }
-           ]
+         "type": "FeatureCollection",
+         "features": [
+           {
+             "type": "Feature",
+             "properties": { "nome": "Fascia 200m Isola di Dino - Tracciato Bordo" },
+             "geometry": {
+               "type": "LineString",
+               "coordinates": [
+                 [15.7795018, 39.8716033],
+                 [15.7793442, 39.8720872],
+                 [15.7785034, 39.87243],
+                 [15.7769532, 39.8722889],
+                 [15.7761913, 39.8718452],
+                 [15.7747724, 39.8718654],
+                 [15.7743258, 39.8721477],
+                 [15.773774, 39.8716638],
+                 [15.7720136, 39.8717242],
+                 [15.7699117, 39.8712403],
+                 [15.7687293, 39.8717847],
+                 [15.7687293, 39.8724502],
+                 [15.7698854, 39.873156],
+                 [15.7696752, 39.8733778],
+                 [15.7711466, 39.8751926],
+                 [15.774536, 39.8758177],
+                 [15.7765065, 39.8751522],
+                 [15.7772685, 39.8753942],
+                 [15.7795018, 39.8749304],
+                 [15.7831277, 39.8754144]
+               ]
+             }
+           },
+           {
+             "type": "Feature",
+             "properties": { "nome": "Fascia 200m Isola di Dino - Tracciato Est" },
+             "geometry": {
+               "type": "LineString",
+               "coordinates": [
+                 [15.779423, 39.8716839],
+                 [15.7797383, 39.8714823],
+                 [15.7852559, 39.8719259]
+               ]
+             }
+           }
+         ]
        };
 
        function disegnaFascia200mCosta() {
@@ -1072,21 +1043,19 @@
                style: function(feature) {
                    return {
                        color: '#ef4444',
-                       weight: 2,
+                       weight: 3,
                        dashArray: '6, 6',
                        fillColor: '#ef4444',
-                       fillOpacity: 0.22
+                       fillOpacity: 0.25
                    };
                },
                onEachFeature: function(feature, layer) {
-                   if (feature.properties && feature.properties.nome) {
-                       layer.bindPopup(`
-                           <div class="text-xs p-1 text-center font-sans">
-                               <b class="text-red-600 block text-sm">🚫 ${feature.properties.nome.toUpperCase()}</b>
-                               <p class="text-slate-600 mt-1">Zona di rispetto balneazione. Navigazione a motore strictly VIETATA entro questa area.</p>
-                           </div>
-                       `);
-                   }
+                   layer.bindPopup(`
+                       <div class="text-xs p-1 text-center font-sans">
+                           <b class="text-red-600 block text-sm">🚫 FASCA DI RISPETTO 200M</b>
+                           <p class="text-slate-600 mt-1">Limite di navigazione e rispetto bagnanti. Procedere con la massima cautela.</p>
+                       </div>
+                   `);
                }
            }).addTo(map);
        }
