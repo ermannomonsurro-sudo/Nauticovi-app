@@ -128,7 +128,7 @@
             <div class="flex justify-between items-start">
                 <div>
                     <span class="bg-cyan-500/20 text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-400/30" data-i18n="active_rental">Noleggio Attivo</span>
-                    <h2 class="text-xl font-extrabold mt-2" id="welcome-nome" data-i18n="welcome_title">Benvenuto a Bordo!</h2>
+                    <h2 class="text-xl font-extrabold mt-2" id="welcome-nome">Benvenuto a Bordo!</h2>
                     <p class="text-xs text-slate-300 mt-0.5"><span data-i18n="boat_label">Barca:</span> <span class="font-bold text-cyan-300" id="welcome-barca">Marlin 1</span></p>
                 </div>
                 <div class="text-right flex flex-col items-end gap-2">
@@ -347,7 +347,7 @@
         <div id="sec-divieti" class="tab-content hidden space-y-3">
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <h3 class="font-bold text-red-600 flex items-center gap-2 border-b pb-2 text-sm">
-                    <i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="rules_header">Regole Tassative di Bordo</span>
+                    <i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="rules_header">Regole Tassative di Navigazione</span>
                 </h3>
                 <div id="divieti-container" class="space-y-3 text-xs"></div>
             </div>
@@ -411,7 +411,7 @@
 
         const translations = {
             it: {
-                nav_sub: "GUEST PORTAL • NAVIGATORE GPS",
+                header_sub: "GUEST PORTAL • NAVIGATORE GPS",
                 active_rental: "Noleggio Attivo",
                 welcome_title: "Benvenuto a Bordo!",
                 boat_label: "Barca:",
@@ -621,6 +621,8 @@
         let poiList = [];
         let pericoliList = [];
         let itinerariList = [];
+        let tipsList = [];
+        let divietiList = [];
         let map, userMarker, markersGroup, dangersGroup, routePolyline;
         let destinazioneSelezionata = null;
         let destinazioneAttiva = null;
@@ -630,6 +632,7 @@
         let currentMovementHeading = 0;
         let audioPlayer = null;
         let bannerMostratoPerPoi = false;
+        let nomeClientePersonalizzato = null;
 
         // ALGORITMO DI PARSING SMART COORDINATE GPS
         function parseSmartCoords(latVal, lngVal, extraStr = "") {
@@ -698,8 +701,15 @@
                 }
             });
 
+            // Ripristina il nome personalizzato del cliente ("Benvenuto Mario!") se presente nell'URL
+            if (nomeClientePersonalizzato) {
+                const welcomeEl = document.getElementById('welcome-nome');
+                if (welcomeEl) welcomeEl.innerText = `Benvenuto ${nomeClientePersonalizzato}!`;
+            }
+
             renderPoiCards();
             renderItinerariCards();
+            renderTipsAndDivieti();
         }
 
         function switchTab(tab) {
@@ -782,6 +792,85 @@
             });
         }
 
+        function renderTipsAndDivieti() {
+            const tipsContainer = document.getElementById('tips-container');
+            if (tipsContainer) {
+                if (!tipsList || tipsList.length === 0) {
+                    tipsContainer.innerHTML = `
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
+                            <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">1</div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm" data-i18n="tip1_h">Accensione Motore</h4>
+                                <p class="text-slate-600 mt-0.5" data-i18n="tip1_p">Mettere la leva in folle (N) e agganciare lo stacco di sicurezza prima di girare la chiave.</p>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
+                            <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">2</div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm" data-i18n="tip2_h">Ancoraggio Corretto</h4>
+                                <p class="text-slate-600 mt-0.5" data-i18n="tip2_p">Calare l'ancora sempre su fondale sabbioso di colore chiaro, mai sulla roccia o sulla posidonia.</p>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
+                            <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">3</div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm" data-i18n="tip3_h">Tendalino Parasole</h4>
+                                <p class="text-slate-600 mt-0.5" data-i18n="tip3_p">Fissare il tendalino solo a barca ferma o a velocità bassissima per evitare danni alla struttura.</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    tipsContainer.innerHTML = '';
+                    tipsList.forEach((tip, idx) => {
+                        tipsContainer.innerHTML += `
+                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
+                                <div class="bg-cyan-600 text-white p-1.5 rounded-lg font-bold text-xs">${idx + 1}</div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm">${tip.titolo}</h4>
+                                    <p class="text-slate-600 mt-0.5">${tip.descrizione}</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+
+            const divietiContainer = document.getElementById('divieti-container');
+            if (divietiContainer) {
+                if (!divietiList || divietiList.length === 0) {
+                    divietiContainer.innerHTML = `
+                        <ul class="text-xs space-y-3 text-slate-700">
+                            <li class="flex items-start gap-2.5 p-2 bg-red-50 rounded-lg border border-red-100">
+                                <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
+                                <span data-i18n="rule1"><b>Distanza Bagnanti:</b> VIETATO avvicinarsi a meno di 200 metri dalle spiagge con bagnanti.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5 p-2 bg-red-50 rounded-lg border border-red-100">
+                                <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
+                                <span data-i18n="rule2"><b>Velocità nelle Grotte:</b> VIETATO entrare veloci nelle grotte. Procedere solo a motore al minimo o a remi.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5 p-2 bg-red-50 rounded-lg border border-red-100">
+                                <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
+                                <span data-i18n="rule3"><b>Protezione Fondali:</b> VIETATO gettare l'ancora sulle praterie protette di Posidonia oceanica.</span>
+                            </li>
+                        </ul>
+                    `;
+                } else {
+                    divietiContainer.innerHTML = '';
+                    divietiList.forEach(divieto => {
+                        divietiContainer.innerHTML += `
+                            <div class="p-3 bg-red-50 rounded-xl border border-red-100 flex items-start gap-2.5">
+                                <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
+                                <div>
+                                    <b class="text-slate-900 block font-bold">${divieto.titolo}</b>
+                                    <p class="text-slate-700 text-xs mt-0.5">${divieto.descrizione}</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+        }
+
         function disegnaMarkerMappa() {
             if (!markersGroup) return;
             markersGroup.clearLayers();
@@ -795,8 +884,8 @@
             });
 
             const coordsBase = {
-                lat: BANCHINA_PARTENZA.latitudine,
-                lng: BANCHINA_PARTENZA.longitudine
+                lat: parseSmartCoords(BANCHINA_PARTENZA.latitudine, BANCHINA_PARTENZA.longitudine).lat || 39.8820,
+                lng: parseSmartCoords(BANCHINA_PARTENZA.latitudine, BANCHINA_PARTENZA.longitudine).lng || 15.7760
             };
 
             if (coordsBase.lat && coordsBase.lng) {
@@ -1092,7 +1181,7 @@ Mia Posizione GPS Attuale: https://maps.google.com/?q=${lastLat},${lastLng}`;
             nascondiBannerProssimita();
             switchTab('navigatore');
 
-            document.getElementById('target-poi-name').innerText = destinazioneAttiva.titolo;
+            document.getElementById('target-poi-name').innerText = destinazioneAttiva.titolo || destinazioneAttiva.nome;
             const btnStop = document.getElementById('btn-stop-nav-top');
             if (btnStop) btnStop.classList.remove('hidden');
 
@@ -1153,9 +1242,13 @@ Mia Posizione GPS Attuale: https://maps.google.com/?q=${lastLat},${lastLng}`;
             }
         }
 
-        function impostaRottaBanchina() {
+        function rottaRientroBanchina() {
             destinazioneSelezionata = BANCHINA_PARTENZA;
             confermaAvvioNavigazione();
+        }
+
+        function impostaRottaBanchina() {
+            rottaRientroBanchina();
         }
 
         function ricentraGPS() {
@@ -1241,8 +1334,15 @@ Mia Posizione GPS Attuale: https://maps.google.com/?q=${lastLat},${lastLng}`;
                 const itinData = data.filter(i => String(i.categoria).toLowerCase() === 'itinerari');
                 if (itinData.length > 0) itinerariList = itinData;
 
+                const tipsData = data.filter(i => String(i.categoria).toLowerCase() === 'tips');
+                if (tipsData.length > 0) tipsList = tipsData;
+
+                const divietiData = data.filter(i => String(i.categoria).toLowerCase() === 'divieti');
+                if (divietiData.length > 0) divietiList = divietiData;
+
                 renderPoiCards();
                 renderItinerariCards();
+                renderTipsAndDivieti();
 
                 if (map) {
                     disegnaMarkerMappa();
@@ -1261,6 +1361,7 @@ Mia Posizione GPS Attuale: https://maps.google.com/?q=${lastLat},${lastLng}`;
                 let primoNome = clienteFullName.trim().split(' ')[0];
                 if (primoNome) {
                     primoNome = primoNome.charAt(0).toUpperCase() + primoNome.slice(1).toLowerCase();
+                    nomeClientePersonalizzato = primoNome;
                     const welcomeEl = document.getElementById('welcome-nome');
                     if (welcomeEl) welcomeEl.innerText = `Benvenuto ${primoNome}!`;
                 }
