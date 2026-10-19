@@ -23,7 +23,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans pb-12">
 
-    <!-- SCHERMATA LOGIN ADMIN (Struttura DIV isolata, zero tag FORM per prevenire invii o redirect del browser) -->
+    <!-- SCHERMATA LOGIN ADMIN (Interfaccia diretta, pulita e priva di form nativi che causano blocchi) -->
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200 max-w-sm w-full space-y-4 text-center">
             <div class="flex flex-col items-center justify-center gap-2">
@@ -35,21 +35,21 @@
                 <i class="fa-solid fa-arrow-left"></i> Torna alla Home
             </a>
 
-            <!-- Contenitore isolato senza form nativo -->
+            <!-- Contenitore isolato -->
             <div class="space-y-3 pt-2 text-left">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Email Admin</label>
-                    <input type="email" id="admin-email" placeholder="admin@nauticovi.it" autocomplete="username" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none bg-slate-50" required>
+                    <input type="email" id="admin-email" placeholder="admin@nauticovi.it" autocomplete="username" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none bg-slate-50">
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Password</label>
-                    <input type="password" id="admin-pass" placeholder="••••••••" autocomplete="current-password" onkeyup="if(event.key === 'Enter') eseguiLogin(event)" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none bg-slate-50" required>
+                    <input type="password" id="admin-pass" placeholder="••••••••" autocomplete="current-password" onkeyup="if(event.key === 'Enter') eseguiLogin()" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none bg-slate-50">
                 </div>
-                <button type="button" id="btn-login" onclick="eseguiLogin(event)" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-xs cursor-pointer active:scale-95 flex items-center justify-center gap-2">
+                <button type="button" id="btn-login" onclick="eseguiLogin()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-xs cursor-pointer active:scale-95 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-right-to-bracket"></i> Accedi al Gestionale
                 </button>
             </div>
-            <p id="login-error" class="text-xs text-red-500 hidden font-bold mt-2 bg-red-50 p-2.5 rounded-xl border border-red-200"></p>
+            <p id="login-error" class="text-xs text-red-500 hidden font-bold mt-2 bg-red-50 p-2.5 rounded-xl border border-red-200 text-center"></p>
         </div>
     </div>
 
@@ -68,7 +68,7 @@
             </div>
             <div class="flex gap-3 items-center">
                 <a href="index.html" class="text-xs text-cyan-400 hover:text-white font-bold"><i class="fa-solid fa-house"></i> Home</a>
-                <button onclick="logout()" class="text-xs text-slate-400 hover:text-white">Esci</button>
+                <button onclick="logout()" class="text-xs text-slate-400 hover:text-white font-bold">Esci</button>
             </div>
         </nav>
 
@@ -408,21 +408,19 @@
             document.getElementById('admin-panel').style.display = 'none';
         }
 
-        async function eseguiLogin(e) {
-            if (e) {
-                if (e.preventDefault) e.preventDefault();
-                if (e.stopPropagation) e.stopPropagation();
-            }
-
+        async function eseguiLogin() {
             const btn = document.getElementById('btn-login');
             const errorEl = document.getElementById('login-error');
-            const email = document.getElementById('admin-email').value.trim();
-            const password = document.getElementById('admin-pass').value;
+            const emailInput = document.getElementById('admin-email');
+            const passInput = document.getElementById('admin-pass');
+
+            const email = emailInput ? emailInput.value.trim() : '';
+            const password = passInput ? passInput.value : '';
 
             if (!email || !password) {
                 errorEl.classList.remove('hidden');
                 errorEl.innerText = "Inserisci sia email che password.";
-                return false;
+                return;
             }
 
             btn.disabled = true;
@@ -436,11 +434,11 @@
                     errorEl.innerText = "Errore di accesso: " + (error.message || "Credenziali errate.");
                     btn.disabled = false;
                     btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Accedi al Gestionale`;
-                    return false;
+                    return;
                 }
 
                 errorEl.classList.add('hidden');
-                document.getElementById('admin-pass').value = '';
+                if (passInput) passInput.value = '';
                 mostraPannello();
             } catch (err) {
                 console.error("Errore imprevisto durante il login:", err);
@@ -449,7 +447,6 @@
                 btn.disabled = false;
                 btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Accedi al Gestionale`;
             }
-            return false;
         }
 
         async function logout() {
