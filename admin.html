@@ -422,7 +422,6 @@
             pannelloVisibile = false;
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('admin-panel').style.display = 'none';
-            // Ripristina il pulsante di accesso (evita che resti bloccato su "Accesso in corso...")
             const b = document.getElementById('btn-login');
             if (b) {
                 b.disabled = false;
@@ -596,15 +595,12 @@
             labelTitolo.innerText = "Titolo Elemento";
             labelSottotitolo.innerText = "Sottotitolo / Dettaglio";
             labelDescrizione.innerText = "Descrizione / Dettagli";
-            document.getElementById('cms_sottotitolo').placeholder = "Es. Banchina Principale o Max 6 Persone";
 
             if (cat === 'flotta') {
                 boxPrezzi.classList.remove('hidden');
                 labelSottotitolo.innerText = "Capienza & Specifiche (es. Max 6 Persone)";
             } else if (cat === 'destinazioni') {
                 boxGps.classList.remove('hidden');
-                labelSottotitolo.innerText = "Comune (es. Praia a Mare, San Nicola Arcella)";
-                document.getElementById('cms_sottotitolo').placeholder = "Es. Praia a Mare";
                 if (currentMacroTab === 'destinazioni') {
                     boxGalleriaExtra.classList.remove('hidden');
                 }
@@ -802,7 +798,6 @@
                 titolo: document.getElementById('cms_titolo').value,
                 sottotitolo: isFaq ? null : (document.getElementById('cms_sottotitolo') ? document.getElementById('cms_sottotitolo').value : null),
                 descrizione: document.getElementById('cms_descrizione').value,
-                // Le FAQ non hanno immagini
                 immagine_url: isFaq ? null : document.getElementById('cms_immagine_url').value,
                 latitudine: isGps ? (parseFloat(document.getElementById('cms_lat').value) || null) : null,
                 longitudine: isGps ? (parseFloat(document.getElementById('cms_lng').value) || null) : null,
@@ -813,7 +808,6 @@
                 prezzo_alta_intera: cat === 'flotta' ? (parseFloat(document.getElementById('cms_alta_intera').value) || 220) : null
             };
 
-            // Colonne foto_2/foto_3 inviate solo per le schede con galleria (destinazioni.html)
             if (haGalleria) {
                 itemData.foto_2 = document.getElementById('cms_foto_2') ? document.getElementById('cms_foto_2').value : null;
                 itemData.foto_3 = document.getElementById('cms_foto_3') ? document.getElementById('cms_foto_3').value : null;
@@ -954,11 +948,15 @@
                 const data = await res.json();
 
                 if (res.ok && data.data) {
-                    alert("BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: " + data.data.id + "\nIl documento è nella sezione \"Bozze\" del tuo account.");
+                    alert("BOZZA CREATA SU FATTURE IN CLOUD!
+
+ID Bozza: " + data.data.id + "
+Il documento è nella sezione "Bozze" del tuo account.");
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
-                    alert("Errore Fatture in Cloud:\n" + JSON.stringify(data.error || data, null, 2));
+                    alert("Errore Fatture in Cloud:
+" + JSON.stringify(data.error || data, null, 2));
                 }
             } catch (err) {
                 alert("Errore di rete: " + err.message);
@@ -1105,9 +1103,11 @@
         }
 
         function esportaCSV() {
-            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin\n";
+            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin
+";
             listaNoleggi.forEach(n => {
-                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"\n`;
+                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"
+`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
