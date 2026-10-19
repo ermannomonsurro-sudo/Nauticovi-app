@@ -984,43 +984,127 @@
         }
 
         
-       // LAYER POLIGONALE FASCIA DI RISPETTO 200M BAGNANTI (PRAIA A MARE) - CALIBRATO
-       let fascia200mPolygon;
+       // LAYER POLIGONALE FASCIA DI RISPETTO 200M BAGNANTI (COSTA PRAIA & ISOLA DI DINO - 100 PUNTI)
+       let fascia200mPolygonCosta;
+       let fascia200mPolygonIsola;
 
        function disegnaFascia200mCosta() {
            if (!map) return;
 
-           // Coordinate calibrate sulla battigia reale di Praia a Mare e offset 200m al largo
-           const coordsFascia200m = [
-               // --- LINEA BATTIGIA COSTA (da Nord a Sud) ---
-               [39.9050, 15.7725], // Confine Nord / Foce Noce (Costa)
-               [39.8970, 15.7760], // Praia Centro Nord (Costa)
-               [39.8900, 15.7785], // Praia Centro / Lungomare (Costa)
-               [39.8830, 15.7795], // Banchina / Lido Fiuzzi Nord (Costa)
-               [39.8760, 15.7820], // Fiuzzi / Località Mantinera (Costa)
-
-               // --- LINEA 200 METRI AL LARGO (da Sud a Nord) ---
-               [39.8760, 15.7792], // Offset 200m al largo Fiuzzi
-               [39.8830, 15.7767], // Offset 200m al largo Banchina
-               [39.8900, 15.7757], // Offset 200m al largo Praia Centro
-               [39.8970, 15.7732], // Offset 200m al largo Praia Nord
-               [39.9050, 15.7697]  // Offset 200m al largo Foce Noce
+           // 1. Poligono 200m Costa Praia a Mare (Alta Precisione)
+           const coordsFasciaCosta = [
+               [39.905, 15.7725],
+               [39.903, 15.7735],
+               [39.901, 15.7744],
+               [39.899, 15.7752],
+               [39.897, 15.776],
+               [39.895, 15.7768],
+               [39.893, 15.7775],
+               [39.891, 15.7781],
+               [39.889, 15.7787],
+               [39.887, 15.7792],
+               [39.885, 15.7796],
+               [39.883, 15.78],
+               [39.881, 15.7804],
+               [39.879, 15.7808],
+               [39.877, 15.7815],
+               [39.8755, 15.7822],
+               [39.874, 15.783],
+               [39.873385, 15.780798],
+               [39.874885, 15.779998],
+               [39.876385, 15.779298],
+               [39.878385, 15.778598],
+               [39.880385, 15.778197],
+               [39.882385, 15.777797],
+               [39.884385, 15.777397],
+               [39.886385, 15.776997],
+               [39.888385, 15.776497],
+               [39.890385, 15.775897],
+               [39.892385, 15.775297],
+               [39.894385, 15.774597],
+               [39.896385, 15.773797],
+               [39.898385, 15.772997],
+               [39.900385, 15.772197],
+               [39.902385, 15.771297],
+               [39.904385, 15.770297]
            ];
 
-           if (fascia200mPolygon) map.removeLayer(fascia200mPolygon);
+           // 2. Poligono 200m Anello Isola di Dino
+           const coordsFasciaIsola = [
+               [39.8742, 15.7745],
+               [39.8735, 15.7752],
+               [39.8725, 15.7758],
+               [39.8715, 15.776],
+               [39.8705, 15.7755],
+               [39.8698, 15.7745],
+               [39.8692, 15.7735],
+               [39.8688, 15.772],
+               [39.8685, 15.7705],
+               [39.8688, 15.769],
+               [39.8695, 15.7678],
+               [39.8705, 15.7668],
+               [39.8715, 15.7662],
+               [39.8725, 15.7665],
+               [39.8735, 15.7672],
+               [39.8742, 15.7682],
+               [39.8748, 15.7695],
+               [39.8752, 15.771],
+               [39.8753, 15.7725],
+               [39.875, 15.7738],
+               [39.876462, 15.775165],
+               [39.876998, 15.773272],
+               [39.876999, 15.771],
+               [39.876464, 15.768609],
+               [39.875487, 15.766562],
+               [39.874323, 15.765116],
+               [39.872758, 15.764181],
+               [39.871258, 15.763878],
+               [39.869741, 15.764675],
+               [39.868217, 15.766158],
+               [39.867178, 15.767986],
+               [39.866712, 15.770245],
+               [39.867051, 15.772547],
+               [39.867716, 15.774825],
+               [39.86866, 15.776313],
+               [39.869784, 15.77765],
+               [39.871268, 15.778324],
+               [39.872742, 15.778122],
+               [39.874259, 15.777325],
+               [39.87534, 15.776313]
+           ];
 
-           fascia200mPolygon = L.polygon(coordsFascia200m, {
+           if (fascia200mPolygonCosta) map.removeLayer(fascia200mPolygonCosta);
+           if (fascia200mPolygonIsola) map.removeLayer(fascia200mPolygonIsola);
+
+           // Disegno Poligono Costa
+           fascia200mPolygonCosta = L.polygon(coordsFasciaCosta, {
                color: '#ef4444',
                weight: 2,
                dashArray: '6, 6',
                fillColor: '#ef4444',
-               fillOpacity: 0.25
+               fillOpacity: 0.22
            }).addTo(map);
 
-           fascia200mPolygon.bindPopup(`
+           fascia200mPolygonCosta.bindPopup(`
                <div class="text-xs p-1 text-center font-sans">
-                   <b class="text-red-600 block text-sm">🚫 ZONA DI RISPETTO 200M BAGNANTI</b>
-                   <p class="text-slate-600 mt-1">Fascia riservata alla balneazione lungo le spiagge di Praia a Mare. Navigazione a motore strictly VIETATA.</p>
+                   <b class="text-red-600 block text-sm">🚫 ZONA DI RISPETTO 200M BAGNANTI (SPIAGGIA)</b>
+                   <p class="text-slate-600 mt-1">Litorale Praia a Mare: Navigazione a motore strictly VIETATA entro questa fascia.</p>
+               </div>
+           `);
+
+           // Disegno Anello Poligonale Isola di Dino
+           fascia200mPolygonIsola = L.polygon(coordsFasciaIsola, {
+               color: '#ef4444',
+               weight: 2,
+               dashArray: '6, 6',
+               fillColor: '#ef4444',
+               fillOpacity: 0.22
+           }).addTo(map);
+
+           fascia200mPolygonIsola.bindPopup(`
+               <div class="text-xs p-1 text-center font-sans">
+                   <b class="text-red-600 block text-sm">🚫 FASCA 200M ISOLA DI DINO</b>
+                   <p class="text-slate-600 mt-1">Fascia di rispetto della costa rocciosa. Procedere al minimo o a motore spento vicino alle grotte.</p>
                </div>
            `);
        }
