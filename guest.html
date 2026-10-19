@@ -806,21 +806,27 @@
         }
 
         function initMapNav() {
-            const mapContainer = document.getElementById('nav-map');
+            const mapContainer = document.getElementById('map');
             if (!mapContainer) return;
 
-            map = L.map('nav-map', { zoomControl: false }).setView([39.8700, 15.7750], 13);
+            if (!map) {
+                map = L.map('map', { zoomControl: false }).setView([39.8700, 15.7750], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+                L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', { attribution: '© OpenSeaMap' }).addTo(map);
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-            L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', { attribution: '© OpenSeaMap' }).addTo(map);
+                markersGroup = L.layerGroup().addTo(map);
+                dangersGroup = L.layerGroup().addTo(map);
+            }
 
-            markersGroup = L.layerGroup().addTo(map);
-            dangersGroup = L.layerGroup().addTo(map);
+            setTimeout(() => { map.invalidateSize(); }, 200);
 
             disegnaMarkerMappa();
             disegnaSegnaliPericoloMappa();
 
-            // ICONA PERSONALIZZATA BARCA
+            avviaGeolocalizzazione();
+        }
+
+        function avviaGeolocalizzazione() {
             const boatIcon = L.divIcon({
                 className: 'boat-marker-container',
                 html: `<div id="boat-icon-inner" class="boat-marker-icon" style="transform: rotate(0deg);">
@@ -926,7 +932,9 @@
                             }
                         }
                     },
-                    err => {},
+                    err => {
+                        console.warn("GPS Non Disponibile o Permessi Negati:", err);
+                    },
                     { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
                 );
             }
