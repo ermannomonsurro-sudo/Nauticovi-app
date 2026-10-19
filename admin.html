@@ -791,14 +791,16 @@
             const cat = document.getElementById('cms_categoria').value;
             const isGps = isCategoriaGPS(cat);
 
+            const isFaq = (cat === 'index_faq');
+            const haGalleria = (cat === 'destinazioni' && currentMacroTab === 'destinazioni');
+
             const itemData = {
                 categoria: cat,
                 titolo: document.getElementById('cms_titolo').value,
-                sottotitolo: document.getElementById('cms_sottotitolo') ? document.getElementById('cms_sottotitolo').value : null,
+                sottotitolo: isFaq ? null : (document.getElementById('cms_sottotitolo') ? document.getElementById('cms_sottotitolo').value : null),
                 descrizione: document.getElementById('cms_descrizione').value,
-                immagine_url: document.getElementById('cms_immagine_url').value,
-                foto_2: document.getElementById('cms_foto_2') ? document.getElementById('cms_foto_2').value : null,
-                foto_3: document.getElementById('cms_foto_3') ? document.getElementById('cms_foto_3').value : null,
+                // Le FAQ non hanno immagini
+                immagine_url: isFaq ? null : document.getElementById('cms_immagine_url').value,
                 latitudine: isGps ? (parseFloat(document.getElementById('cms_lat').value) || null) : null,
                 longitudine: isGps ? (parseFloat(document.getElementById('cms_lng').value) || null) : null,
                 testo_audioguida: isGps ? document.getElementById('cms_audioguida').value : null,
@@ -807,6 +809,12 @@
                 prezzo_alta_mezza: cat === 'flotta' ? (parseFloat(document.getElementById('cms_alta_mezza').value) || 150) : null,
                 prezzo_alta_intera: cat === 'flotta' ? (parseFloat(document.getElementById('cms_alta_intera').value) || 220) : null
             };
+
+            // Colonne foto_2/foto_3 inviate solo per le schede con galleria (destinazioni.html)
+            if (haGalleria) {
+                itemData.foto_2 = document.getElementById('cms_foto_2') ? document.getElementById('cms_foto_2').value : null;
+                itemData.foto_3 = document.getElementById('cms_foto_3') ? document.getElementById('cms_foto_3').value : null;
+            }
 
             let error;
             if (editId) {
