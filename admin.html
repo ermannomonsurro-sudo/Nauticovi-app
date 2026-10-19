@@ -23,7 +23,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans pb-12">
 
-    <!-- SCHERMATA LOGIN ADMIN (Interfaccia diretta, pulita e priva di form nativi che causano blocchi) -->
+    <!-- SCHERMATA LOGIN ADMIN (Div isolato senza form nativi) -->
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200 max-w-sm w-full space-y-4 text-center">
             <div class="flex flex-col items-center justify-center gap-2">
@@ -35,7 +35,7 @@
                 <i class="fa-solid fa-arrow-left"></i> Torna alla Home
             </a>
 
-            <!-- Contenitore isolato -->
+            <!-- Contenitore isolato senza form nativo -->
             <div class="space-y-3 pt-2 text-left">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Email Admin</label>
@@ -396,19 +396,24 @@
             console.error("Supabase init error:", err);
         }
 
-        function mostraPannello() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('admin-panel').style.display = 'block';
+        // ESPOSIZIONE ESPLICITA DELLE FUNZIONI GLOBALI SU WINDOW
+        window.mostraPannello = function() {
+            const loginEl = document.getElementById('login-screen');
+            const panelEl = document.getElementById('admin-panel');
+            if (loginEl) loginEl.style.display = 'none';
+            if (panelEl) panelEl.style.display = 'block';
             caricaDatiCloud();
             selezionaMacroTab('guest');
-        }
+        };
 
-        function mostraLogin() {
-            document.getElementById('login-screen').style.display = 'flex';
-            document.getElementById('admin-panel').style.display = 'none';
-        }
+        window.mostraLogin = function() {
+            const loginEl = document.getElementById('login-screen');
+            const panelEl = document.getElementById('admin-panel');
+            if (loginEl) loginEl.style.display = 'flex';
+            if (panelEl) panelEl.style.display = 'none';
+        };
 
-        async function eseguiLogin() {
+        window.eseguiLogin = async function() {
             const btn = document.getElementById('btn-login');
             const errorEl = document.getElementById('login-error');
             const emailInput = document.getElementById('admin-email');
@@ -418,62 +423,74 @@
             const password = passInput ? passInput.value : '';
 
             if (!email || !password) {
-                errorEl.classList.remove('hidden');
-                errorEl.innerText = "Inserisci sia email che password.";
+                if (errorEl) {
+                    errorEl.classList.remove('hidden');
+                    errorEl.innerText = "Inserisci sia email che password.";
+                }
                 return;
             }
 
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Accesso in corso...`;
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Accesso in corso...`;
+            }
 
             try {
                 const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
 
                 if (error) {
-                    errorEl.classList.remove('hidden');
-                    errorEl.innerText = "Errore di accesso: " + (error.message || "Credenziali errate.");
-                    btn.disabled = false;
-                    btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Accedi al Gestionale`;
+                    if (errorEl) {
+                        errorEl.classList.remove('hidden');
+                        errorEl.innerText = "Errore di accesso: " + (error.message || "Credenziali errate.");
+                    }
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Accedi al Gestionale`;
+                    }
                     return;
                 }
 
-                errorEl.classList.add('hidden');
+                if (errorEl) errorEl.classList.add('hidden');
                 if (passInput) passInput.value = '';
-                mostraPannello();
+                window.mostraPannello();
             } catch (err) {
                 console.error("Errore imprevisto durante il login:", err);
-                errorEl.classList.remove('hidden');
-                errorEl.innerText = "Errore di connessione o di rete.";
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Accedi al Gestionale`;
+                if (errorEl) {
+                    errorEl.classList.remove('hidden');
+                    errorEl.innerText = "Errore di connessione o di rete.";
+                }
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Accedi al Gestionale`;
+                }
             }
-        }
+        };
 
-        async function logout() {
+        window.logout = async function() {
             await _supabase.auth.signOut();
-            mostraLogin();
-        }
+            window.mostraLogin();
+        };
 
         window.addEventListener('DOMContentLoaded', async () => {
             if (!_supabase) return;
             try {
                 const { data: { session } } = await _supabase.auth.getSession();
                 if (session) {
-                    mostraPannello();
+                    window.mostraPannello();
                 } else {
-                    mostraLogin();
+                    window.mostraLogin();
                 }
 
                 _supabase.auth.onAuthStateChange((event, sessione) => {
                     if (sessione) {
-                        mostraPannello();
+                        window.mostraPannello();
                     } else {
-                        mostraLogin();
+                        window.mostraLogin();
                     }
                 });
             } catch (e) {
                 console.error("Errore init auth:", e);
-                mostraLogin();
+                window.mostraLogin();
             }
         });
 
@@ -519,7 +536,7 @@
             }
         };
 
-        function selezionaMacroTab(tabKey) {
+        window.selezionaMacroTab = function(tabKey) {
             currentMacroTab = tabKey;
             
             document.querySelectorAll('.macro-tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -541,13 +558,13 @@
 
             resetFormCMS();
             caricaContenutiCMS();
-        }
+        };
 
         function isCategoriaGPS(cat) {
             return cat === 'destinazioni' || cat === 'base' || cat === 'banchina' || cat === 'pericoli';
         }
 
-        function toggleCampiCMS() {
+        window.toggleCampiCMS = function() {
             const cat = document.getElementById('cms_categoria').value;
             const boxPrezzi = document.getElementById('box-prezzi-cms');
             const boxGps = document.getElementById('box-gps-cms');
@@ -588,9 +605,9 @@
                 labelTitolo.innerText = "Nome Attrazione / Slot Vetrina";
                 labelSottotitolo.innerText = "Sottotitolo Promozionale";
             }
-        }
+        };
 
-        async function uploadFotoSupabaseStorage(inputEl, targetInputId) {
+        window.uploadFotoSupabaseStorage = async function(inputEl, targetInputId) {
             if (!inputEl.files || inputEl.files.length === 0) return;
             const file = inputEl.files[0];
             const spinner = document.getElementById('upload_spinner');
@@ -628,9 +645,9 @@
                 };
                 reader.readAsDataURL(file);
             }
-        }
+        };
 
-        async function caricaContenutiCMS() {
+        window.caricaContenutiCMS = async function() {
             const container = document.getElementById('cmsListaContenuti');
             if (!container || !_supabase) return;
 
@@ -698,9 +715,9 @@
             } catch (err) {
                 console.error("Errore caricamento CMS:", err);
             }
-        }
+        };
 
-        function gestisciNuovaCategoria() {
+        window.gestisciNuovaCategoria = function() {
             const nuovaCat = prompt("Inserisci il nome della nuova Categoria (es. 'eventi', 'promozioni'):");
             if (nuovaCat && nuovaCat.trim() !== '') {
                 const select = document.getElementById('cms_categoria');
@@ -712,9 +729,9 @@
                 select.value = valClean;
                 toggleCampiCMS();
             }
-        }
+        };
 
-        function caricaInModificaCMS(id) {
+        window.caricaInModificaCMS = function(id) {
             const item = listaCMSCache.find(i => String(i.id) === String(id));
             if (!item) return;
 
@@ -744,17 +761,17 @@
             document.getElementById('btn-salva-cms-text').innerText = 'Aggiorna Contenuto';
             document.getElementById('btn-annulla-edit-cms').classList.remove('hidden');
             document.getElementById('cmsForm').scrollIntoView({ behavior: 'smooth' });
-        }
+        };
 
-        function resetFormCMS() {
+        window.resetFormCMS = function() {
             document.getElementById('cmsForm').reset();
             document.getElementById('cms_edit_id').value = '';
             document.getElementById('btn-salva-cms-text').innerText = 'Salva in Cloud';
             document.getElementById('btn-annulla-edit-cms').classList.add('hidden');
             toggleCampiCMS();
-        }
+        };
 
-        async function salvaContenutoCMS(e) {
+        window.salvaContenutoCMS = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-salva-cms');
             btn.disabled = true;
@@ -796,20 +813,20 @@
                 caricaContenutiCMS();
             }
             btn.disabled = false;
-        }
+        };
 
-        async function eliminaContenutoCMS(id) {
+        window.eliminaContenutoCMS = async function(id) {
             if (confirm("Sei sicuro di voler eliminare questo contenuto dal CMS?")) {
                 await _supabase.from('cms_contenuti').delete().eq('id', id);
                 caricaContenutiCMS();
             }
-        }
+        };
 
         // FATTURE IN CLOUD INTEGRATION
         const VAT_ID_FORFETTARIO = 66;
         const GESTISCI_BOLLO = false;
 
-        async function generaFatturaInCloud(noleggioId) {
+        window.generaFatturaInCloud = async function(noleggioId) {
             const noleggio = listaNoleggi.find(n => String(n.id) === String(noleggioId));
             if (!noleggio) {
                 alert("Noleggio non trovato. Ricarica la pagina e riprova.");
@@ -819,7 +836,7 @@
             const { data: { session } } = await _supabase.auth.getSession();
             if (!session) {
                 alert("Sessione scaduta. Effettua di nuovo l'accesso.");
-                mostraLogin();
+                window.mostraLogin();
                 return;
             }
 
@@ -926,11 +943,11 @@ Il documento è nella sezione "Bozze" del tuo account.`);
             } catch (err) {
                 alert("Errore di rete: " + err.message);
             }
-        }
+        };
 
         let listaNoleggi = [];
 
-        async function caricaDatiCloud() {
+        window.caricaDatiCloud = async function() {
             const filtro = document.getElementById('filtroPeriodo').value;
             if(!_supabase) return;
 
@@ -959,7 +976,7 @@ Il documento è nella sezione "Bozze" del tuo account.`);
             } catch(err) {
                 console.error("Errore di rete:", err);
             }
-        }
+        };
 
         function aggiornaDashboardKPI(noleggi) {
             let totaleFatturato = 0;
@@ -1029,7 +1046,7 @@ Il documento è nella sezione "Bozze" del tuo account.`);
             });
         }
 
-        async function registraNoleggioCloud(e) {
+        window.registraNoleggioCloud = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-salva-noleggio');
             btn.disabled = true;
@@ -1053,16 +1070,16 @@ Il documento è nella sezione "Bozze" del tuo account.`);
                 caricaDatiCloud();
             }
             btn.disabled = false;
-        }
+        };
 
-        async function eliminaNoleggio(id) {
+        window.eliminaNoleggio = async function(id) {
             if(confirm("Sei sicuro di voler eliminare questo noleggio dal database cloud?")) {
                 await _supabase.from('noleggi').delete().eq('id', id);
                 caricaDatiCloud();
             }
-        }
+        };
 
-        function esportaCSV() {
+        window.esportaCSV = function() {
             let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin
 ";
             listaNoleggi.forEach(n => {
@@ -1075,7 +1092,7 @@ Il documento è nella sezione "Bozze" del tuo account.`);
             a.setAttribute('href', url);
             a.setAttribute('download', 'noleggi_nauticovi_cloud.csv');
             a.click();
-        }
+        };
     </script>
 </body>
 </html>
