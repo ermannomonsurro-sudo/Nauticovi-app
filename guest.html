@@ -984,18 +984,27 @@
         }
 
         
-       // LAYER POLIGONALE FASCIA DI RISPETTO 200M BAGNANTI (PRAIA A MARE)
+       // LAYER POLIGONALE FASCIA DI RISPETTO 200M BAGNANTI (PRAIA A MARE) - CALIBRATO
        let fascia200mPolygon;
 
        function disegnaFascia200mCosta() {
            if (!map) return;
 
+           // Coordinate calibrate sulla battigia reale di Praia a Mare e offset 200m al largo
            const coordsFascia200m = [
-               [39.8980, 15.7780], // Punto Nord Spiaggia
-               [39.8980, 15.7755], // 200m al largo Nord
-               [39.8700, 15.7725], // 200m al largo Centro
-               [39.8450, 15.7860], // 200m al largo Sud (Arco Magno)
-               [39.8450, 15.7885]  // Punto Sud Costa
+               // --- LINEA BATTIGIA COSTA (da Nord a Sud) ---
+               [39.9050, 15.7725], // Confine Nord / Foce Noce (Costa)
+               [39.8970, 15.7760], // Praia Centro Nord (Costa)
+               [39.8900, 15.7785], // Praia Centro / Lungomare (Costa)
+               [39.8830, 15.7795], // Banchina / Lido Fiuzzi Nord (Costa)
+               [39.8760, 15.7820], // Fiuzzi / Località Mantinera (Costa)
+
+               // --- LINEA 200 METRI AL LARGO (da Sud a Nord) ---
+               [39.8760, 15.7792], // Offset 200m al largo Fiuzzi
+               [39.8830, 15.7767], // Offset 200m al largo Banchina
+               [39.8900, 15.7757], // Offset 200m al largo Praia Centro
+               [39.8970, 15.7732], // Offset 200m al largo Praia Nord
+               [39.9050, 15.7697]  // Offset 200m al largo Foce Noce
            ];
 
            if (fascia200mPolygon) map.removeLayer(fascia200mPolygon);
@@ -1005,13 +1014,13 @@
                weight: 2,
                dashArray: '6, 6',
                fillColor: '#ef4444',
-               fillOpacity: 0.20
+               fillOpacity: 0.25
            }).addTo(map);
 
            fascia200mPolygon.bindPopup(`
                <div class="text-xs p-1 text-center font-sans">
-                   <b class="text-red-600 block text-sm">🚫 ZONA DI RISPETTO 200M</b>
-                   <p class="text-slate-600 mt-1">Fascia riservata ai bagnanti. Navigazione a motore strictly VIETATA entro questa area.</p>
+                   <b class="text-red-600 block text-sm">🚫 ZONA DI RISPETTO 200M BAGNANTI</b>
+                   <p class="text-slate-600 mt-1">Fascia riservata alla balneazione lungo le spiagge di Praia a Mare. Navigazione a motore strictly VIETATA.</p>
                </div>
            `);
        }
