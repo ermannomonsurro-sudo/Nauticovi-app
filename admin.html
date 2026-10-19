@@ -106,14 +106,14 @@
                 </div>
             </div>
 
-            <!-- 2. SEZIONE CMS - GESTIONE CONTENUTI, DESTINAZIONI, PERICOLI, BASE & ITINERARI -->
+            <!-- 2. SEZIONE CMS - GESTIONE CONTENUTI, DESTINAZIONI, PERICOLI, BASE & ITINERARI CON UPLOAD FOTO -->
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 gap-2">
                     <div>
                         <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                             <i class="fa-solid fa-layer-group text-cyan-600"></i> CMS — Gestione Contenuti, Base, Pericoli & Flotta
                         </h2>
-                        <p class="text-xs text-slate-500">Gestisci le destinazioni, il punto Base Nauticovi, i segnali di pericolo sulla mappa, gli itinerari e la flotta</p>
+                        <p class="text-xs text-slate-500">Gestisci le destinazioni, la base, i pericoli, gli itinerari, la flotta e carica direttamente le foto su Supabase Storage</p>
                     </div>
                 </div>
 
@@ -198,9 +198,20 @@
                                 </div>
                             </div>
 
-                            <div>
-                                <label class="block font-bold text-slate-600 uppercase">URL Immagine (Foto Reale)</label>
-                                <input type="url" id="cms_immagine_url" placeholder="https://..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                            <!-- GESTIONE IMMAGINE CON UPLOAD DIRETTO SUPABASE STORAGE O LINK ESTERNO -->
+                            <div class="space-y-2 p-3 bg-slate-100 rounded-xl border border-slate-200">
+                                <b class="block text-slate-800 font-bold uppercase text-[10px]"><i class="fa-solid fa-image text-cyan-600"></i> Immagine di Copertina</b>
+                                <div>
+                                    <label class="block text-[9px] font-bold text-slate-600 uppercase">Carica Immagine da Dispositivo (Supabase Storage)</label>
+                                    <input type="file" id="cms_file_upload" accept="image/*" onchange="uploadFotoSupabaseStorage(this)" class="w-full mt-1 text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700 cursor-pointer">
+                                </div>
+                                <div>
+                                    <label class="block text-[9px] font-bold text-slate-600 uppercase">Oppure incolla URL Immagine</label>
+                                    <input type="url" id="cms_immagine_url" placeholder="https://..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none text-xs">
+                                </div>
+                                <div id="upload_spinner" class="hidden text-xs text-cyan-700 font-bold flex items-center gap-2">
+                                    <i class="fa-solid fa-spinner animate-spin"></i> Caricamento file su Supabase Storage (`cms-media`)...
+                                </div>
                             </div>
 
                             <!-- CAMPI PREZZI PERSONALIZZATI PER BARCHE -->
@@ -415,12 +426,53 @@
             });
         });
 
-        // CMS LOGIC CON PERICOLI, BASE, EDITING E MODIFICA CONTENUTI ESISTENTI
+        // CMS LOGIC CON PERICOLI, BASE, EDITING E UPLOAD SUPABASE STORAGE
         let listaCMSCache = [];
 
-        // Categorie che hanno coordinate GPS sulla mappa
         function isCategoriaGPS(cat) {
             return cat === 'destinazioni' || cat === 'base' || cat === 'banchina' || cat === 'pericoli';
+        }
+
+        // CARICAMENTO FILE SU BUCKET SUPABASE STORAGE ('cms-media') CON FALLBACK BASE64 DATA URL
+        async function uploadFotoSupabaseStorage(inputEl) {
+            if (!inputEl.files || inputEl.files.length === 0) return;
+            const file = inputEl.files[0];
+            const spinner = document.getElementById('upload_spinner');
+            if (spinner) spinner.classList.remove('hidden');
+
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+            const filePath = `uploads/${fileName}`;
+
+            try {
+                // Tentativo di upload diretto nel bucket pubblico `cms-media`
+                const { data, error } = await _supabase.storage.from('cms-media').upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: true
+                });
+
+                if (error) {
+                    console.warn("Upload Storage fallito/bucket non presente, converto in Base64 Data URL localmente:", error.message);
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        document.getElementById('cms_immagine_url').value = e.target.result;
+                        if (spinner) spinner.classList.add('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    const { data: publicUrlData } = _supabase.storage.from('cms-media').getPublicUrl(filePath);
+                    document.getElementById('cms_immagine_url').value = publicUrlData.publicUrl;
+                    if (spinner) spinner.classList.add('hidden');
+                }
+            } catch (err) {
+                console.error("Errore upload file:", err);
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('cms_immagine_url').value = e.target.result;
+                    if (spinner) spinner.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
         }
 
         async function caricaContenutiCMS() {
@@ -720,11 +772,15 @@
                 const data = await res.json();
 
                 if (res.ok && data.data) {
-                    alert(`BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: ${data.data.id}\nIl documento è nella sezione "Bozze" del tuo account.`);
+                    alert(`BOZZA CREATA SU FATTURE IN CLOUD!
+
+ID Bozza: ${data.data.id}
+Il documento è nella sezione "Bozze" del tuo account.`);
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
-                    alert("Errore Fatture in Cloud:\n" + JSON.stringify(data.error || data, null, 2));
+                    alert("Errore Fatture in Cloud:
+" + JSON.stringify(data.error || data, null, 2));
                 }
             } catch (err) {
                 alert("Errore di rete: " + err.message);
@@ -797,7 +853,11 @@
                 const guestLink = `${window.location.origin}/guest.html?cliente=${encodeURIComponent(n.nome_cliente)}&barca=${encodeURIComponent(n.barca)}&date=${n.data_noleggio}`;
                 const telefonoWa = String(n.telefono || '').replace(/\D/g, '');
 
-                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).\n\n⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}\n\n🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
+                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).
+
+⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}
+
+🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
 
                 const badgeCheckin = n.stato_checkin === 'completato'
                     ? `<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">✓ Completato</span>`
