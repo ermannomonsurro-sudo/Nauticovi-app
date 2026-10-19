@@ -23,7 +23,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans pb-12">
 
-    <!-- SCHERMATA LOGIN ADMIN -->
+    <!-- SCHERMATA LOGIN ADMIN (Struttura DIV isolata, zero tag FORM per prevenire invii o redirect del browser) -->
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200 max-w-sm w-full space-y-4 text-center">
             <div class="flex flex-col items-center justify-center gap-2">
@@ -35,7 +35,7 @@
                 <i class="fa-solid fa-arrow-left"></i> Torna alla Home
             </a>
 
-            <!-- Div contenitore senza form HTML nativo per evitare il submit/redirect del browser -->
+            <!-- Contenitore isolato senza form nativo -->
             <div class="space-y-3 pt-2 text-left">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Email Admin</label>
@@ -169,33 +169,32 @@
                         <form id="cmsForm" onsubmit="salvaContenutoCMS(event)" class="space-y-3 text-xs">
                             <input type="hidden" id="cms_edit_id" value="">
                             
-                            <!-- SELETTORE SOTTO-CATEGORIA (CAMBIA IN BASE ALLA MACRO TAB ATTIVA) -->
+                            <!-- SELETTORE SOTTO-CATEGORIA -->
                             <div>
                                 <label class="block font-bold text-slate-600 uppercase mb-1">Tipologia Elemento</label>
                                 <select id="cms_categoria" onchange="toggleCampiCMS()" class="w-full p-2 border rounded-lg bg-white font-semibold outline-none focus:ring-2 focus:ring-cyan-500">
-                                    <!-- Opzioni popolate dinamicamente da JS -->
                                 </select>
                             </div>
 
-                            <!-- CAMPO TITOLO / DOMANDA FAQ -->
+                            <!-- CAMPO TITOLO -->
                             <div>
                                 <label id="label-cms-titolo" class="block font-bold text-slate-600 uppercase">Titolo Elemento</label>
                                 <input type="text" id="cms_titolo" required placeholder="Inserisci il titolo..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none bg-white">
                             </div>
 
-                            <!-- CAMPO SOTTOTITOLO / DETTAGLIO -->
+                            <!-- CAMPO SOTTOTITOLO -->
                             <div id="box-sottotitolo-cms">
-                                <label id="label-cms-sottotitolo" class="block font-bold text-slate-600 uppercase">Sottotitolo / Dettaglio (es. Punto Rientro)</label>
+                                <label id="label-cms-sottotitolo" class="block font-bold text-slate-600 uppercase">Sottotitolo / Dettaglio</label>
                                 <input type="text" id="cms_sottotitolo" placeholder="Es. Banchina Principale o Max 6 Persone" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none bg-white">
                             </div>
 
-                            <!-- CAMPO DESCRIZIONE / RISPOSTA FAQ -->
+                            <!-- CAMPO DESCRIZIONE -->
                             <div>
                                 <label id="label-cms-descrizione" class="block font-bold text-slate-600 uppercase">Descrizione / Dettagli</label>
                                 <textarea id="cms_descrizione" required rows="2" placeholder="Inserisci il testo dettagliato..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none bg-white"></textarea>
                             </div>
 
-                            <!-- BOX CARICAMENTO IMMAGINI (FOTO PRINCIPALE + GALLERIA FOTO 2 & FOTO 3) -->
+                            <!-- BOX CARICAMENTO IMMAGINI -->
                             <div id="box-foto-cms" class="space-y-2 p-3 bg-slate-100 rounded-xl border border-slate-200">
                                 <b class="block text-slate-800 font-bold uppercase text-[10px]"><i class="fa-solid fa-image text-cyan-600"></i> Immagine di Copertina / Foto Reale</b>
                                 <div>
@@ -207,7 +206,6 @@
                                     <input type="url" id="cms_immagine_url" placeholder="https://..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none text-xs bg-white">
                                 </div>
 
-                                <!-- GALLERIA IMMAGINI SUPPLEMENTARI (PER DESTINAZIONI E FLOTTA) -->
                                 <div id="box-galleria-extra" class="pt-2 border-t border-slate-200/80 space-y-2 hidden">
                                     <b class="block text-purple-900 font-bold uppercase text-[10px]">📸 Galleria Fotografica Aggiuntiva (Carosello 3 Foto)</b>
                                     <div>
@@ -225,7 +223,7 @@
                                 </div>
                             </div>
 
-                            <!-- CAMPI COORDINATE GPS ED AUDIOGUIDA (PER DESTINAZIONI, BASE E PERICOLI) -->
+                            <!-- CAMPI COORDINATE GPS ED AUDIOGUIDA -->
                             <div id="box-gps-cms" class="p-3 bg-cyan-50/60 border border-cyan-200 rounded-xl space-y-2">
                                 <b class="block text-cyan-900 font-bold uppercase text-[10px]">📍 Coordinate GPS sulla Mappa</b>
                                 <div class="grid grid-cols-2 gap-2">
@@ -246,7 +244,7 @@
                                 </div>
                             </div>
 
-                            <!-- CAMPI PREZZI PERSONALIZZATI PER BARCHE -->
+                            <!-- CAMPI PREZZI PERSONALIZZATI -->
                             <div id="box-prezzi-cms" class="hidden p-3 bg-cyan-50 border border-cyan-200 rounded-xl space-y-2">
                                 <b class="block text-cyan-900 font-bold uppercase text-[10px]">💶 Prezzi Personalizzati (€)</b>
                                 <div class="grid grid-cols-2 gap-2">
@@ -282,7 +280,7 @@
                         </form>
                     </div>
 
-                    <!-- COLONNA CONTENUTI ATTIVI FILTRATI (COLONNA DESTRA) -->
+                    <!-- COLONNA CONTENUTI ATTIVI FILTRATI -->
                     <div class="lg:col-span-2 space-y-3">
                         <div class="flex justify-between items-center border-b pb-2">
                             <h3 class="text-xs font-extrabold uppercase text-slate-700 flex items-center gap-1.5">
@@ -412,7 +410,7 @@
 
         async function eseguiLogin(e) {
             if (e) {
-                e.preventDefault();
+                if (e.preventDefault) e.preventDefault();
                 if (e.stopPropagation) e.stopPropagation();
             }
 
@@ -423,7 +421,7 @@
 
             if (!email || !password) {
                 errorEl.classList.remove('hidden');
-                errorEl.innerText = "Compila sia email che password.";
+                errorEl.innerText = "Inserisci sia email che password.";
                 return false;
             }
 
@@ -445,9 +443,9 @@
                 document.getElementById('admin-pass').value = '';
                 mostraPannello();
             } catch (err) {
-                console.error("Errore imprevisto:", err);
+                console.error("Errore imprevisto durante il login:", err);
                 errorEl.classList.remove('hidden');
-                errorEl.innerText = "Errore di rete o connessione.";
+                errorEl.innerText = "Errore di connessione o di rete.";
                 btn.disabled = false;
                 btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Accedi al Gestionale`;
             }
@@ -527,17 +525,14 @@
         function selezionaMacroTab(tabKey) {
             currentMacroTab = tabKey;
             
-            // Aggiorna stile dei pulsanti Tab
             document.querySelectorAll('.macro-tab-btn').forEach(btn => btn.classList.remove('active'));
             const activeBtn = document.getElementById(`macro-tab-${tabKey}`);
             if (activeBtn) activeBtn.classList.add('active');
 
-            // Aggiorna Badge e Label
             const config = MACRO_CONFIG[tabKey];
             document.getElementById('macro-tab-label-badge').innerText = config.label.toUpperCase();
             document.getElementById('col-categoria-attiva').innerText = config.label;
 
-            // Popola la select delle categorie per la tab scelta
             const selectCat = document.getElementById('cms_categoria');
             selectCat.innerHTML = '';
             config.categorie.forEach(c => {
@@ -567,7 +562,6 @@
             const labelSottotitolo = document.getElementById('label-cms-sottotitolo');
             const labelDescrizione = document.getElementById('label-cms-descrizione');
 
-            // Reset visibilità
             boxPrezzi.classList.add('hidden');
             boxGps.classList.add('hidden');
             boxFoto.classList.remove('hidden');
@@ -654,7 +648,6 @@
 
                 listaCMSCache = data;
 
-                // Filtra i dati in base alla Macro-Tab attiva
                 const categorieTabAttiva = MACRO_CONFIG[currentMacroTab].categorie.map(c => c.value);
                 const filtrati = data.filter(item => categorieTabAttiva.includes(item.categoria));
 
@@ -1073,9 +1066,11 @@ Il documento è nella sezione "Bozze" del tuo account.`);
         }
 
         function esportaCSV() {
-            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin\n";
+            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin
+";
             listaNoleggi.forEach(n => {
-                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"\n`;
+                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"
+`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
