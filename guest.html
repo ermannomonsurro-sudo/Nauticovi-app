@@ -702,10 +702,15 @@
         }
 
         function renderPoiCards() {
-            const container = document.getElementById('poi-cards-container');
+            const container = document.getElementById('punti-esatti-lista');
             if (!container) return;
-            container.innerHTML = '';
 
+            if (!poiList || poiList.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-4">${translations[currentLang]?.no_dest_cms || 'Nessuna destinazione trovata nel CMS.'}</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
             const btnNavText = translations[currentLang]?.btn_start_nav || "Avvia Navigatore GPS";
 
             poiList.forEach(poi => {
@@ -1154,9 +1159,14 @@ Mia Posizione GPS Attuale: https://maps.google.com/?q=${lastLat},${lastLng}`;
                 const { data, error } = await _supabase.from('cms_contenuti').select('*').order('created_at', { ascending: false });
                 if (error || !data) return;
 
-                poiList = data.filter(i => i.categoria === 'destinazioni');
-                pericoliList = data.filter(i => i.categoria === 'pericoli');
-                itinerariList = data.filter(i => i.categoria === 'itinerari');
+                const destData = data.filter(i => String(i.categoria).toLowerCase() === 'destinazioni');
+                if (destData.length > 0) poiList = destData;
+                
+                const pericoliData = data.filter(i => String(i.categoria).toLowerCase() === 'pericoli');
+                if (pericoliData.length > 0) pericoliList = pericoliData;
+                
+                const itinData = data.filter(i => String(i.categoria).toLowerCase() === 'itinerari');
+                if (itinData.length > 0) itinerariList = itinData;
 
                 renderPoiCards();
                 renderItinerariCards();
