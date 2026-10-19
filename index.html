@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NAUTICOVI - Noleggio Barche & SUP Praia a Mare</title>
 
-    <!-- METATAG PWA & ICONA PER SCHERMATA HOME SMARTPHONE -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <meta name="mobile-web-app-capable" content="yes">
@@ -17,6 +16,8 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Supabase Client JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .hero-bg {
             background: linear-gradient(to bottom, rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.95)), url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80');
@@ -33,7 +34,6 @@
             transform: scale(1.15);
             border-color: #06b6d4;
         }
-        /* Nasconde il titolo inglese di Elfsight se presente per sostituirlo con il nostro in italiano */
         .elfsight-app-a7d2ad04-84e6-4138-bf19-05221c510fb4 [class*="Header__Title"],
         .elfsight-app-a7d2ad04-84e6-4138-bf19-05221c510fb4 [class*="Title-sc"] {
             display: none !important;
@@ -42,25 +42,15 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans pb-16">
 
-    <!-- HERO SECTION SCENOGRAFICA CON LOGO & COVER MARE -->
+    <!-- HERO SECTION -->
     <header class="hero-bg text-white pt-6 pb-16 px-4 text-center shadow-2xl border-b-4 border-cyan-500 relative overflow-hidden">
-
-        <!-- SELETTORE LINGUA CON BANDIERE -->
         <div class="max-w-md mx-auto flex justify-end gap-3 mb-6 relative z-30">
-            <button onclick="setLanguage('it')" id="flag-it" class="flag-btn active bg-slate-800/80 p-1.5 rounded-full border-2 border-slate-600 shadow" title="Italiano">
-                <span class="text-base">🇮🇹</span>
-            </button>
-            <button onclick="setLanguage('en')" id="flag-en" class="flag-btn bg-slate-800/80 p-1.5 rounded-full border-2 border-slate-600 shadow" title="English">
-                <span class="text-base">🇬🇧</span>
-            </button>
-            <button onclick="setLanguage('es')" id="flag-es" class="flag-btn bg-slate-800/80 p-1.5 rounded-full border-2 border-slate-600 shadow" title="Español">
-                <span class="text-base">🇪🇸</span>
-            </button>
+            <button onclick="setLanguage('it')" id="flag-it" class="flag-btn active bg-slate-800/80 p-1.5 rounded-full border-2 border-slate-600 shadow">🇮🇹</button>
+            <button onclick="setLanguage('en')" id="flag-en" class="flag-btn bg-slate-800/80 p-1.5 rounded-full border-2 border-slate-600 shadow">🇬🇧</button>
+            <button onclick="setLanguage('es')" id="flag-es" class="flag-btn bg-slate-800/80 p-1.5 rounded-full border-2 border-slate-600 shadow">🇪🇸</button>
         </div>
 
         <div class="max-w-md mx-auto space-y-4 relative z-10">
-
-            <!-- Logo & Brand Header (Usa il logo.png trasparente originale del sito) -->
             <div class="flex flex-col items-center justify-center gap-2">
                 <img src="logo.png" alt="Nauticovi Logo" class="h-20 sm:h-24 w-auto object-contain drop-shadow-lg">
             </div>
@@ -69,7 +59,6 @@
                 NOLEGGIO BARCHE & SUP • PRAIA A MARE
             </p>
 
-            <!-- Headline Emozionale Persuasiva -->
             <h2 class="text-2xl font-black text-white leading-tight pt-2" data-i18n="hero_title">
                 Il Tuo Mare, la Tua Barca, Zero Pensieri.
             </h2>
@@ -78,7 +67,6 @@
                 Noleggia gommoni e scafi nuovi <b>100% senza patente</b>. Vivi l'Isola di Dino, la Grotta Azzurra e l'Arco Magno in totale autonomia.
             </p>
 
-            <!-- PULSANTE PRIMARIO PRINCIPALE AD ALTA CONVERSIONE -->
             <div class="pt-4">
                 <a href="catalogo.html" class="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600 text-white text-base font-black px-8 py-4 rounded-2xl shadow-2xl transform active:scale-95 transition border border-white/20 w-full max-w-xs">
                     <i class="fa-solid fa-ship text-xl"></i>
@@ -86,13 +74,12 @@
                     <i class="fa-solid fa-arrow-right text-sm"></i>
                 </a>
             </div>
-
         </div>
     </header>
 
     <main class="max-w-md mx-auto p-4 space-y-6 -mt-8 relative z-20">
 
-        <!-- STATS / HIGHLIGHTS AD IMPATTO VISIVO -->
+        <!-- HIGHLIGHTS -->
         <div class="grid grid-cols-3 gap-2 text-center text-xs">
             <div class="bg-white p-3 rounded-2xl shadow-md border border-slate-200/80">
                 <i class="fa-solid fa-id-card text-cyan-600 text-lg mb-1 block"></i>
@@ -111,7 +98,7 @@
             </div>
         </div>
 
-        <!-- DESTINAZIONI ESPANDIBILI (ACCORDION AD 3 SLOT) -->
+        <!-- DESTINAZIONI ESPANDIBILI -->
         <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
             <div class="flex justify-between items-center border-b pb-2">
                 <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2">
@@ -120,10 +107,10 @@
                 <span class="text-[10px] text-cyan-600 font-bold" data-i18n="destinations_subtitle">Clicca per scoprire</span>
             </div>
 
-            <!-- SLOT 1: Isola di Dino & Grotte (Azzurra e Leone) -->
+            <!-- SLOT 1: Isola di Dino -->
             <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm transition">
                 <button onclick="toggleSlot('slot-dino')" class="w-full text-left relative h-28 block group focus:outline-none">
-                    <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" alt="Isola di Dino" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    <img id="index-img-dino" src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80" alt="Isola di Dino" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                     <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent p-3 flex justify-between items-end text-white">
                         <div>
                             <b class="text-sm font-bold block" data-i18n="dest_dino_title">Isola di Dino, Grotta Azzurra & Leone</b>
@@ -134,59 +121,31 @@
                 </button>
                 <div id="slot-dino" class="hidden p-4 bg-slate-50 border-t border-slate-200 text-xs text-slate-600 space-y-2">
                     <p data-i18n="dest_dino_desc">
-                        L'Isola di Dino è il simbolo di Praia a Mare. Circumnavigandola potrai entrare nella maestosa <b>Grotta Azzurra</b> per fare il bagno in acque cristalline ed esplorare la spettacolare <b>Grotta del Leone</b>, famosa per la roccia naturale a forma di leone ruggente.
+                        L'Isola di Dino è il simbolo di Praia a Mare. Circumnavigandola potrai entrare nella maestosa <b>Grotta Azzurra</b> per fare il bagno in acque cristalline.
                     </p>
-                    <div class="flex items-center gap-2 text-[10px] text-cyan-700 font-bold bg-cyan-100/60 p-2 rounded-lg">
-                        <i class="fa-solid fa-compass"></i> <span data-i18n="dest_dino_time">Distanza: 5 Minuti • Ideale per Snorkeling & Tuffi</span>
-                    </div>
                 </div>
             </div>
 
-            <!-- SLOT 2: Arco Magno & San Nicola Arcella -->
+            <!-- SLOT 2: Arco Magno -->
             <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm transition">
                 <button onclick="toggleSlot('slot-arcomagno')" class="w-full text-left relative h-28 block group focus:outline-none">
-                    <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" alt="Arco Magno" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    <img id="index-img-arcomagno" src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" alt="Arco Magno" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                     <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent p-3 flex justify-between items-end text-white">
                         <div>
                             <b class="text-sm font-bold block" data-i18n="dest_arcomagno_title">Arco Magno & Grotta del Saraceno</b>
-                            <span class="text-[10px] text-cyan-300" data-i18n="dest_arcomagno_sub">San Nicola Arcella • Laguna naturale incastonato nella roccia</span>
+                            <span class="text-[10px] text-cyan-300" data-i18n="dest_arcomagno_sub">San Nicola Arcella • Laguna naturale</span>
                         </div>
                         <i id="icon-slot-arcomagno" class="fa-solid fa-chevron-down text-cyan-400 text-xs transition-transform duration-300"></i>
                     </div>
                 </button>
                 <div id="slot-arcomagno" class="hidden p-4 bg-slate-50 border-t border-slate-200 text-xs text-slate-600 space-y-2">
                     <p data-i18n="dest_arcomagno_desc">
-                        L'<b>Arco Magno</b> è un maestoso arco di roccia naturale che racchiude un'incantevole caletta segreta accessibile via mare. Proseguendo scorgerai la suggestiva <b>Grotta del Saraceno</b> e la bellissima insenatura di San Nicola Arcella.
+                        L'<b>Arco Magno</b> è un maestoso arco di roccia naturale che racchiude un'incantevole caletta segreta accessibile via mare.
                     </p>
-                    <div class="flex items-center gap-2 text-[10px] text-cyan-700 font-bold bg-cyan-100/60 p-2 rounded-lg">
-                        <i class="fa-solid fa-camera"></i> <span data-i18n="dest_arcomagno_time">Distanza: 12 Minuti • Scorcio Fotografico Unico</span>
-                    </div>
                 </div>
             </div>
 
-            <!-- SLOT 3: Maratea & Costa Lucana -->
-            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm transition">
-                <button onclick="toggleSlot('slot-maratea')" class="w-full text-left relative h-28 block group focus:outline-none">
-                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" alt="Costa di Maratea" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent p-3 flex justify-between items-end text-white">
-                        <div>
-                            <b class="text-sm font-bold block" data-i18n="dest_maratea_title">Costa di Maratea & Secca della Sciabella</b>
-                            <span class="text-[10px] text-cyan-300" data-i18n="dest_maratea_sub">Calette incontaminate, insenature selvagge e Cristo Redentore</span>
-                        </div>
-                        <i id="icon-slot-maratea" class="fa-solid fa-chevron-down text-cyan-400 text-xs transition-transform duration-300"></i>
-                    </div>
-                </button>
-                <div id="slot-maratea" class="hidden p-4 bg-slate-50 border-t border-slate-200 text-xs text-slate-600 space-y-2">
-                    <p data-i18n="dest_maratea_desc">
-                        Navigando verso nord raggiungi la splendida <b>Costa Tirrenica Lucana di Maratea</b>. Scoprirai la Secca della Sciabella, le spiagge nere di Castrocucco e la vista mozzafiato sul gigantesco <b>Cristo Redentore</b> che domina il mare dall'alto.
-                    </p>
-                    <div class="flex items-center gap-2 text-[10px] text-cyan-700 font-bold bg-cyan-100/60 p-2 rounded-lg">
-                        <i class="fa-solid fa-anchor"></i> <span data-i18n="dest_maratea_time">Distanza: 20 Minuti • Relax & Acque Incontaminate</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PULSANTE VEDI GUIDA COMPLETA DESTINAZIONI -->
+            <!-- PULSANTE GUIDA COMPLETA -->
             <div class="pt-2 text-center">
                 <a href="destinazioni.html" class="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold px-5 py-3 rounded-xl shadow transition w-full">
                     <i class="fa-solid fa-map-location-dot text-cyan-400"></i>
@@ -195,68 +154,19 @@
             </div>
         </div>
 
-        <!-- SOCIAL PROOF & RECENSIONI REALI GOOGLE (ELFSIGHT WIDGET CON TITOLO ITALIANO) -->
+        <!-- ELFSIGHT RECENSIONI -->
         <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200 space-y-3 text-center overflow-hidden">
             <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider border-b pb-2 flex items-center justify-center gap-2">
                 <i class="fa-brands fa-google text-red-500 text-sm"></i> <span data-i18n="reviews_section_title">Cosa Dicono i Nostri Clienti</span>
             </h3>
-
-            <!-- Elfsight Google Reviews Widget -->
             <script src="https://elfsightcdn.com/platform.js" async></script>
             <div class="elfsight-app-a7d2ad04-84e6-4138-bf19-05221c510fb4" data-elfsight-app-lazy></div>
-
-            <div class="pt-2 border-t border-slate-100 flex justify-center items-center gap-2">
-                <a href="https://share.google/x81whRHwldPZQKUrw" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-700 hover:text-cyan-800 bg-cyan-50 px-3.5 py-2 rounded-xl border border-cyan-100 shadow-sm transition">
-                    <i class="fa-brands fa-google text-red-500"></i> <span data-i18n="btn_read_reviews">Leggi tutte le Recensioni Ufficiali su Google</span>
-                </a>
-            </div>
-        </div>
-
-        <!-- FASCIA FAQ RAPIDE PER SUPERARE LE FRIZIONI -->
-        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3">
-            <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider border-b pb-2 flex items-center gap-2">
-                <i class="fa-solid fa-circle-question text-cyan-600"></i> <span data-i18n="faq_title">Hai Domande prima di Noleggiare?</span>
-            </h3>
-
-            <div class="space-y-2.5 text-xs text-slate-600">
-                <div>
-                    <b class="text-slate-800 block" data-i18n="faq_q1">E se non ho mai guidato una barca?</b>
-                    <span data-i18n="faq_a1">Nessun problema! Prima di salpare faremo un briefing di 5 minuti dove ti spiegheremo comandi, ancora e sicurezza.</span>
-                </div>
-                <div class="border-t pt-2">
-                    <b class="text-slate-800 block" data-i18n="faq_q2">Come funziona in caso di brutto tempo?</b>
-                    <span data-i18n="faq_a2">In caso di mare mosso o allerta meteo, la caparra del 50% viene rimborsata al 100% o la data spostata gratuitamente.</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- SEZIONE CONTATTI E SOCIAL (WHATSAPP, INSTAGRAM, GOOGLE) -->
-        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-3 text-center">
-            <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider border-b pb-2 flex items-center justify-center gap-2">
-                <i class="fa-solid fa-comments text-cyan-600"></i> <span data-i18n="social_section_title">Seguici & Contattaci</span>
-            </h3>
-
-            <div class="grid grid-cols-3 gap-2 pt-1 text-xs font-bold">
-                <a href="https://wa.me/393484364498?text=Ciao!%20Vorrei%20informazioni%20per%20un%20noleggio" target="_blank" class="p-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-center shadow flex flex-col items-center justify-center gap-1 transition">
-                    <i class="fa-brands fa-whatsapp text-lg"></i>
-                    <span class="text-[10px]">WhatsApp</span>
-                </a>
-                <a href="https://www.instagram.com/noleggio_barche_praia?srtk=MWxxMmp1azFvbWl5Zg==" target="_blank" class="p-3 bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 hover:opacity-90 text-white rounded-xl text-center shadow flex flex-col items-center justify-center gap-1 transition">
-                    <i class="fa-brands fa-instagram text-lg"></i>
-                    <span class="text-[10px]">Instagram</span>
-                </a>
-                <a href="https://share.google/x81whRHwldPZQKUrw" target="_blank" class="p-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-center shadow flex flex-col items-center justify-center gap-1 transition">
-                    <i class="fa-brands fa-google text-red-400 text-lg"></i>
-                    <span class="text-[10px]">Recensioni</span>
-                </a>
-            </div>
         </div>
 
     </main>
 
     <footer class="mt-8 text-center pb-8 border-t border-slate-200 pt-6 bg-white">
         <p class="text-xs font-bold text-slate-700">NAUTICOVI • Praia a Mare (CS)</p>
-        <p class="text-[10px] text-slate-400 mt-0.5" data-i18n="footer_sub">Noleggio Barche & SUP senza patente</p>
         <div class="mt-4">
             <a href="admin.html" class="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-cyan-600 font-medium transition bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
                 <i class="fa-solid fa-lock text-cyan-600"></i> <span data-i18n="admin_access">Area Riservata Gestore</span>
@@ -264,55 +174,40 @@
         </div>
     </footer>
 
-    <!-- SERVICE WORKER REGISTRATION PER PWA -->
+    <!-- SCRIPT SUPABASE E TRADUZIONI -->
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker registrato con successo:', reg))
-                    .catch(err => console.error('Errore registrazione Service Worker:', err));
-            });
-        }
-    </script>
+        const SUPABASE_URL = "https://cbvpixcfhmedbapnvfmw.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_V0B06YxZ1oW6tqg_6yx5og_OgbhxlUo";
+        let _supabase;
+        try { _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e){}
 
-    <!-- DIZIONARIO DI TRADUZIONE IT / EN / ES & LOGICA ACCORDION -->
-    <script>
+        async function sincronizzaFotoIndex() {
+            if (!_supabase) return;
+            try {
+                const { data } = await _supabase.from('cms_contenuti').select('*').eq('categoria', 'destinazioni');
+                if (data && data.length > 0) {
+                    data.forEach(item => {
+                        const tit = (item.titolo || '').toLowerCase();
+                        if (tit.includes('dino') && item.immagine_url) {
+                            const el = document.getElementById('index-img-dino');
+                            if (el) el.src = item.immagine_url;
+                        } else if (tit.includes('arco') && item.immagine_url) {
+                            const el = document.getElementById('index-img-arcomagno');
+                            if (el) el.src = item.immagine_url;
+                        }
+                    });
+                }
+            } catch(e){}
+        }
+
         const translations = {
             it: {
                 tagline: "NOLEGGIO BARCHE & SUP • PRAIA A MARE",
                 hero_title: "Il Tuo Mare, la Tua Barca, Zero Pensieri.",
                 hero_desc: "Noleggia gommoni e scafi nuovi <b>100% senza patente</b>. Vivi l'Isola di Dino, la Grotta Azzurra e l'Arco Magno in totale autonomia.",
                 btn_catalog: "SCOPRI FLOTTA & PREZZI",
-                stat_no_license_title: "Senza Patente",
-                stat_no_license_sub: "Guida facile 30/40 CV",
-                stat_weather_title: "Garanzia Meteo",
-                stat_weather_sub: "100% Rimborsabile",
-                stat_fridge_title: "Frigo + Ghiaccio",
-                stat_fridge_sub: "Su richiesta (15€)",
                 destinations_title: "Le Meraviglie da Esplorare",
-                destinations_subtitle: "Clicca per scoprire",
-                dest_dino_title: "Isola di Dino, Grotta Azzurra & Leone",
-                dest_dino_sub: "A soli 5 minuti di navigazione dalla costa",
-                dest_dino_desc: "L'Isola di Dino è il simbolo di Praia a Mare. Circumnavigandola potrai entrare nella maestosa <b>Grotta Azzurra</b> per fare il bagno in acque cristalline ed esplorare la spettacolare <b>Grotta del Leone</b>, famosa per la roccia naturale a forma di leone ruggente.",
-                dest_dino_time: "Distanza: 5 Minuti • Ideale per Snorkeling & Tuffi",
-                dest_arcomagno_title: "Arco Magno & Grotta del Saraceno",
-                dest_arcomagno_sub: "San Nicola Arcella • Laguna naturale incastonato nella roccia",
-                dest_arcomagno_desc: "L'<b>Arco Magno</b> è un maestoso arco di roccia naturale che racchiude un'incantevole caletta segreta accessibile via mare. Proseguendo scorgerai la suggestiva <b>Grotta del Saraceno</b> e la bellissima insenatura di San Nicola Arcella.",
-                dest_arcomagno_time: "Distanza: 12 Minuti • Scorcio Fotografico Unico",
-                dest_maratea_title: "Costa di Maratea & Secca della Sciabella",
-                dest_maratea_sub: "Calette incontaminate, insenature selvagge e Cristo Redentore",
-                dest_maratea_desc: "Navigando verso nord raggiungi la splendida <b>Costa Tirrenica Lucana di Maratea</b>. Scoprirai la Secca della Sciabella, le spiagge nere di Castrocucco e la vista mozzafiato sul gigantesco <b>Cristo Redentore</b> che domina il mare dall'alto.",
-                dest_maratea_time: "Distanza: 20 Minuti • Relax & Acque Incontaminate",
                 btn_full_guide: "📸 Scopri Foto & Guida Completa dei Posti →",
-                reviews_section_title: "Cosa Dicono i Nostri Clienti",
-                btn_read_reviews: "Leggi tutte le Recensioni Ufficiali su Google",
-                faq_title: "Hai Domande prima di Noleggiare?",
-                faq_q1: "E se non ho mai guidato una barca?",
-                faq_a1: "Nessun problema! Prima di salpare faremo un briefing di 5 minuti dove ti spiegheremo comandi, ancora e sicurezza.",
-                faq_q2: "Come funziona in caso di brutto tempo?",
-                faq_a2: "In caso di mare mosso o allerta meteo, la caparra del 50% viene rimborsata al 100% o la data spostata gratuitamente.",
-                social_section_title: "Seguici & Contattaci",
-                footer_sub: "Noleggio Barche & SUP senza patente",
                 admin_access: "Area Riservata Gestore"
             },
             en: {
@@ -320,36 +215,8 @@
                 hero_title: "Your Sea, Your Boat, Zero Worries.",
                 hero_desc: "Rent new RIBs and motorboats <b>100% no license required</b>. Explore Dino Island, the Blue Grotto and Arco Magno on your own.",
                 btn_catalog: "EXPLORE FLEET & PRICES",
-                stat_no_license_title: "No License",
-                stat_no_license_sub: "Easy driving 30/40 HP",
-                stat_weather_title: "Weather Guarantee",
-                stat_weather_sub: "100% Refundable",
-                stat_fridge_title: "Ice Cooler Box",
-                stat_fridge_sub: "On request (€15)",
                 destinations_title: "Wonders to Explore",
-                destinations_subtitle: "Click to reveal",
-                dest_dino_title: "Dino Island, Blue Grotto & Lion Cave",
-                dest_dino_sub: "Just 5 minutes navigation from the beach",
-                dest_dino_desc: "Dino Island is the landmark of Praia a Mare. Sailing around it, you can enter the majestic <b>Blue Grotto</b> for a swim in crystal waters and explore the breathtaking <b>Lion's Cave</b>, famous for its lion-shaped rock formation.",
-                dest_dino_time: "Distance: 5 Minutes • Ideal for Snorkeling & Diving",
-                dest_arcomagno_title: "Arco Magno & Saracen Cave",
-                dest_arcomagno_sub: "San Nicola Arcella • Natural lagoon surrounded by cliffs",
-                dest_arcomagno_desc: "<b>Arco Magno</b> is a giant natural stone arch protecting a hidden beach accessible only by sea. Continuing along the coast, you'll see the <b>Saracen Cave</b> and the gorgeous bay of San Nicola Arcella.",
-                dest_arcomagno_time: "Distance: 12 Minutes • Unique Photo Spot",
-                dest_maratea_title: "Maratea Coast & Sciabella Shoal",
-                dest_maratea_sub: "Pristine coves, wild bays and the Christ the Redeemer Statue",
-                dest_maratea_desc: "Sailing north you'll reach the stunning <b>Lucanian Coast of Maratea</b>. Discover the Sciabella Shoal, Castrocucco black sand beaches, and the breathtaking view of the giant <b>Christ the Redeemer Statue</b> towering over the sea.",
-                dest_maratea_time: "Distance: 20 Minutes • Pure Relaxation & Pristine Sea",
                 btn_full_guide: "📸 Discover Photos & Full Spots Guide →",
-                reviews_section_title: "What Our Customers Say",
-                btn_read_reviews: "Read all Official Reviews on Google",
-                faq_title: "Questions before Renting?",
-                faq_q1: "What if I have never driven a boat?",
-                faq_a1: "No problem! Before sailing we will do a 5-minute briefing explaining controls, anchor and safety rules.",
-                faq_q2: "What happens in case of bad weather?",
-                faq_a2: "In case of rough sea or weather warning, your 50% deposit is 100% refunded or rescheduled for free.",
-                social_section_title: "Follow & Contact Us",
-                footer_sub: "Boat & SUP rental without license",
                 admin_access: "Manager Private Area"
             },
             es: {
@@ -357,67 +224,31 @@
                 hero_title: "Tu Mar, Tu Barco, Cero Preocupaciones.",
                 hero_desc: "Alquila lanchas y neumáticas <b>100% sin licencia</b>. Descubre la Isla de Dino, la Cueva Azul y el Arco Magno a tu ritmo.",
                 btn_catalog: "VER FLOTA Y PRECIOS",
-                stat_no_license_title: "Sin Licencia",
-                stat_no_license_sub: "Fácil manejo 30/40 CV",
-                stat_weather_title: "Garantía Clima",
-                stat_weather_sub: "100% Reembolsable",
-                stat_fridge_title: "Nevera con Hielo",
-                stat_fridge_sub: "Bajo petición (15€)",
                 destinations_title: "Maravillas por Explorar",
-                destinations_subtitle: "Haz clic para descubrir",
-                dest_dino_title: "Isla de Dino, Cueva Azul y Cueva del León",
-                dest_dino_sub: "A solo 5 minutos de navegación",
-                dest_dino_desc: "La Isla de Dino es el símbolo de Praia a Mare. Al bordearla entrarás en la majestuosa <b>Cueva Azul</b> para nadar en aguas cristalinas y explorar la <b>Cueva del León</b>, famosa por su roca con forma de león.",
-                dest_dino_time: "Distancia: 5 Minutos • Ideal para Snorkel y Saltos",
-                dest_arcomagno_title: "Arco Magno y Cueva del Saraceno",
-                dest_arcomagno_sub: "San Nicola Arcella • Laguna natural entre acantilados",
-                dest_arcomagno_desc: "El <b>Arco Magno</b> es un gran arco de piedra natural que protege una cala secreta accesible por mar. Siguiendo la costa verás la <b>Cueva del Saraceno</b> y la cala de San Nicola Arcella.",
-                dest_arcomagno_time: "Distancia: 12 Minutos • Lugar Fotográfico Único",
-                dest_maratea_title: "Costa de Maratea y Secca della Sciabella",
-                dest_maratea_sub: "Calas vírgenes, acantilados salvajes y el Cristo Redentor",
-                dest_maratea_desc: "Navegando hacia el norte llegarás a la preciosa <b>Costa de Maratea</b>. Descubrirás la Secca della Sciabella, las playas de arena negra y las vistas del colosal <b>Cristo Redentor</b> sobre la montaña.",
-                dest_maratea_time: "Distancia: 20 Minutos • Relax y Aguas Inmaculadas",
                 btn_full_guide: "📸 Descubrir Fotos y Guía Completa →",
-                reviews_section_title: "Lo Que Dicen Nuestros Clientes",
-                btn_read_reviews: "Leer todas las Reseñas Oficiales en Google",
-                faq_title: "¿Preguntas antes de Alquilar?",
-                faq_q1: "¿Y si nunca he conducido un barco?",
-                faq_a1: "¡Sin problema! Antes de salir te daremos una instrucción de 5 minutos sobre mandos, ancla y seguridad.",
-                faq_q2: "¿Qué pasa si hay mal tiempo?",
-                faq_a2: "En caso de mar picado o aviso meteorológico, se reembolsa el 100% de la señal o se cambia de fecha gratis.",
-                social_section_title: "Síguenos y Contáctanos",
-                footer_sub: "Alquiler de barcos y SUP sin titulación",
                 admin_access: "Área Privada Gestión"
             }
         };
 
-        let currentLang = 'it';
-
         function setLanguage(lang) {
-            currentLang = lang;
             localStorage.setItem('nauticovi_lang', lang);
-
-            // Cambia stato visivo bandiere
             document.querySelectorAll('.flag-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('flag-' + lang).classList.add('active');
+            const flagEl = document.getElementById('flag-' + lang);
+            if (flagEl) flagEl.classList.add('active');
 
-            // Traduce tutti gli elementi con attributo data-i18n
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (translations[lang][key]) {
+                if (translations[lang] && translations[lang][key]) {
                     el.innerHTML = translations[lang][key];
                 }
             });
         }
 
-        // LOGICA ACCORDION PER LE DESTINAZIONI (SI CHIUDE L'ALTRO SE SI APRE UNO)
         function toggleSlot(slotId) {
-            const slots = ['slot-dino', 'slot-arcomagno', 'slot-maratea'];
-            
+            const slots = ['slot-dino', 'slot-arcomagno'];
             slots.forEach(id => {
                 const contentEl = document.getElementById(id);
                 const iconEl = document.getElementById('icon-' + id);
-                
                 if (id === slotId) {
                     if (contentEl.classList.contains('hidden')) {
                         contentEl.classList.remove('hidden');
@@ -427,7 +258,6 @@
                         if (iconEl) iconEl.style.transform = 'rotate(0deg)';
                     }
                 } else {
-                    // Chiude gli altri slot aperti
                     contentEl.classList.add('hidden');
                     if (iconEl) iconEl.style.transform = 'rotate(0deg)';
                 }
@@ -437,6 +267,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             const savedLang = localStorage.getItem('nauticovi_lang') || 'it';
             setLanguage(savedLang);
+            sincronizzaFotoIndex();
         });
     </script>
 </body>
