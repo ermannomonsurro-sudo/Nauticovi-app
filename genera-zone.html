@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generatore fasce di rispetto Nauticovi</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; }
+  #bar { padding: 10px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; background: #0f172a; color: #fff; font-size: 14px; }
+  #bar input { width: 70px; padding: 3px; }
+  #bar button { padding: 6px 12px; font-weight: bold; cursor: pointer; }
+  #st { padding: 6px 10px; font-size: 13px; }
+  #map { height: calc(100vh - 100px); }
+</style>
+</head>
+<body>
+<div id="bar">
+  <label>Distanza costa (m) <input id="dc" type="number" value="200"></label>
+  <label>Distanza isole (m) <input id="di" type="number" value="200"></label>
+  <button id="go">1. Genera</button>
+  <button id="dl" disabled>2. Scarica zone200.geojson</button>
+</div>
+<div id="st">Pronto. Premi "Genera" (serve internet).</div>
+<div id="map"></div>
+
+<script>
+// Area da analizzare [ovest, sud, est, nord]. Allargala se la costa non basta.
+const BB = [15.740, 39.850, 15.810, 39.920];
+
+const map = L.map('map').setView([39.885, 15.775], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+let layer, result;
+const st = t => document.getElementById('st').textContent = t;
+const inBB = p => p[0] >= BB[0] && p[0] <= BB[2] && p[1] >= BB[1] && p[1] <= BB[3];
+
+// Unisce i tratti di costa OSM (terra a sinistra, mare a destra) in linee continue
+function chain(ways) {
+  const lines = ways.map(w => ({ ids: w.nodes.slice(), pts: w.geometry.map(p => [p.lon, p.lat]) }));
+  let merged = true;
+  while (merged) {
+    merged = false;
+    outer: for (let i = 0; i < lines.length; i++) {
+      for (let j = 0; j < lines.length; j++) {
+        if (i === j) continue;
+        const a = lines[i], b = lines[j];
+        if (a.ids[0] !== a.ids[a.ids.length - 1] && a.ids[a.ids.length - 1] === b.ids[0]) {
+          a.ids = a.ids.concat(b.ids.slice(1));
+          a.pts = a.pts.concat(b.pts.slice(1));
+          lines.splice(j, 1);
+          merged = true;
+          break outer;
+        }
+      }
+    }
+  }
+  return lines;
+}
+
+// Spezza la linea nei tratti che stanno dentro l'area
+function clip(pts) {
+  const out = []; let cur = [];
+  pts.forEach(p => {
+    if (inBB(p)) cur.push(p);
+    else { if (cur.length > 1) out.push(cur); cur = []; }
+  });
+  if (cur.length > 1) out.push(cur);
+  return out;
+}
+
+// Costa continentale: striscia tra la costa e la sua copia spostata di d metri verso il mare (a destra)
+function ribbon(pts, d) {
+  const line = turf.simplify(turf.lineString(pts), { tolerance: 0.00002 }).geometry.coordinates;
+  const off = line.map((p, i) => {
+    const prev = line[Math.max(i - 1, 0)], next = line[Math.min(i + 1, line.length - 1)];
+    const b = turf.bearing(turf.point(prev), turf.point(next));
+    return turf.destination(turf.point(p), d / 1000, b + 90).geometry.coordinates;
+  });
+  return turf.polygon([[...line, ...off.reverse(), line[0]]]);
+}
+
+// Isole: anello = buffer dell'isola meno l'isola stessa
+function ring(pts, d) {
+  const poly = turf.polygon([pts]);
+  const buf = turf.buffer(poly, d / 1000, { units: 'kilometers' });
+  return turf.difference(buf, poly);
+}
+
+document.getElementById('go').onclick = async () => {
+  try {
+    st('Scarico la linea di costa da OpenStreetMap…');
+    const q = `[out:json][timeout:60];way["natural"="coastline"](${BB[1]},${BB[0]},${BB[3]},${BB[2]});out geom;`;
+    const r = await fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(q));
+    if (!r.ok) throw new Error('Overpass HTTP ' + r.status);
+    const j = await r.json();
+    const ways = j.elements.filter(e => e.type === 'way' && e.geometry && e.nodes);
+    st(`Trovati ${ways.length} tratti di costa. Calcolo…`);
+
+    const dc = +document.getElementById('dc').value, di = +document.getElementById('di').value;
+    const feats = [];
+    chain(ways).forEach(l => {
+      const closed = l.ids[0] === l.ids[l.ids.length - 1] && l.pts.length >= 4 && l.pts.every(inBB);
+      if (closed) {
+        const f = ring(l.pts, di);
+        if (f) { f.properties = { tipo: 'isola', distanza: di }; feats.push(f); }
+      } else {
+        clip(l.pts).forEach(seg => {
+          const f = ribbon(seg, dc);
+          f.properties = { tipo: 'costa', distanza: dc };
+          feats.push(f);
+        });
+      }
+    });
+
+    result = turf.featureCollection(feats);
+    if (layer) map.removeLayer(layer);
+    layer = L.geoJSON(result, { style: { color: '#ef4444', weight: 1.5, fillOpacity: 0.25 } }).addTo(map);
+    document.getElementById('dl').disabled = false;
+    st(`Fatto: ${feats.length} zone generate. Controlla la mappa e poi scarica il file.`);
+  } catch (e) {
+    st('Errore: ' + e.message);
+    console.error(e);
+  }
+};
+
+document.getElementById('dl').onclick = () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(result)], { type: 'application/json' }));
+  a.download = 'zone200.geojson';
+  a.click();
+};
+</script>
+</body>
+</html>
