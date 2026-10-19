@@ -128,7 +128,7 @@
             <div class="flex justify-between items-start">
                 <div>
                     <span class="bg-cyan-500/20 text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-400/30" data-i18n="active_rental">Noleggio Attivo</span>
-                    <h2 class="text-xl font-extrabold mt-2" id="welcome-nome">Benvenuto a Bordo!</h2>
+                    <h2 class="text-xl font-extrabold mt-2" id="welcome-nome" data-i18n="welcome_title">Benvenuto a Bordo!</h2>
                     <p class="text-xs text-slate-300 mt-0.5"><span data-i18n="boat_label">Barca:</span> <span class="font-bold text-cyan-300" id="welcome-barca">Marlin 1</span></p>
                 </div>
                 <div class="text-right flex flex-col items-end gap-2">
@@ -154,7 +154,7 @@
                     <i class="fa-regular fa-clock text-cyan-400 text-sm"></i>
                     <span class="text-[11px] text-slate-300" data-i18n="return_notice">Rientro obbligatorio in banchina alle:</span>
                 </div>
-                <b class="text-cyan-300 font-mono text-xs bg-slate-800 px-2 py-0.5 rounded border border-cyan-500/30">Ore 18:00</b>
+                <b class="text-cyan-300 font-mono text-xs bg-slate-800 px-2 py-0.5 rounded border border-cyan-500/30" data-i18n="return_time">Ore 18:00</b>
             </div>
         </div>
 
@@ -716,10 +716,16 @@
                 }
             });
 
-            // Ripristina il nome personalizzato del cliente ("Benvenuto Mario!") se presente nell'URL
-            if (nomeClientePersonalizzato) {
-                const welcomeEl = document.getElementById('welcome-nome');
-                if (welcomeEl) welcomeEl.innerText = `Benvenuto ${nomeClientePersonalizzato}!`;
+            // Gestione del saluto personalizzato in base alla lingua (IT, EN, ES)
+            const welcomeEl = document.getElementById('welcome-nome');
+            if (welcomeEl) {
+                if (nomeClientePersonalizzato) {
+                    const welcomePrefix = lang === 'en' ? 'Welcome' : (lang === 'es' ? '¡Bienvenido' : 'Benvenuto');
+                    const welcomeSuffix = lang === 'es' ? '!' : '!';
+                    welcomeEl.innerText = `${welcomePrefix} ${nomeClientePersonalizzato}${welcomeSuffix}`;
+                } else {
+                    welcomeEl.innerText = translations[lang]?.welcome_title || 'Benvenuto a Bordo!';
+                }
             }
 
             renderPoiCards();
