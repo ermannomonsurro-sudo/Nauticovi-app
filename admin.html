@@ -24,7 +24,7 @@
             </a>
 
             <form onsubmit="eseguiLogin(event); return false;" class="space-y-3 pt-2">
-                <input type="email" id="admin-email" placeholder="Email" autocomplete="username" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none" required>
+                <input type="email" id="admin-email" placeholder="Email (Opzionale per Supabase)" autocomplete="username" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
                 <input type="password" id="admin-pass" placeholder="Password" autocomplete="current-password" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none" required>
                 <button type="submit" id="btn-login" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-xs cursor-pointer active:scale-95">
                     Accedi al Gestionale
@@ -368,33 +368,49 @@
             if (e) e.preventDefault();
             const btn = document.getElementById('btn-login');
             const errorEl = document.getElementById('login-error');
-            const email = document.getElementById('admin-email').value.trim();
-            const password = document.getElementById('admin-pass').value;
+            const emailEl = document.getElementById('admin-email');
+            const passEl = document.getElementById('admin-pass');
 
-            if (!email || !password) return;
+            const email = emailEl ? emailEl.value.trim() : '';
+            const password = passEl ? passEl.value : '';
+
+            if (!password) return;
 
             btn.disabled = true;
             btn.innerText = "Accesso in corso...";
 
-            try {
-                const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-                
-                if (error) {
-                    errorEl.classList.remove('hidden');
-                    errorEl.innerText = "Credenziali errate o account non verificato.";
-                    btn.disabled = false;
-                    btn.innerText = "Accedi al Gestionale";
-                    return;
-                }
-
-                errorEl.classList.add('hidden');
-                document.getElementById('admin-pass').value = '';
+            // 1. Controllo Master Password diretta "nauticovi2026"
+            if (password === 'nauticovi2026') {
+                sessionStorage.setItem('nauticovi_admin_auth', 'true');
+                if (errorEl) errorEl.classList.add('hidden');
+                if (passEl) passEl.value = '';
                 mostraPannello();
-            } catch (err) {
-                console.error("Errore imprevisto:", err);
                 btn.disabled = false;
                 btn.innerText = "Accedi al Gestionale";
+                return;
             }
+
+            // 2. Controllo tramite Supabase Auth (se inserita la mail)
+            if (email && _supabase) {
+                try {
+                    const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+                    if (!error && data.session) {
+                        if (errorEl) errorEl.classList.add('hidden');
+                        if (passEl) passEl.value = '';
+                        mostraPannello();
+                        btn.disabled = false;
+                        btn.innerText = "Accedi al Gestionale";
+                        return;
+                    }
+                } catch (err) {}
+            }
+
+            if (errorEl) {
+                errorEl.classList.remove('hidden');
+                errorEl.innerText = "Credenziali errate! Prova con la password principale.";
+            }
+            btn.disabled = false;
+            btn.innerText = "Accedi al Gestionale";
         }
 
         async function logout() {
@@ -879,3 +895,4 @@ Il documento è nella sezione "Bozze" del tuo account.`);
         }
     </script>
 </body>
+</html>
