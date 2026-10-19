@@ -35,14 +35,21 @@
                 <i class="fa-solid fa-arrow-left"></i> Torna alla Home
             </a>
 
-            <form id="admin-login-form" onsubmit="eseguiLogin(event)" class="space-y-3 pt-2">
-                <input type="email" id="admin-email" placeholder="Email Admin" autocomplete="username" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none" required>
-                <input type="password" id="admin-pass" placeholder="Password" autocomplete="current-password" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none" required>
-                <button type="submit" id="btn-login" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-xs cursor-pointer active:scale-95">
-                    Accedi al Gestionale
+            <!-- Div contenitore senza form HTML nativo per evitare il submit/redirect del browser -->
+            <div class="space-y-3 pt-2 text-left">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Email Admin</label>
+                    <input type="email" id="admin-email" placeholder="admin@nauticovi.it" autocomplete="username" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none bg-slate-50" required>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Password</label>
+                    <input type="password" id="admin-pass" placeholder="••••••••" autocomplete="current-password" onkeyup="if(event.key === 'Enter') eseguiLogin(event)" class="w-full p-2.5 border rounded-xl text-center text-sm focus:ring-2 focus:ring-cyan-500 outline-none bg-slate-50" required>
+                </div>
+                <button type="button" id="btn-login" onclick="eseguiLogin(event)" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-xs cursor-pointer active:scale-95 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> Accedi al Gestionale
                 </button>
-            </form>
-            <p id="login-error" class="text-xs text-red-500 hidden font-bold mt-2"></p>
+            </div>
+            <p id="login-error" class="text-xs text-red-500 hidden font-bold mt-2 bg-red-50 p-2.5 rounded-xl border border-red-200"></p>
         </div>
     </div>
 
@@ -379,7 +386,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT SUPABASE & CMS MACRO-TAB LOGIC -->
+    <!-- SCRIPT SUPABASE & CRM ADMIN LOGIC -->
     <script>
         const SUPABASE_URL = "https://cbvpixcfhmedbapnvfmw.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_V0B06YxZ1oW6tqg_6yx5og_OgbhxlUo";
@@ -406,7 +413,7 @@
         async function eseguiLogin(e) {
             if (e) {
                 e.preventDefault();
-                e.stopPropagation();
+                if (e.stopPropagation) e.stopPropagation();
             }
 
             const btn = document.getElementById('btn-login');
@@ -414,10 +421,14 @@
             const email = document.getElementById('admin-email').value.trim();
             const password = document.getElementById('admin-pass').value;
 
-            if (!email || !password) return false;
+            if (!email || !password) {
+                errorEl.classList.remove('hidden');
+                errorEl.innerText = "Compila sia email che password.";
+                return false;
+            }
 
             btn.disabled = true;
-            btn.innerText = "Accesso in corso...";
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Accesso in corso...`;
 
             try {
                 const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
@@ -426,7 +437,7 @@
                     errorEl.classList.remove('hidden');
                     errorEl.innerText = "Errore di accesso: " + (error.message || "Credenziali errate.");
                     btn.disabled = false;
-                    btn.innerText = "Accedi al Gestionale";
+                    btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Accedi al Gestionale`;
                     return false;
                 }
 
@@ -438,7 +449,7 @@
                 errorEl.classList.remove('hidden');
                 errorEl.innerText = "Errore di rete o connessione.";
                 btn.disabled = false;
-                btn.innerText = "Accedi al Gestionale";
+                btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Accedi al Gestionale`;
             }
             return false;
         }
