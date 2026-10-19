@@ -9,6 +9,10 @@
     <!-- Supabase Client JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        .f-lbl{display:block;font-weight:700;color:#475569;text-transform:uppercase}
+        .f-in{width:100%;margin-top:.25rem;padding:.5rem;border:1px solid #cbd5e1;border-radius:.5rem;background:#fff;outline:none}
+        .f-in:focus{box-shadow:0 0 0 2px #06b6d4}
+        .f-file{width:100%;font-size:.7rem;border:1px solid #cbd5e1;border-radius:.5rem;padding:.25rem;background:#fff}
         .macro-tab-btn {
             transition: all 0.2s ease-in-out;
             cursor: pointer;
@@ -23,7 +27,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans pb-12">
 
-    <!-- SCHERMATA LOGIN ADMIN (Contenitore div isolato per prevenire submit HTML nativi) -->
+    <!-- SCHERMATA LOGIN ADMIN (Interfaccia diretta, pulita e priva di form nativi che causano blocchi) -->
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200 max-w-sm w-full space-y-4 text-center">
             <div class="flex flex-col items-center justify-center gap-2">
@@ -35,7 +39,7 @@
                 <i class="fa-solid fa-arrow-left"></i> Torna alla Home
             </a>
 
-            <!-- Contenitore isolato per input -->
+            <!-- Contenitore isolato -->
             <div class="space-y-3 pt-2 text-left">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Email Admin</label>
@@ -125,147 +129,93 @@
                 </div>
             </div>
 
-            <!-- 2. SEZIONE CMS ESTRUTTURATA IN MACRO-SCHEDE DINAMICHE -->
+            <!-- 2. SEZIONE CMS STRUTTURATA IN MACRO-SCHEDE DINAMICHE -->
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-5">
-
-                <!-- HEADER SEZIONE CMS & MACRO TAB NAVIGATORE -->
                 <div class="space-y-3 border-b pb-4">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                        <div>
-                            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                <i class="fa-solid fa-layer-group text-cyan-600"></i> CMS — Gestione Contenuti & Vetrina
-                            </h2>
-                            <p class="text-xs text-slate-500">Seleziona la sezione del sito per filtrare il modulo di inserimento e i contenuti attivi su Cloud</p>
-                        </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-layer-group text-cyan-600"></i> CMS — Gestione Contenuti & Vetrina</h2>
+                        <p class="text-xs text-slate-500">① Scegli la pagina del sito → ② scegli il tipo di contenuto → ③ compila solo i campi che compaiono.</p>
                     </div>
-
-                    <!-- MACRO-TAB NAVIGATOR BAR -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs font-extrabold pt-2">
-                        <button onclick="selezionaMacroTab('guest')" id="macro-tab-guest" class="macro-tab-btn active p-3 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-compass text-cyan-500"></i> 1. Guest Portal (guest.html)
-                        </button>
-                        <button onclick="selezionaMacroTab('catalogo')" id="macro-tab-catalogo" class="macro-tab-btn p-3 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-ship text-emerald-500"></i> 2. Catalogo Flotta (catalogo.html)
-                        </button>
-                        <button onclick="selezionaMacroTab('home')" id="macro-tab-home" class="macro-tab-btn p-3 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-house text-amber-500"></i> 3. Home Page (index.html)
-                        </button>
-                        <button onclick="selezionaMacroTab('destinazioni')" id="macro-tab-destinazioni" class="macro-tab-btn p-3 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-map-location-dot text-purple-500"></i> 4. Destinazioni (destinazioni.html)
-                        </button>
-                    </div>
+                    <div id="macro-tabs" class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs font-extrabold"></div>
+                    <p id="macro-hint" class="text-[11px] text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-2"></p>
                 </div>
 
-                <!-- CORPO CMS: FORM DINAMICO + LISTA FILTRATA -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                    <!-- FORM DINAMICO (COLONNA SINISTRA) -->
+                    <!-- FORM DINAMICO -->
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
                         <h3 class="text-xs font-extrabold uppercase text-slate-700 flex items-center justify-between">
-                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-pen-to-square text-cyan-600"></i> Form Inserimento / Modifica</span>
-                            <span id="macro-tab-label-badge" class="bg-cyan-100 text-cyan-800 text-[9px] px-2 py-0.5 rounded-full font-bold">GUEST PORTAL</span>
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-pen-to-square text-cyan-600"></i> Inserimento / Modifica</span>
+                            <span id="macro-tab-label-badge" class="bg-cyan-100 text-cyan-800 text-[9px] px-2 py-0.5 rounded-full font-bold"></span>
                         </h3>
-
                         <form id="cmsForm" onsubmit="salvaContenutoCMS(event)" class="space-y-3 text-xs">
                             <input type="hidden" id="cms_edit_id" value="">
 
-                            <!-- SELETTORE SOTTO-CATEGORIA -->
                             <div>
-                                <label class="block font-bold text-slate-600 uppercase mb-1">Tipologia Elemento</label>
-                                <select id="cms_categoria" onchange="toggleCampiCMS()" class="w-full p-2 border rounded-lg bg-white font-semibold outline-none focus:ring-2 focus:ring-cyan-500">
-                                </select>
+                                <label class="f-lbl">Tipo di contenuto</label>
+                                <select id="cms_categoria" onchange="toggleCampiCMS()" class="f-in font-semibold"></select>
+                                <p id="cms-dove" class="text-[10px] text-cyan-700 font-bold mt-1"></p>
                             </div>
 
-                            <!-- CAMPO TITOLO -->
-                            <div>
-                                <label id="label-cms-titolo" class="block font-bold text-slate-600 uppercase">Titolo Elemento</label>
-                                <input type="text" id="cms_titolo" required placeholder="Inserisci il titolo..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none bg-white">
+                            <div id="box-slot" class="hidden">
+                                <label class="f-lbl">Slot della home (1, 2 o 3)</label>
+                                <select id="cms_slot" class="f-in font-semibold"><option value="1">Slot 1 (primo)</option><option value="2">Slot 2 (secondo)</option><option value="3">Slot 3 (terzo)</option></select>
                             </div>
 
-                            <!-- CAMPO SOTTOTITOLO -->
+                            <div>
+                                <label id="label-cms-titolo" class="f-lbl">Titolo</label>
+                                <input type="text" id="cms_titolo" required class="f-in">
+                            </div>
                             <div id="box-sottotitolo-cms">
-                                <label id="label-cms-sottotitolo" class="block font-bold text-slate-600 uppercase">Sottotitolo / Dettaglio</label>
-                                <input type="text" id="cms_sottotitolo" placeholder="Es. Banchina Principale o Max 6 Persone" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none bg-white">
+                                <label id="label-cms-sottotitolo" class="f-lbl">Sottotitolo</label>
+                                <input type="text" id="cms_sottotitolo" class="f-in">
                             </div>
-
-                            <!-- CAMPO DESCRIZIONE -->
                             <div>
-                                <label id="label-cms-descrizione" class="block font-bold text-slate-600 uppercase">Descrizione / Dettagli</label>
-                                <textarea id="cms_descrizione" required rows="2" placeholder="Inserisci il testo dettagliato..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none bg-white"></textarea>
+                                <label id="label-cms-descrizione" class="f-lbl">Descrizione</label>
+                                <textarea id="cms_descrizione" required rows="3" class="f-in"></textarea>
+                            </div>
+                            <div id="box-ordine" class="hidden">
+                                <label class="f-lbl">Posizione nella pagina (1 = primo)</label>
+                                <input type="number" id="cms_ordine" min="0" placeholder="1" class="f-in">
                             </div>
 
-                            <!-- BOX CARICAMENTO IMMAGINI -->
+                            <!-- FOTO -->
                             <div id="box-foto-cms" class="space-y-2 p-3 bg-slate-100 rounded-xl border border-slate-200">
-                                <b class="block text-slate-800 font-bold uppercase text-[10px]"><i class="fa-solid fa-image text-cyan-600"></i> Immagine di Copertina / Foto Reale</b>
-                                <div>
-                                    <label class="block text-[9px] font-bold text-slate-600 uppercase">1. Upload File da Dispositivo (Supabase Storage)</label>
-                                    <input type="file" id="cms_file_upload" accept="image/*" onchange="uploadFotoSupabaseStorage(this, 'cms_immagine_url')" class="w-full mt-1 text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700 cursor-pointer border border-slate-300 rounded-lg p-1 bg-white">
+                                <b class="block text-slate-800 font-bold uppercase text-[10px]"><i class="fa-solid fa-image text-cyan-600"></i> Foto principale</b>
+                                <input type="file" accept="image/*" onchange="uploadFotoSupabaseStorage(this,'cms_immagine_url')" class="f-file">
+                                <input type="url" id="cms_immagine_url" placeholder="oppure incolla un URL https://..." class="f-in text-xs">
+                                <div id="box-galleria-extra" class="pt-2 border-t border-slate-300/60 space-y-2 hidden">
+                                    <b class="block text-purple-900 font-bold uppercase text-[10px]">📸 Galleria (foto 2 e 3, facoltative)</b>
+                                    <input type="file" accept="image/*" onchange="uploadFotoSupabaseStorage(this,'cms_foto_2')" class="f-file">
+                                    <input type="url" id="cms_foto_2" placeholder="Foto 2 — URL" class="f-in text-xs">
+                                    <input type="file" accept="image/*" onchange="uploadFotoSupabaseStorage(this,'cms_foto_3')" class="f-file">
+                                    <input type="url" id="cms_foto_3" placeholder="Foto 3 — URL" class="f-in text-xs">
                                 </div>
-                                <div>
-                                    <label class="block text-[9px] font-bold text-slate-600 uppercase">Oppure Incolla URL Foto Principale</label>
-                                    <input type="url" id="cms_immagine_url" placeholder="https://..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none text-xs bg-white">
-                                </div>
-
-                                <div id="box-galleria-extra" class="pt-2 border-t border-slate-200/80 space-y-2 hidden">
-                                    <b class="block text-purple-900 font-bold uppercase text-[10px]">📸 Galleria Fotografica Aggiuntiva (Carosello 3 Foto)</b>
-                                    <div>
-                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">Foto 2 (Seconda Slide Carosello)</label>
-                                        <input type="url" id="cms_foto_2" placeholder="https://.../foto2.jpg" class="w-full p-1.5 border rounded bg-white text-xs">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">Foto 3 (Terza Slide Carosello)</label>
-                                        <input type="url" id="cms_foto_3" placeholder="https://.../foto3.jpg" class="w-full p-1.5 border rounded bg-white text-xs">
-                                    </div>
-                                </div>
-
-                                <div id="upload_spinner" class="hidden text-xs text-cyan-700 font-bold flex items-center gap-2 pt-1">
-                                    <i class="fa-solid fa-spinner animate-spin"></i> Caricamento file su Supabase Storage (cms-media)...
-                                </div>
+                                <div id="upload_spinner" class="hidden text-xs text-cyan-700 font-bold flex items-center gap-2"><i class="fa-solid fa-spinner animate-spin"></i> Caricamento foto in corso...</div>
                             </div>
 
-                            <!-- CAMPI COORDINATE GPS ED AUDIOGUIDA -->
-                            <div id="box-gps-cms" class="p-3 bg-cyan-50/60 border border-cyan-200 rounded-xl space-y-2">
-                                <b class="block text-cyan-900 font-bold uppercase text-[10px]">📍 Coordinate GPS sulla Mappa</b>
+                            <!-- GPS & AUDIO -->
+                            <div id="box-gps-cms" class="p-3 bg-cyan-50/60 border border-cyan-200 rounded-xl space-y-2 hidden">
+                                <b class="block text-cyan-900 font-bold uppercase text-[10px]">📍 Coordinate GPS</b>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">Latitudine</label>
-                                        <input type="number" step="any" id="cms_lat" placeholder="Es. 39.8731" class="w-full p-1.5 border rounded bg-white font-mono">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">Longitudine</label>
-                                        <input type="number" step="any" id="cms_lng" placeholder="Es. 15.7735" class="w-full p-1.5 border rounded bg-white font-mono">
-                                    </div>
+                                    <input type="number" step="any" id="cms_lat" placeholder="Latitudine es. 39.8731" class="f-in font-mono">
+                                    <input type="number" step="any" id="cms_lng" placeholder="Longitudine es. 15.7735" class="f-in font-mono">
                                 </div>
-                                <div id="subbox-audio-cms" class="space-y-2 pt-1 border-t border-cyan-200/60">
-                                    <div>
-                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">Testo Audioguida (Letto all'arrivo ai 200m)</label>
-                                        <textarea id="cms_audioguida" rows="2" placeholder="Benvenuto alla Grotta Azzurra..." class="w-full p-1.5 border rounded bg-white text-[11px]"></textarea>
-                                    </div>
+                                <div id="subbox-audio-cms" class="space-y-2 pt-2 border-t border-cyan-200/60 hidden">
+                                    <label class="f-lbl text-[9px]">Testo audioguida (voce di sistema)</label>
+                                    <textarea id="cms_audioguida" rows="2" class="f-in text-[11px]"></textarea>
+                                    <label class="f-lbl text-[9px]">URL audio MP3 (ha la precedenza sul testo)</label>
+                                    <input type="url" id="cms_audio_url" placeholder="https://..." class="f-in text-xs">
                                 </div>
                             </div>
 
-                            <!-- CAMPI PREZZI PERSONALIZZATI -->
+                            <!-- PREZZI -->
                             <div id="box-prezzi-cms" class="hidden p-3 bg-cyan-50 border border-cyan-200 rounded-xl space-y-2">
-                                <b class="block text-cyan-900 font-bold uppercase text-[10px]">💶 Prezzi Personalizzati (€)</b>
+                                <b class="block text-cyan-900 font-bold uppercase text-[10px]">💶 Tariffe (€)</b>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">Bassa Mezza (€)</label>
-                                        <input type="number" id="cms_bassa_mezza" placeholder="120" class="w-full p-1.5 border rounded bg-white">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">Bassa Intera (€)</label>
-                                        <input type="number" id="cms_bassa_intera" placeholder="200" class="w-full p-1.5 border rounded bg-white">
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">Alta Mezza (€)</label>
-                                        <input type="number" id="cms_alta_mezza" placeholder="150" class="w-full p-1.5 border rounded bg-white">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[9px] font-bold text-slate-600 uppercase">Alta Intera (€)</label>
-                                        <input type="number" id="cms_alta_intera" placeholder="220" class="w-full p-1.5 border rounded bg-white">
-                                    </div>
+                                    <input type="number" id="cms_bassa_mezza" placeholder="Bassa mezza (120)" class="f-in">
+                                    <input type="number" id="cms_bassa_intera" placeholder="Bassa intera (200)" class="f-in">
+                                    <input type="number" id="cms_alta_mezza" placeholder="Alta mezza (150)" class="f-in">
+                                    <input type="number" id="cms_alta_intera" placeholder="Alta intera (220)" class="f-in">
                                 </div>
                             </div>
 
@@ -273,25 +223,21 @@
                                 <button type="submit" id="btn-salva-cms" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg shadow transition flex justify-center items-center gap-2">
                                     <i class="fa-solid fa-floppy-disk"></i> <span id="btn-salva-cms-text">Salva in Cloud</span>
                                 </button>
-                                <button type="button" id="btn-annulla-edit-cms" onclick="resetFormCMS()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2.5 rounded-lg transition" title="Annulla Modifica">
-                                    Annulla
-                                </button>
+                                <button type="button" id="btn-annulla-edit-cms" onclick="resetFormCMS()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2.5 rounded-lg transition">Annulla</button>
                             </div>
                         </form>
                     </div>
 
-                    <!-- COLONNA CONTENUTI ATTIVI FILTRATI -->
+                    <!-- LISTA CONTENUTI ATTIVI -->
                     <div class="lg:col-span-2 space-y-3">
                         <div class="flex justify-between items-center border-b pb-2">
                             <h3 class="text-xs font-extrabold uppercase text-slate-700 flex items-center gap-1.5">
-                                <i class="fa-solid fa-server text-cyan-600"></i> Contenuti Attivi in <span id="col-categoria-attiva" class="text-cyan-600 uppercase font-black">Guest Portal</span>
+                                <i class="fa-solid fa-server text-cyan-600"></i> Contenuti attivi in <span id="col-categoria-attiva" class="text-cyan-600 font-black"></span>
                             </h3>
-                            <button onclick="caricaContenutiCMS()" class="text-xs font-bold text-cyan-600 hover:underline">
-                                <i class="fa-solid fa-arrows-rotate"></i> Aggiorna Lista
-                            </button>
+                            <button type="button" onclick="caricaContenutiCMS()" class="text-xs font-bold text-cyan-600 hover:underline"><i class="fa-solid fa-arrows-rotate"></i> Aggiorna</button>
                         </div>
-
-                        <div id="cmsListaContenuti" class="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
+                        <div id="cms-chips" class="flex flex-wrap gap-1.5"></div>
+                        <div id="cmsListaContenuti" class="space-y-2.5 max-h-[560px] overflow-y-auto pr-1">
                             <p class="text-xs text-slate-400 italic">Caricamento contenuti in corso...</p>
                         </div>
                     </div>
@@ -422,6 +368,7 @@
             pannelloVisibile = false;
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('admin-panel').style.display = 'none';
+            // Ripristina il pulsante di accesso (evita che resti bloccato su "Accesso in corso...")
             const b = document.getElementById('btn-login');
             if (b) {
                 b.disabled = false;
@@ -481,12 +428,6 @@
             mostraLogin();
         }
 
-        // Esposizione esplicita su window per garantire la risoluzione degli onclick inline
-        window.eseguiLogin = eseguiLogin;
-        window.mostraPannello = mostraPannello;
-        window.mostraLogin = mostraLogin;
-        window.logout = logout;
-
         window.addEventListener('DOMContentLoaded', async () => {
             if (!_supabase) return;
             try {
@@ -511,348 +452,258 @@
         });
 
         // -----------------------------------------------------------------------------
-        // LOGICA MACRO-TAB CMS & FORM DINAMICO
+        // CMS: MACRO-SCHEDE (una per pagina del sito) + FORM GUIDATO PER TIPO DI CONTENUTO
         // -----------------------------------------------------------------------------
-        let currentMacroTab = 'guest';
-        let listaCMSCache = [];
+        const E = id => document.getElementById(id);
+        const val = id => E(id) ? E(id).value : '';
+        const setV = (id, v) => { if (E(id)) E(id).value = (v == null ? '' : v); };
+        const show = (id, on) => { if (E(id)) E(id).classList.toggle('hidden', !on); };
+        const setTxt = (id, t) => { if (E(id)) E(id).innerText = t; };
 
-        const MACRO_CONFIG = {
-            guest: {
-                label: "Guest Portal",
-                badge: "GUEST PORTAL (guest.html)",
-                categorie: [
-                    { value: "destinazioni", text: "📍 Destinazione Singola / Punto GPS" },
-                    { value: "base", text: "⚓ Base / Banchina Nauticovi (Mappa GPS)" },
-                    { value: "pericoli", text: "⚠️ Segnale di Pericolo (Mappa GPS)" },
-                    { value: "tips", text: "💡 Tip / Consiglio di Bordo" },
-                    { value: "divieti", text: "🚫 Regola / Divieto di Bordo" }
-                ]
-            },
-            catalogo: {
-                label: "Catalogo Flotta",
-                badge: "CATALOGO FLOTTA (catalogo.html)",
-                categorie: [
-                    { value: "flotta", text: "🚤 Barca / Flotta / SUP" }
-                ]
-            },
-            home: {
-                label: "Home Page",
-                badge: "HOME PAGE (index.html)",
-                categorie: [
-                    { value: "index_slot", text: "⭐ Slot Vetrina Meraviglie" },
-                    { value: "index_faq", text: "❓ Domanda e Risposta (FAQ)" }
-                ]
-            },
-            destinazioni: {
-                label: "Guida Destinazioni",
-                badge: "GUIDA DESTINAZIONI (destinazioni.html)",
-                categorie: [
-                    { value: "destinazioni", text: "📸 Scheda Destinazione con Galleria" }
-                ]
-            }
+        // Ogni tipo dichiara quali campi mostrare. Le categorie sono quelle già presenti nel DB.
+        const TIPI = {
+            destinazioni: { ico: '📍', nome: 'Destinazione GPS', dove: 'guest.html › Destinazioni e Mappa GPS', tit: 'Nome del luogo', sub: 'Etichetta breve (opzionale)', desc: 'Descrizione', foto: 1, gps: 1, audio: 1 },
+            base:         { ico: '⚓', nome: 'Base nautica', dove: 'guest.html › Mappa GPS e "Torna in banchina"', tit: 'Nome della base', desc: 'Descrizione', foto: 1, gps: 1 },
+            pericoli:     { ico: '⚠️', nome: 'Segnale di pericolo', dove: 'guest.html › Mappa GPS (marker rosso)', tit: 'Titolo avviso', desc: 'Descrizione del pericolo', gps: 1 },
+            itinerari:    { ico: '🧭', nome: 'Itinerario', dove: 'guest.html › Itinerari', tit: 'Nome itinerario', sub: 'Durata / tipo (es. 2 ore)', desc: 'Descrizione', foto: 1, gps: 1 },
+            tips:         { ico: '💡', nome: 'Tip di bordo', dove: 'guest.html › Tips', tit: 'Titolo del consiglio', desc: 'Testo del consiglio' },
+            divieti:      { ico: '🚫', nome: 'Divieto / regola', dove: 'guest.html › Divieti', tit: 'Titolo della regola', desc: 'Testo della regola' },
+            flotta:       { ico: '🚤', nome: 'Imbarcazione', dove: 'catalogo.html › Le nostre imbarcazioni', tit: 'Nome imbarcazione', sub: 'Specifiche tecniche (es. Gommone • Max 6 persone)', desc: 'Descrizione', foto: 1, galleria: 1, prezzi: 1 },
+            index_slot:   { ico: '⭐', nome: 'Slot vetrina', dove: 'index.html › Le meraviglie da esplorare (3 slot)', tit: 'Titolo dello slot', sub: 'Sottotitolo promozionale', desc: 'Breve descrizione', foto: 1, slot: 1 },
+            index_faq:    { ico: '❓', nome: 'FAQ', dove: 'index.html › Hai domande prima di noleggiare?', tit: 'Domanda', desc: 'Risposta' },
+            guida_destinazione: { ico: '📸', nome: 'Scheda destinazione', dove: 'destinazioni.html › guida con galleria', tit: 'Titolo della destinazione', sub: 'Comune (es. Praia a Mare)', desc: 'Descrizione estesa', foto: 1, galleria: 1, ordine: 1 }
+        };
+        const ORDINATI = ['index_slot', 'guida_destinazione'];
+
+        const MACRO = {
+            guest:        { label: 'Guest Portal', ico: 'fa-compass', color: 'text-cyan-500', tipi: ['destinazioni', 'base', 'pericoli', 'itinerari', 'tips', 'divieti'], hint: 'guest.html — portale usato dal cliente in barca: punti GPS, base, pericoli, itinerari, tips e divieti. Questi contenuti NON compaiono nel sito pubblico.' },
+            catalogo:     { label: 'Catalogo Flotta', ico: 'fa-ship', color: 'text-emerald-500', tipi: ['flotta'], hint: 'catalogo.html — le barche mostrate sopra a quelle fisse della pagina, con foto, specifiche e tariffe.' },
+            home:         { label: 'Home Page', ico: 'fa-house', color: 'text-amber-500', tipi: ['index_slot', 'index_faq'], hint: 'index.html — i 3 slot "Le meraviglie da esplorare" (foto, titolo, breve descrizione) e le FAQ (aggiungi, modifica, elimina).' },
+            destinazioni: { label: 'Destinazioni', ico: 'fa-map-location-dot', color: 'text-purple-500', tipi: ['guida_destinazione'], hint: 'destinazioni.html — guida pubblica con galleria fino a 3 foto. Aggiungi quante destinazioni vuoi: le schede si dispongono da sole nella pagina.' }
         };
 
-        function selezionaMacroTab(tabKey) {
-            currentMacroTab = tabKey;
+        let currentMacroTab = 'guest', filtroTipo = '', listaCMSCache = [], cmsCaricato = false;
+        const catNorm = c => (c === 'banchina' ? 'base' : c);
+        const itemsDelTab = k => listaCMSCache.filter(i => MACRO[k].tipi.includes(catNorm(i.categoria)));
 
-            document.querySelectorAll('.macro-tab-btn').forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.getElementById(`macro-tab-${tabKey}`);
-            if (activeBtn) activeBtn.classList.add('active');
+        function renderMacroTabs() {
+            E('macro-tabs').innerHTML = Object.entries(MACRO).map(([k, m], i) =>
+                `<button type="button" id="macro-tab-${k}" onclick="selezionaMacroTab('${k}')" class="macro-tab-btn ${k === currentMacroTab ? 'active' : ''} p-3 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 flex items-center justify-center gap-2">
+                    <i class="fa-solid ${m.ico} ${m.color}"></i> ${i + 1}. ${m.label}
+                    <span class="text-[10px] bg-slate-200 text-slate-700 rounded-full px-1.5">${itemsDelTab(k).length}</span>
+                </button>`).join('');
+        }
 
-            const config = MACRO_CONFIG[tabKey];
-            document.getElementById('macro-tab-label-badge').innerText = config.label.toUpperCase();
-            document.getElementById('col-categoria-attiva').innerText = config.label;
-
-            const selectCat = document.getElementById('cms_categoria');
-            selectCat.innerHTML = '';
-            config.categorie.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.value;
-                opt.text = c.text;
-                selectCat.appendChild(opt);
-            });
-
+        function selezionaMacroTab(k) {
+            currentMacroTab = k; filtroTipo = '';
+            const m = MACRO[k];
+            setTxt('macro-hint', m.hint);
+            setTxt('macro-tab-label-badge', m.label.toUpperCase());
+            setTxt('col-categoria-attiva', m.label);
+            E('cms_categoria').innerHTML = m.tipi.map(t => `<option value="${t}">${TIPI[t].ico} ${TIPI[t].nome}</option>`).join('');
+            renderMacroTabs();
             resetFormCMS();
-            caricaContenutiCMS();
+            if (cmsCaricato) renderListaCMS(); else caricaContenutiCMS();
         }
 
-        function isCategoriaGPS(cat) {
-            return cat === 'destinazioni' || cat === 'base' || cat === 'banchina' || cat === 'pericoli';
-        }
+        function filtraTipoCMS(t) { filtroTipo = t; renderListaCMS(); }
 
         function toggleCampiCMS() {
-            const cat = document.getElementById('cms_categoria').value;
-            const boxPrezzi = document.getElementById('box-prezzi-cms');
-            const boxGps = document.getElementById('box-gps-cms');
-            const boxFoto = document.getElementById('box-foto-cms');
-            const boxGalleriaExtra = document.getElementById('box-galleria-extra');
-            const boxSottotitolo = document.getElementById('box-sottotitolo-cms');
-
-            const labelTitolo = document.getElementById('label-cms-titolo');
-            const labelSottotitolo = document.getElementById('label-cms-sottotitolo');
-            const labelDescrizione = document.getElementById('label-cms-descrizione');
-
-            boxPrezzi.classList.add('hidden');
-            boxGps.classList.add('hidden');
-            boxFoto.classList.remove('hidden');
-            boxGalleriaExtra.classList.add('hidden');
-            boxSottotitolo.classList.remove('hidden');
-
-            labelTitolo.innerText = "Titolo Elemento";
-            labelSottotitolo.innerText = "Sottotitolo / Dettaglio";
-            labelDescrizione.innerText = "Descrizione / Dettagli";
-
-            if (cat === 'flotta') {
-                boxPrezzi.classList.remove('hidden');
-                labelSottotitolo.innerText = "Capienza & Specifiche (es. Max 6 Persone)";
-            } else if (cat === 'destinazioni') {
-                boxGps.classList.remove('hidden');
-                if (currentMacroTab === 'destinazioni') {
-                    boxGalleriaExtra.classList.remove('hidden');
-                }
-            } else if (cat === 'base' || cat === 'banchina' || cat === 'pericoli') {
-                boxGps.classList.remove('hidden');
-            } else if (cat === 'index_faq') {
-                boxFoto.classList.add('hidden');
-                boxSottotitolo.classList.add('hidden');
-                labelTitolo.innerText = "Domanda Frequente (FAQ)";
-                labelDescrizione.innerText = "Risposta Dettagliata";
-            } else if (cat === 'index_slot') {
-                labelTitolo.innerText = "Nome Attrazione / Slot Vetrina";
-                labelSottotitolo.innerText = "Sottotitolo Promozionale";
-            }
+            const T = TIPI[val('cms_categoria')];
+            if (!T) return;
+            setTxt('label-cms-titolo', T.tit);
+            setTxt('label-cms-descrizione', T.desc);
+            show('box-sottotitolo-cms', !!T.sub);
+            if (T.sub) setTxt('label-cms-sottotitolo', T.sub);
+            show('box-foto-cms', !!T.foto);
+            show('box-galleria-extra', !!T.galleria);
+            show('box-gps-cms', !!T.gps);
+            show('subbox-audio-cms', !!T.audio);
+            show('box-prezzi-cms', !!T.prezzi);
+            show('box-slot', !!T.slot);
+            show('box-ordine', !!T.ordine);
+            setTxt('cms-dove', 'Compare in: ' + T.dove);
         }
 
-        async function uploadFotoSupabaseStorage(inputEl, targetInputId) {
-            if (!inputEl.files || inputEl.files.length === 0) return;
-            const file = inputEl.files[0];
-            const spinner = document.getElementById('upload_spinner');
-            if (spinner) spinner.classList.remove('hidden');
-
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
-            const filePath = `uploads/${fileName}`;
-
-            try {
-                const { data, error } = await _supabase.storage.from('cms-media').upload(filePath, file, {
-                    cacheControl: '3600',
-                    upsert: true
-                });
-
-                if (error) {
-                    console.warn("Upload Storage fallito, converto in Base64 Data URL:", error.message);
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        document.getElementById(targetInputId).value = e.target.result;
-                        if (spinner) spinner.classList.add('hidden');
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    const { data: publicUrlData } = _supabase.storage.from('cms-media').getPublicUrl(filePath);
-                    document.getElementById(targetInputId).value = publicUrlData.publicUrl;
-                    if (spinner) spinner.classList.add('hidden');
-                }
-            } catch (err) {
-                console.error("Errore upload file:", err);
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById(targetInputId).value = e.target.result;
-                    if (spinner) spinner.classList.add('hidden');
+        // Ridimensiona le foto (max 1400px, JPEG) prima del caricamento: pagine più veloci e DB leggero
+        function ridimensiona(file, maxPx = 1400, q = 0.82) {
+            return new Promise(res => {
+                if (!file.type.startsWith('image/') || file.type === 'image/svg+xml') return res(file);
+                const img = new Image(), url = URL.createObjectURL(file);
+                img.onload = () => {
+                    const r = Math.min(1, maxPx / Math.max(img.width, img.height));
+                    const c = document.createElement('canvas');
+                    c.width = Math.round(img.width * r); c.height = Math.round(img.height * r);
+                    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+                    URL.revokeObjectURL(url);
+                    c.toBlob(b => res(b || file), 'image/jpeg', q);
                 };
-                reader.readAsDataURL(file);
+                img.onerror = () => { URL.revokeObjectURL(url); res(file); };
+                img.src = url;
+            });
+        }
+
+        async function uploadFotoSupabaseStorage(inputEl, targetId) {
+            if (!inputEl.files || !inputEl.files.length) return;
+            const spinner = E('upload_spinner');
+            if (spinner) spinner.classList.remove('hidden');
+            const blob = await ridimensiona(inputEl.files[0]);
+            const ext = blob.type === 'image/jpeg' ? 'jpg' : (inputEl.files[0].name.split('.').pop() || 'img');
+            const path = `uploads/${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
+            try {
+                const { error } = await _supabase.storage.from('cms-media').upload(path, blob, { cacheControl: '3600', upsert: true, contentType: blob.type });
+                if (error) throw error;
+                E(targetId).value = _supabase.storage.from('cms-media').getPublicUrl(path).data.publicUrl;
+            } catch (err) {
+                console.warn('Upload Storage non riuscito, uso Data URL (foto già ridimensionata):', err.message || err);
+                const reader = new FileReader();
+                reader.onload = e => { E(targetId).value = e.target.result; };
+                reader.readAsDataURL(blob);
             }
+            if (spinner) spinner.classList.add('hidden');
+            inputEl.value = '';
         }
 
         async function caricaContenutiCMS() {
-            const container = document.getElementById('cmsListaContenuti');
-            if (!container || !_supabase) return;
-
+            if (!_supabase) return;
             try {
                 const { data, error } = await _supabase.from('cms_contenuti').select('*').order('created_at', { ascending: false });
-
-                if (error || !data || data.length === 0) {
-                    listaCMSCache = [];
-                    container.innerHTML = `<p class="text-xs text-slate-400 italic py-4 text-center">Nessun contenuto CMS presente in questa sezione.</p>`;
-                    return;
-                }
-
-                listaCMSCache = data;
-
-                const categorieTabAttiva = MACRO_CONFIG[currentMacroTab].categorie.map(c => c.value);
-                const filtrati = data.filter(item => categorieTabAttiva.includes(item.categoria));
-
-                if (filtrati.length === 0) {
-                    container.innerHTML = `<p class="text-xs text-slate-400 italic py-4 text-center">Nessun contenuto trovato per ${MACRO_CONFIG[currentMacroTab].label}. Aggiungi il primo!</p>`;
-                    return;
-                }
-
-                container.innerHTML = '';
-                filtrati.forEach(item => {
-                    const isBase = item.categoria === 'base' || item.categoria === 'banchina';
-
-                    const badgeColor = item.categoria === 'destinazioni' ? 'bg-cyan-100 text-cyan-800 font-bold'
-                                     : (isBase ? 'bg-slate-900 text-cyan-300 border border-cyan-500/50 font-bold'
-                                     : (item.categoria === 'pericoli' ? 'bg-red-100 text-red-800 font-bold border border-red-300'
-                                     : (item.categoria === 'flotta' ? 'bg-emerald-100 text-emerald-800 font-bold'
-                                     : (item.categoria === 'index_faq' ? 'bg-amber-100 text-amber-900 font-bold'
-                                     : 'bg-slate-200 text-slate-800'))));
-
-                    let extraInfo = '';
-                    if (isCategoriaGPS(item.categoria) && item.latitudine) {
-                        extraInfo = `<span class="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-mono">GPS: ${esc(item.latitudine)}, ${esc(item.longitudine)}</span>`;
-                    }
-
-                    const imgThumb = item.immagine_url ? `<img src="${esc(item.immagine_url)}" class="w-10 h-10 object-cover rounded-lg border">` : '';
-
-                    container.innerHTML += `
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center text-xs gap-3">
-                            <div class="flex items-center gap-3 space-y-1">
-                                ${imgThumb}
-                                <div>
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <span class="${badgeColor} text-[9px] px-2 py-0.5 rounded-full uppercase">${esc(String(item.categoria).toUpperCase())}</span>
-                                        <b class="text-slate-800 text-xs">${esc(item.titolo)}</b>
-                                        ${extraInfo}
-                                    </div>
-                                    <p class="text-slate-600 text-[11px] mt-0.5">${esc(item.descrizione)}</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-1">
-                                <button onclick="caricaInModificaCMS('${esc(item.id)}')" class="text-cyan-600 hover:text-cyan-800 p-1 font-bold text-xs" title="Modifica">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </button>
-                                <button onclick="eliminaContenutoCMS('${esc(item.id)}')" class="text-red-400 hover:text-red-600 p-1" title="Elimina">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch (err) {
-                console.error("Errore caricamento CMS:", err);
-            }
+                if (error) { E('cmsListaContenuti').innerHTML = `<p class="text-xs text-red-500 py-4 text-center">Errore lettura CMS: ${esc(error.message)}</p>`; return; }
+                listaCMSCache = data || []; cmsCaricato = true;
+                renderMacroTabs(); renderListaCMS();
+            } catch (err) { console.error('Errore caricamento CMS:', err); }
         }
 
-        function gestisciNuovaCategoria() {
-            const nuovaCat = prompt("Inserisci il nome della nuova Categoria (es. 'eventi', 'promozioni'):");
-            if (nuovaCat && nuovaCat.trim() !== '') {
-                const select = document.getElementById('cms_categoria');
-                const option = document.createElement('option');
-                const valClean = nuovaCat.trim().toLowerCase().replace(/\s+/g, '_');
-                option.value = valClean;
-                option.text = '📌 ' + nuovaCat.trim();
-                select.add(option);
-                select.value = valClean;
-                toggleCampiCMS();
-            }
+        function renderListaCMS() {
+            const box = E('cmsListaContenuti'); if (!box) return;
+            const m = MACRO[currentMacroTab], tutti = itemsDelTab(currentMacroTab);
+            E('cms-chips').innerHTML = m.tipi.length > 1 ? [''].concat(m.tipi).map(t => {
+                const n = t ? tutti.filter(i => catNorm(i.categoria) === t).length : tutti.length;
+                return `<button type="button" onclick="filtraTipoCMS('${t}')" class="px-2.5 py-1 rounded-full border text-[10px] font-bold ${t === filtroTipo ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'}">${t ? TIPI[t].ico + ' ' + TIPI[t].nome : 'Tutti'} (${n})</button>`;
+            }).join('') : '';
+
+            const righe = (filtroTipo ? tutti.filter(i => catNorm(i.categoria) === filtroTipo) : tutti.slice()).sort((a, b) => {
+                const ta = m.tipi.indexOf(catNorm(a.categoria)), tb = m.tipi.indexOf(catNorm(b.categoria));
+                if (ta !== tb) return ta - tb;
+                return ORDINATI.includes(a.categoria) ? (Number(a.ordine) || 0) - (Number(b.ordine) || 0) : 0;
+            });
+
+            if (!righe.length) { box.innerHTML = `<p class="text-xs text-slate-400 italic py-6 text-center">Nessun contenuto in questa sezione. Usa il modulo a sinistra per aggiungere il primo.</p>`; return; }
+
+            box.innerHTML = righe.map(it => {
+                const c = catNorm(it.categoria), T = TIPI[c], ex = [];
+                if (T.slot) ex.push('Slot ' + (it.ordine || '?'));
+                if (T.ordine) ex.push('Posizione ' + (it.ordine || 0));
+                if (T.gps) ex.push(it.latitudine ? `GPS ${esc(it.latitudine)}, ${esc(it.longitudine)}` : (c === 'itinerari' ? '' : '⚠ senza coordinate'));
+                if (T.prezzi) ex.push(`Bassa €${esc(it.prezzo_bassa_mezza || '-')}/${esc(it.prezzo_bassa_intera || '-')} · Alta €${esc(it.prezzo_alta_mezza || '-')}/${esc(it.prezzo_alta_intera || '-')}`);
+                if (it.audio_url) ex.push('🔊 MP3'); else if (it.testo_audioguida) ex.push('🔊 voce di sistema');
+                if (it.foto_2 || it.foto_3) ex.push('🖼 galleria');
+                const testo = String(it.descrizione || '').replace(/<[^>]*>/g, '');
+                const th = it.immagine_url ? `<img src="${esc(it.immagine_url)}" class="w-12 h-12 object-cover rounded-lg border flex-shrink-0">` : '';
+                return `<div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center text-xs gap-3">
+                    <div class="flex items-center gap-3 min-w-0">${th}
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap"><span class="bg-slate-200 text-slate-800 text-[9px] px-2 py-0.5 rounded-full font-bold">${T.ico} ${esc(T.nome)}</span><b class="text-slate-800">${esc(it.titolo)}</b></div>
+                            ${it.sottotitolo ? `<p class="text-[10px] text-cyan-700 font-semibold mt-0.5">${esc(it.sottotitolo)}</p>` : ''}
+                            <p class="text-slate-600 text-[11px] mt-0.5">${esc(testo.length > 130 ? testo.slice(0, 130) + '…' : testo)}</p>
+                            ${ex.filter(Boolean).length ? `<p class="text-[9px] text-slate-500 font-mono mt-1">${ex.filter(Boolean).join(' • ')}</p>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 flex-shrink-0">
+                        <button type="button" onclick="caricaInModificaCMS('${esc(it.id)}')" class="text-cyan-600 hover:text-cyan-800 p-1" title="Modifica"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button type="button" onclick="eliminaContenutoCMS('${esc(it.id)}')" class="text-red-400 hover:text-red-600 p-1" title="Elimina"><i class="fa-solid fa-trash"></i></button>
+                    </div></div>`;
+            }).join('');
         }
 
         function caricaInModificaCMS(id) {
-            const item = listaCMSCache.find(i => String(i.id) === String(id));
-            if (!item) return;
-
-            document.getElementById('cms_edit_id').value = item.id;
-            document.getElementById('cms_categoria').value = item.categoria || 'destinazioni';
+            const it = listaCMSCache.find(i => String(i.id) === String(id));
+            if (!it) return;
+            const c = catNorm(it.categoria);
+            E('cms_categoria').value = c;
             toggleCampiCMS();
-
-            document.getElementById('cms_titolo').value = item.titolo || '';
-            document.getElementById('cms_sottotitolo').value = item.sottotitolo || '';
-            document.getElementById('cms_descrizione').value = item.descrizione || '';
-            document.getElementById('cms_immagine_url').value = item.immagine_url || '';
-
-            if (document.getElementById('cms_foto_2')) document.getElementById('cms_foto_2').value = item.foto_2 || '';
-            if (document.getElementById('cms_foto_3')) document.getElementById('cms_foto_3').value = item.foto_3 || '';
-
-            if (isCategoriaGPS(item.categoria)) {
-                document.getElementById('cms_lat').value = item.latitudine || '';
-                document.getElementById('cms_lng').value = item.longitudine || '';
-                if (document.getElementById('cms_audioguida')) document.getElementById('cms_audioguida').value = item.testo_audioguida || '';
-            } else if (item.categoria === 'flotta') {
-                document.getElementById('cms_bassa_mezza').value = item.prezzo_bassa_mezza || '';
-                document.getElementById('cms_bassa_intera').value = item.prezzo_bassa_intera || '';
-                document.getElementById('cms_alta_mezza').value = item.prezzo_alta_mezza || '';
-                document.getElementById('cms_alta_intera').value = item.prezzo_alta_intera || '';
-            }
-
-            document.getElementById('btn-salva-cms-text').innerText = 'Aggiorna Contenuto';
-            document.getElementById('btn-annulla-edit-cms').classList.remove('hidden');
-            document.getElementById('cmsForm').scrollIntoView({ behavior: 'smooth' });
+            setV('cms_edit_id', it.id); setV('cms_titolo', it.titolo); setV('cms_sottotitolo', it.sottotitolo);
+            setV('cms_descrizione', it.descrizione); setV('cms_immagine_url', it.immagine_url);
+            setV('cms_foto_2', it.foto_2); setV('cms_foto_3', it.foto_3);
+            setV('cms_lat', it.latitudine); setV('cms_lng', it.longitudine);
+            setV('cms_audioguida', it.testo_audioguida); setV('cms_audio_url', it.audio_url);
+            setV('cms_bassa_mezza', it.prezzo_bassa_mezza); setV('cms_bassa_intera', it.prezzo_bassa_intera);
+            setV('cms_alta_mezza', it.prezzo_alta_mezza); setV('cms_alta_intera', it.prezzo_alta_intera);
+            setV('cms_slot', it.ordine || 1); setV('cms_ordine', it.ordine);
+            setTxt('btn-salva-cms-text', 'Aggiorna contenuto');
+            show('btn-annulla-edit-cms', true);
+            E('cmsForm').scrollIntoView({ behavior: 'smooth' });
         }
 
         function resetFormCMS() {
-            document.getElementById('cmsForm').reset();
-            document.getElementById('cms_edit_id').value = '';
-            document.getElementById('btn-salva-cms-text').innerText = 'Salva in Cloud';
-            document.getElementById('btn-annulla-edit-cms').classList.add('hidden');
+            E('cmsForm').reset();
+            setV('cms_edit_id', '');
+            setTxt('btn-salva-cms-text', 'Salva in Cloud');
+            show('btn-annulla-edit-cms', false);
             toggleCampiCMS();
+        }
+
+        function mostraErroreCMS(err) {
+            const m = /Could not find the '(\w+)' column/.exec(err.message || '');
+            alert(m
+                ? `Nel database manca la colonna "${m[1]}".\n\nEsegui lo script "cms_migrazione.sql" nell'SQL Editor di Supabase (non cancella nessun dato) e riprova.`
+                : 'Errore nel salvataggio CMS: ' + err.message);
         }
 
         async function salvaContenutoCMS(e) {
             e.preventDefault();
-            const btn = document.getElementById('btn-salva-cms');
-            btn.disabled = true;
+            const btn = E('btn-salva-cms'); btn.disabled = true;
+            const cat = val('cms_categoria'), T = TIPI[cat];
+            let editId = val('cms_edit_id');
+            const orig = editId ? listaCMSCache.find(i => String(i.id) === String(editId)) : null;
+            const num = id => { const v = parseFloat(val(id)); return isNaN(v) ? null : v; };
 
-            const editId = document.getElementById('cms_edit_id').value;
-            const cat = document.getElementById('cms_categoria').value;
-            const isGps = isCategoriaGPS(cat);
-
-            const isFaq = (cat === 'index_faq');
-            const haGalleria = (cat === 'destinazioni' && currentMacroTab === 'destinazioni');
-
-            const itemData = {
+            // Solo i campi pertinenti al tipo vengono salvati; gli altri restano vuoti
+            const d = {
                 categoria: cat,
-                titolo: document.getElementById('cms_titolo').value,
-                sottotitolo: isFaq ? null : (document.getElementById('cms_sottotitolo') ? document.getElementById('cms_sottotitolo').value : null),
-                descrizione: document.getElementById('cms_descrizione').value,
-                immagine_url: isFaq ? null : document.getElementById('cms_immagine_url').value,
-                latitudine: isGps ? (parseFloat(document.getElementById('cms_lat').value) || null) : null,
-                longitudine: isGps ? (parseFloat(document.getElementById('cms_lng').value) || null) : null,
-                testo_audioguida: isGps ? document.getElementById('cms_audioguida').value : null,
-                prezzo_bassa_mezza: cat === 'flotta' ? (parseFloat(document.getElementById('cms_bassa_mezza').value) || 120) : null,
-                prezzo_bassa_intera: cat === 'flotta' ? (parseFloat(document.getElementById('cms_bassa_intera').value) || 200) : null,
-                prezzo_alta_mezza: cat === 'flotta' ? (parseFloat(document.getElementById('cms_alta_mezza').value) || 150) : null,
-                prezzo_alta_intera: cat === 'flotta' ? (parseFloat(document.getElementById('cms_alta_intera').value) || 220) : null
+                titolo: val('cms_titolo').trim(),
+                descrizione: val('cms_descrizione').trim(),
+                sottotitolo: T.sub ? (val('cms_sottotitolo').trim() || null) : null,
+                immagine_url: T.foto ? (val('cms_immagine_url').trim() || null) : null,
+                latitudine: T.gps ? num('cms_lat') : null,
+                longitudine: T.gps ? num('cms_lng') : null,
+                testo_audioguida: T.audio ? (val('cms_audioguida').trim() || null) : null
             };
+            if (T.prezzi) {
+                d.prezzo_bassa_mezza = num('cms_bassa_mezza') || 120; d.prezzo_bassa_intera = num('cms_bassa_intera') || 200;
+                d.prezzo_alta_mezza = num('cms_alta_mezza') || 150; d.prezzo_alta_intera = num('cms_alta_intera') || 220;
+            }
+            if (T.slot) d.ordine = parseInt(val('cms_slot')) || 1;
+            else if (T.ordine) d.ordine = parseInt(val('cms_ordine')) || 0;
 
-            if (haGalleria) {
-                itemData.foto_2 = document.getElementById('cms_foto_2') ? document.getElementById('cms_foto_2').value : null;
-                itemData.foto_3 = document.getElementById('cms_foto_3') ? document.getElementById('cms_foto_3').value : null;
+            // Colonne "extra": inviate solo se compilate (o già presenti) → nessun errore se la colonna non esiste ancora
+            const extra = (col, v) => { if (v || (orig && col in orig)) d[col] = v || null; };
+            if (T.galleria) { extra('foto_2', val('cms_foto_2').trim()); extra('foto_3', val('cms_foto_3').trim()); }
+            if (T.audio) extra('audio_url', val('cms_audio_url').trim());
+
+            // Gli slot della home sono 3: se lo slot è occupato si propone la sostituzione
+            if (cat === 'index_slot' && !editId) {
+                const dup = listaCMSCache.find(i => i.categoria === 'index_slot' && Number(i.ordine) === d.ordine);
+                if (dup) {
+                    if (!confirm(`Lo slot ${d.ordine} contiene già "${dup.titolo}". Vuoi sostituirlo?`)) { btn.disabled = false; return; }
+                    editId = dup.id;
+                }
             }
 
-            let error;
-            if (editId) {
-                const result = await _supabase.from('cms_contenuti').update(itemData).eq('id', editId);
-                error = result.error;
-            } else {
-                const result = await _supabase.from('cms_contenuti').insert([itemData]);
-                error = result.error;
-            }
-
-            if (error) {
-                alert("Errore nel salvataggio CMS: " + error.message);
-            } else {
-                resetFormCMS();
-                caricaContenutiCMS();
-            }
+            const r = editId
+                ? await _supabase.from('cms_contenuti').update(d).eq('id', editId)
+                : await _supabase.from('cms_contenuti').insert([d]);
+            if (r.error) mostraErroreCMS(r.error);
+            else { resetFormCMS(); await caricaContenutiCMS(); }
             btn.disabled = false;
         }
 
         async function eliminaContenutoCMS(id) {
-            if (confirm("Sei sicuro di voler eliminare questo contenuto dal CMS?")) {
-                await _supabase.from('cms_contenuti').delete().eq('id', id);
-                caricaContenutiCMS();
-            }
+            if (!confirm('Sei sicuro di voler eliminare questo contenuto dal CMS?')) return;
+            const { error } = await _supabase.from('cms_contenuti').delete().eq('id', id);
+            if (error) alert('Errore eliminazione: ' + error.message);
+            await caricaContenutiCMS();
         }
-
-        window.selezionaMacroTab = selezionaMacroTab;
-        window.toggleCampiCMS = toggleCampiCMS;
-        window.uploadFotoSupabaseStorage = uploadFotoSupabaseStorage;
-        window.caricaContenutiCMS = caricaContenutiCMS;
-        window.gestisciNuovaCategoria = gestisciNuovaCategoria;
-        window.caricaInModificaCMS = caricaInModificaCMS;
-        window.resetFormCMS = resetFormCMS;
-        window.salvaContenutoCMS = salvaContenutoCMS;
-        window.eliminaContenutoCMS = eliminaContenutoCMS;
 
         // -----------------------------------------------------------------------------
         // FATTURE IN CLOUD INTEGRATION
@@ -968,8 +819,7 @@
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
-                    alert("Errore Fatture in Cloud:
-" + JSON.stringify(data.error || data, null, 2));
+                    alert("Errore Fatture in Cloud:\n" + JSON.stringify(data.error || data, null, 2));
                 }
             } catch (err) {
                 alert("Errore di rete: " + err.message);
@@ -1116,11 +966,9 @@
         }
 
         function esportaCSV() {
-            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin
-";
+            let csv = "ID,NomeCliente,Telefono,Barca,DataNoleggio,Importo,Caparra,StatoCheckin\n";
             listaNoleggi.forEach(n => {
-                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"
-`;
+                csv += `"${n.id}","${n.nome_cliente}","${n.telefono}","${n.barca}","${n.data_noleggio}",${n.importo},${n.caparra},"${n.stato_checkin}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
@@ -1129,12 +977,6 @@
             a.setAttribute('download', 'noleggi_nauticovi_cloud.csv');
             a.click();
         }
-
-        window.generaFatturaInCloud = generaFatturaInCloud;
-        window.caricaDatiCloud = caricaDatiCloud;
-        window.registraNoleggioCloud = registraNoleggioCloud;
-        window.eliminaNoleggio = eliminaNoleggio;
-        window.esportaCSV = esportaCSV;
     </script>
 </body>
 </html>
