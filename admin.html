@@ -948,15 +948,11 @@
                 const data = await res.json();
 
                 if (res.ok && data.data) {
-                    alert("BOZZA CREATA SU FATTURE IN CLOUD!
-
-ID Bozza: " + data.data.id + "
-Il documento è nella sezione "Bozze" del tuo account.");
+                    alert("BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: " + data.data.id + "\nIl documento è nella sezione \"Bozze\" del tuo account.");
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaDatiCloud();
                 } else {
-                    alert("Errore Fatture in Cloud:
-" + JSON.stringify(data.error || data, null, 2));
+                    alert("Errore Fatture in Cloud:\n" + JSON.stringify(data.error || data, null, 2));
                 }
             } catch (err) {
                 alert("Errore di rete: " + err.message);
