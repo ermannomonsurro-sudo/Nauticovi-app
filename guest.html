@@ -134,7 +134,7 @@
                 <div class="text-right flex flex-col items-end gap-2">
                     <div class="flex items-center gap-1.5">
                         <a href="tel:+393484364498" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1.5 rounded-lg font-bold text-xs inline-flex items-center gap-1 shadow" title="Chiama Assistenza">
-                            <i class="fa-solid fa-phone"></i> <span class="hidden sm:inline">Chiama</span>
+                            <i class="fa-solid fa-phone"></i> <span class="hidden sm:inline" data-i18n="btn_call">Chiama</span>
                         </a>
                         <a href="https://wa.me/393484364498?text=SOS%20Assistenza%20in%20mare!%20Ho%20bisogno%20di%20supporto." target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1.5 rounded-lg font-bold text-xs inline-flex items-center gap-1 shadow" title="Scrivi su WhatsApp">
                             <i class="fa-brands fa-whatsapp text-sm"></i> <span class="hidden sm:inline">WhatsApp</span>
@@ -148,7 +148,7 @@
                 </div>
             </div>
 
-            <!-- Promemoria Rientro No-Stress -->
+            <!-- Promemoria Rientro Obbligatorio -->
             <div class="bg-slate-950/60 border border-cyan-500/20 rounded-xl p-2.5 flex items-center justify-between text-xs mt-1">
                 <div class="flex items-center gap-2">
                     <i class="fa-regular fa-clock text-cyan-400 text-sm"></i>
@@ -415,6 +415,7 @@
                 active_rental: "Noleggio Attivo",
                 welcome_title: "Benvenuto a Bordo!",
                 boat_label: "Barca:",
+                btn_call: "Chiama",
                 btn_return_base: "Torna in Banchina",
                 return_notice: "Rientro obbligatorio in banchina alle:",
                 return_time: "Ore 18:00",
@@ -438,6 +439,7 @@
                 btn_start_tour: "Avvia Questo Tour",
                 loading_itin: "Caricamento itinerari dal CMS...",
                 no_itin_cms: "Nessun itinerario trovato nel CMS.",
+                no_dest_cms: "Nessuna destinazione trovata nel CMS.",
                 telemetry_speed: "Velocità",
                 telemetry_dist: "Distanza",
                 telemetry_eta: "Tempo",
@@ -460,9 +462,12 @@
                 tip3_h: "Tendalino Parasole",
                 tip3_p: "Fissare il tendalino solo a barca ferma o a velocità bassissima per evitare danni alla struttura.",
                 rules_title: "Regole Tassative di Bordo",
-                rule1: "<b>Distanza Bagnanti:</b> VIETATO avvicinarsi a meno di 200 metri dalle spiagge con bagnanti.",
-                rule2: "<b>Velocità nelle Grotte:</b> VIETATO entrare veloci nelle grotte. Procedere solo a motore al minimo o a remi.",
-                rule3: "<b>Protezione Fondali:</b> VIETATO gettare l'ancora sulle praterie protette di Posidonia oceanica.",
+                rule1_h: "Distanza Bagnanti",
+                rule1_p: "VIETATO avvicinarsi a meno di 200 metri dalle spiagge con bagnanti.",
+                rule2_h: "Velocità nelle Grotte",
+                rule2_p: "VIETATO entrare veloci nelle grotte. Procedere solo a motore al minimo o a remi.",
+                rule3_h: "Protezione Fondali",
+                rule3_p: "VIETATO gettare l'ancora sulle praterie protette di Posidonia oceanica.",
                 share_title: "Scatta & Condividi i Tuoi Momenti",
                 share_desc: "Taggaci nelle tue Storie Instagram o lasciaci una recensione al rientro!",
                 btn_review: "Recensione",
@@ -484,6 +489,7 @@
                 active_rental: "Active Rental",
                 welcome_title: "Welcome Aboard!",
                 boat_label: "Boat:",
+                btn_call: "Call",
                 btn_return_base: "Return to Base",
                 return_notice: "Mandatory return to base by:",
                 return_time: "6:00 PM",
@@ -507,6 +513,7 @@
                 btn_start_tour: "Start This Tour",
                 loading_itin: "Loading itineraries from CMS...",
                 no_itin_cms: "No itineraries found in CMS.",
+                no_dest_cms: "No destinations found in CMS.",
                 telemetry_speed: "Speed",
                 telemetry_dist: "Distance",
                 telemetry_eta: "Time",
@@ -529,9 +536,12 @@
                 tip3_h: "Sun Canopy",
                 tip3_p: "Secure the canopy only when stationary or moving very slowly to prevent structural damage.",
                 rules_title: "Strict Onboard Rules",
-                rule1: "<b>Swimmer Distance:</b> PROHIBITED to approach closer than 200 meters to beaches with swimmers.",
-                rule2: "<b>Cave Speed:</b> PROHIBITED to enter caves at high speed. Proceed only at idle speed or with oars.",
-                rule3: "<b>Seabed Protection:</b> PROHIBITED to drop anchor on protected Posidonia oceanica beds.",
+                rule1_h: "Swimmer Distance",
+                rule1_p: "PROHIBITED to approach closer than 200 meters to beaches with swimmers.",
+                rule2_h: "Cave Speed",
+                rule2_p: "PROHIBITED to enter caves at high speed. Proceed only at idle speed or with oars.",
+                rule3_h: "Seabed Protection",
+                rule3_p: "PROHIBITED to drop anchor on protected Posidonia oceanica beds.",
                 share_title: "Capture & Share Your Moments",
                 share_desc: "Tag us in your Instagram Stories or leave us a review upon return!",
                 btn_review: "Review",
@@ -553,6 +563,7 @@
                 active_rental: "Alquiler Activo",
                 welcome_title: "¡Bienvenido a Bordo!",
                 boat_label: "Barco:",
+                btn_call: "Llamar",
                 btn_return_base: "Volver a la Base",
                 return_notice: "Regreso obligatorio a la base a las:",
                 return_time: "18:00 Hs",
@@ -574,6 +585,7 @@
                 btn_start_tour: "Iniciar Este Tour",
                 loading_itin: "Cargando itinerarios desde el CMS...",
                 no_itin_cms: "No se encontraron itinerarios en el CMS.",
+                no_dest_cms: "No se encontraron destinos en el CMS.",
                 telemetry_speed: "Velocidad",
                 telemetry_dist: "Distancia",
                 telemetry_eta: "Tiempo",
@@ -596,9 +608,12 @@
                 tip3_h: "Toldo Parasol",
                 tip3_p: "Fijar el toldo solo con el barco parado o navegando a muy baja velocidad para evitar daños.",
                 rules_title: "Reglas Estrictas de Bordo",
-                rule1: "<b>Distancia a Bañistas:</b> PROHIBIDO acercarse a menos de 200 metros de las playas con bañistas.",
-                rule2: "<b>Velocidad en Cuevas:</b> PROHIBIDO entrar rápido en las cuevas. Avanzar solo con motor al mínimo o a remos.",
-                rule3: "<b>Protección de Fondos:</b> PROHIBIDO echar el ancla sobre las praderas protegidas de Posidonia oceánica.",
+                rule1_h: "Distancia a Bañistas",
+                rule1_p: "PROHIBIDO acercarse a menos de 200 metros de las playas con bañistas.",
+                rule2_h: "Velocidad en Cuevas",
+                rule2_p: "PROHIBIDO entrar rápido en las cuevas. Avanzar solo con motor al mínimo o a remos.",
+                rule3_h: "Protección de Fondos",
+                rule3_p: "PROHIBIDO echar el ancla sobre las praderas protegidas de Posidonia oceanica.",
                 share_title: "Captura y Comparte tus Momentos",
                 share_desc: "¡Etiquétanos en tus Stories de Instagram o déjanos una reseña al regresar!",
                 btn_review: "Reseña",
@@ -744,13 +759,35 @@
             container.innerHTML = '';
             const btnNavText = translations[currentLang]?.btn_start_nav || "Avvia Navigatore GPS";
 
+            // Dizionario traduzioni descrizioni famose di Praia a Mare (Isola di Dino, Grotta del Leone, Arco Magno, ecc.)
+            const descTranslations = {
+                en: {
+                    "Prende il nome dalla roccia emersa a forma di leone sdraiato. Fondale sabbioso ideale per dare l'ancora.": "Takes its name from the emerged rock shaped like a lying lion. Sandy seabed ideal for anchoring.",
+                    "Iconica isola rocciosa famosa per i riflessi azzurri al suo interno.": "Iconic rocky island famous for the blue reflections inside its caves.",
+                    "Caratterizzata da una roccia sommersa a forma di leone sdraiato. Fondale ideale per snorkeling.": "Characterized by a submerged rock in the shape of a lying lion. Ideal seabed for snorkeling.",
+                    "Spettacolare arco naturale di roccia che racchiude una baia incantata.": "Spectacular natural rock arch enclosing an enchanted bay."
+                },
+                es: {
+                    "Prende il nome dalla roccia emersa a forma di leone sdraiato. Fondale sabbioso ideale per dare l'ancora.": "Toma su nombre de la roca emergida con forma de león acostado. Fondo de arena ideal para fondear.",
+                    "Iconica isola rocciosa famosa per i riflessi azzurri al suo interno.": "Icónica isla rocosa famosa por los reflejos azules en su interior.",
+                    "Caratterizzata da una roccia sommersa a forma di leone sdraiato. Fondale ideale per snorkeling.": "Caracterizada por una roca sumergida con forma de león acostado. Fondo ideal para el snorkel.",
+                    "Spettacolare arco naturale di roccia che racchiude una baia incantata.": "Espectacular arco natural de roca que encierra una bahía encantada."
+                }
+            };
+
             poiList.forEach(poi => {
+                let descTradotta = poi.descrizione || '';
+                if (currentLang !== 'it' && descTranslations[currentLang] && descTranslations[currentLang][poi.descrizione]) {
+                    descTradotta = descTranslations[currentLang][poi.descrizione];
+                }
+
                 container.innerHTML += `
                     <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
                         <img src="${poi.immagine_url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80'}" alt="${poi.titolo}" class="w-full h-40 object-cover">
                         <div class="p-4 space-y-2">
+                            <!-- NOME DEL LUOGO INVARIATO IN TUTTE LE LINGUE -->
                             <h4 class="font-extrabold text-slate-800 text-base">${poi.titolo}</h4>
-                            <p class="text-xs text-slate-600 leading-relaxed">${poi.descrizione}</p>
+                            <p class="text-xs text-slate-600 leading-relaxed">${descTradotta}</p>
                             <button onclick="chiediConfermaNavigazione('${poi.id}')" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow">
                                 <i class="fa-solid fa-location-arrow"></i> ${btnNavText}
                             </button>
@@ -800,22 +837,22 @@
                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
                             <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">1</div>
                             <div>
-                                <h4 class="font-bold text-slate-800 text-sm" data-i18n="tip1_h">Accensione Motore</h4>
-                                <p class="text-slate-600 mt-0.5" data-i18n="tip1_p">Mettere la leva in folle (N) e agganciare lo stacco di sicurezza prima di girare la chiave.</p>
+                                <h4 class="font-bold text-slate-800 text-sm" data-i18n="tip1_h">${translations[currentLang].tip1_h}</h4>
+                                <p class="text-slate-600 mt-0.5" data-i18n="tip1_p">${translations[currentLang].tip1_p}</p>
                             </div>
                         </div>
                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
                             <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">2</div>
                             <div>
-                                <h4 class="font-bold text-slate-800 text-sm" data-i18n="tip2_h">Ancoraggio Corretto</h4>
-                                <p class="text-slate-600 mt-0.5" data-i18n="tip2_p">Calare l'ancora sempre su fondale sabbioso di colore chiaro, mai sulla roccia o sulla posidonia.</p>
+                                <h4 class="font-bold text-slate-800 text-sm" data-i18n="tip2_h">${translations[currentLang].tip2_h}</h4>
+                                <p class="text-slate-600 mt-0.5" data-i18n="tip2_p">${translations[currentLang].tip2_p}</p>
                             </div>
                         </div>
                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3">
                             <div class="bg-cyan-600 text-white p-2 rounded-lg font-bold">3</div>
                             <div>
-                                <h4 class="font-bold text-slate-800 text-sm" data-i18n="tip3_h">Tendalino Parasole</h4>
-                                <p class="text-slate-600 mt-0.5" data-i18n="tip3_p">Fissare il tendalino solo a barca ferma o a velocità bassissima per evitare danni alla struttura.</p>
+                                <h4 class="font-bold text-slate-800 text-sm" data-i18n="tip3_h">${translations[currentLang].tip3_h}</h4>
+                                <p class="text-slate-600 mt-0.5" data-i18n="tip3_p">${translations[currentLang].tip3_p}</p>
                             </div>
                         </div>
                     `;
@@ -842,15 +879,15 @@
                         <ul class="text-xs space-y-3 text-slate-700">
                             <li class="flex items-start gap-2.5 p-2 bg-red-50 rounded-lg border border-red-100">
                                 <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
-                                <span data-i18n="rule1"><b>Distanza Bagnanti:</b> VIETATO avvicinarsi a meno di 200 metri dalle spiagge con bagnanti.</span>
+                                <span><b data-i18n="rule1_h">${translations[currentLang].rule1_h}:</b> <span data-i18n="rule1_p">${translations[currentLang].rule1_p}</span></span>
                             </li>
                             <li class="flex items-start gap-2.5 p-2 bg-red-50 rounded-lg border border-red-100">
                                 <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
-                                <span data-i18n="rule2"><b>Velocità nelle Grotte:</b> VIETATO entrare veloci nelle grotte. Procedere solo a motore al minimo o a remi.</span>
+                                <span><b data-i18n="rule2_h">${translations[currentLang].rule2_h}:</b> <span data-i18n="rule2_p">${translations[currentLang].rule2_p}</span></span>
                             </li>
                             <li class="flex items-start gap-2.5 p-2 bg-red-50 rounded-lg border border-red-100">
                                 <i class="fa-solid fa-ban text-red-500 text-sm mt-0.5"></i>
-                                <span data-i18n="rule3"><b>Protezione Fondali:</b> VIETATO gettare l'ancora sulle praterie protette di Posidonia oceanica.</span>
+                                <span><b data-i18n="rule3_h">${translations[currentLang].rule3_h}:</b> <span data-i18n="rule3_p">${translations[currentLang].rule3_p}</span></span>
                             </li>
                         </ul>
                     `;
@@ -1335,7 +1372,7 @@ Mia Posizione GPS Attuale: https://maps.google.com/?q=${lastLat},${lastLng}`;
                 if (itinData.length > 0) itinerariList = itinData;
 
                 const tipsData = data.filter(i => String(i.categoria).toLowerCase() === 'tips');
-                if (tipsData.length > 0) tipsList = tipsData;
+                if (tipsData.filter) tipsList = tipsData;
 
                 const divietiData = data.filter(i => String(i.categoria).toLowerCase() === 'divieti');
                 if (divietiData.length > 0) divietiList = divietiData;
