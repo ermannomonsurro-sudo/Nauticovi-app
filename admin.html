@@ -8,6 +8,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Supabase Client JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Conversione foto HEIC/HEIF in JPEG (solo per il caricamento da CMS) -->
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
     <style>
         .f-lbl{display:block;font-weight:700;color:#475569;text-transform:uppercase}
         .f-in{width:100%;margin-top:.25rem;padding:.5rem;border:1px solid #cbd5e1;border-radius:.5rem;background:#fff;outline:none}
@@ -525,10 +527,19 @@
             setTxt('cms-dove', 'Compare in: ' + T.dove);
         }
 
-        // Ridimensiona le foto (max 1400px, JPEG) prima del caricamento: pagine più veloci e DB leggero
-        function ridimensiona(file, maxPx = 1400, q = 0.82) {
-            return new Promise(res => {
-                if (!file.type.startsWith('image/') || file.type === 'image/svg+xml') return res(file);
+        // Converte HEIC/HEIF in JPEG e ridimensiona le foto (max 1400px, JPEG): pagine più veloci e DB leggero.
+        // Se la foto non è elaborabile lancia un errore: non viene caricato nulla di inutilizzabile.
+        const isHeic = f => /hei[cf]/i.test(f.type || '') || /\.hei[cf]$/i.test(f.name || '');
+
+        async function ridimensiona(file, maxPx = 1400, q = 0.82) {
+            if (isHeic(file)) {
+                if (!window.heic2any) throw new Error('convertitore HEIC non disponibile (controlla la connessione)');
+                const out = await window.heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 });
+                const b = Array.isArray(out) ? out[0] : out;
+                file = new File([b], (file.name || 'foto').replace(/\.hei[cf]$/i, '') + '.jpg', { type: 'image/jpeg' });
+            }
+            if (file.type === 'image/svg+xml') return file;
+            return new Promise((res, rej) => {
                 const img = new Image(), url = URL.createObjectURL(file);
                 img.onload = () => {
                     const r = Math.min(1, maxPx / Math.max(img.width, img.height));
@@ -536,9 +547,9 @@
                     c.width = Math.round(img.width * r); c.height = Math.round(img.height * r);
                     c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
                     URL.revokeObjectURL(url);
-                    c.toBlob(b => res(b || file), 'image/jpeg', q);
+                    c.toBlob(b => b ? res(b) : rej(new Error('conversione non riuscita')), 'image/jpeg', q);
                 };
-                img.onerror = () => { URL.revokeObjectURL(url); res(file); };
+                img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('formato immagine non supportato da questo browser')); };
                 img.src = url;
             });
         }
@@ -547,7 +558,14 @@
             if (!inputEl.files || !inputEl.files.length) return;
             const spinner = E('upload_spinner');
             if (spinner) spinner.classList.remove('hidden');
-            const blob = await ridimensiona(inputEl.files[0]);
+            let blob;
+            try { blob = await ridimensiona(inputEl.files[0]); }
+            catch (e) {
+                if (spinner) spinner.classList.add('hidden');
+                inputEl.value = '';
+                alert('Foto non elaborabile: ' + (e.message || e) + '.\n\nConvertila in JPG o PNG e riprova.');
+                return;
+            }
             const ext = blob.type === 'image/jpeg' ? 'jpg' : (inputEl.files[0].name.split('.').pop() || 'img');
             const path = `uploads/${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
             try {
