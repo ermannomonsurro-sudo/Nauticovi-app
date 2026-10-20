@@ -29,7 +29,7 @@
             <a href="index.html" class="text-xs text-cyan-400 hover:text-white font-bold flex items-center gap-1 bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700">
                 <i class="fa-solid fa-house"></i> Home
             </a>
-            
+
             <div class="flex flex-col items-center justify-center">
                 <div class="flex items-center gap-2">
                     <img src="logo.png" alt="Nauticovi" class="h-10 w-auto object-contain">
@@ -61,7 +61,7 @@
                 <i class="fa-solid fa-ship text-cyan-600"></i> <span data-i18n="fleet_title">Le Nostre Imbarcazioni</span>
             </h3>
 
-            <!-- Contenitore Imbarcazioni Dinamiche aggiunte da CMS -->
+            <!-- Contenitore Imbarcazioni Dinamiche aggiunte da CMS (Catalogo Flotta) -->
             <div id="flotta-dinamica-cms" class="space-y-4"></div>
 
             <!-- Card Gommoni 40 CV (Base) -->
@@ -77,7 +77,7 @@
                 <div class="p-4 space-y-2">
                     <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase" data-i18n="rib_tag">Gommone • Max 6 Persone</span>
                     <h4 class="font-extrabold text-slate-800 text-base" data-i18n="rib_title">Gommoni Marlin 40 CV (Senza Patente)</h4>
-                    
+
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
                         <div class="flex justify-between">
                             <span class="text-slate-500" data-i18n="low_season">Bassa Stagione (Giu/Set):</span>
@@ -101,7 +101,7 @@
                 <div class="p-4 space-y-2">
                     <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase" data-i18n="open_tag">Scafo Rigido • Max 5 Persone</span>
                     <h4 class="font-extrabold text-slate-800 text-base" data-i18n="open_title">Scafi Open Poseidon 40 CV (Senza Patente)</h4>
-                    
+
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
                         <div class="flex justify-between">
                             <span class="text-slate-500" data-i18n="low_season">Bassa Stagione (Giu/Set):</span>
@@ -125,7 +125,7 @@
                 <div class="p-4 space-y-2">
                     <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase" data-i18n="lancia_tag">Lancia Tradizionale • Max 4 Persone</span>
                     <h4 class="font-extrabold text-slate-800 text-base" data-i18n="lancia_title">Lancia Tradizionale 30 CV (Senza Patente)</h4>
-                    
+
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
                         <div class="flex justify-between">
                             <span class="text-slate-500" data-i18n="low_season">Bassa Stagione (Giu/Set):</span>
@@ -150,7 +150,7 @@
                 <i class="fa-solid fa-calculator text-cyan-600"></i> <span data-i18n="calc_title">Calcolatore Indicativo Carburante (Motore 40CV)</span>
             </h3>
             <p class="text-[11px] text-slate-500" data-i18n="calc_sub">Stima basata su un costo medio indicativo di 2,50 €/L con partenza dall'Isola di Dino.</p>
-            
+
             <div class="space-y-2 text-xs">
                 <label class="block font-bold text-slate-700" data-i18n="calc_label">Seleziona Itinerario:</label>
                 <select id="calc-rotta" onchange="calcolaCarburante()" class="w-full p-2 border rounded-lg bg-slate-50 font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-cyan-500">
@@ -244,6 +244,10 @@
         try {
             _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } catch(e) {}
+
+        function esc(v) {
+            return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
 
         const translations = {
             it: {
@@ -374,7 +378,7 @@
         function calcolaCarburante() {
             const rotta = document.getElementById('calc-rotta').value;
             const res = document.getElementById('calc-risultato');
-            
+
             if(currentLang === 'en') {
                 if(rotta === 'dino') res.innerHTML = "Estimated fuel cost: <b>4 - 7 Liters (~€10.00 - €17.50)</b>";
                 else if(rotta === 'arcomagno') res.innerHTML = "Estimated fuel cost: <b>10 - 15 Liters (~€25.00 - €37.50)</b>";
@@ -397,6 +401,17 @@
             document.getElementById(idImg).src = url;
         }
 
+        // GALLERIA DELLE BARCHE DAL CMS (foto principale + foto 2 + foto 3)
+        const flottaFoto = {}, flottaPos = {};
+        function flottaSlide(k, dir) {
+            const n = flottaFoto[k].length;
+            flottaPos[k] = (flottaPos[k] + dir + n) % n;
+            document.getElementById('fl-img-' + k).src = flottaFoto[k][flottaPos[k]];
+            document.querySelectorAll('[data-fd="' + k + '"]').forEach((el, i) => {
+                el.className = 'w-2.5 h-2.5 rounded-full shadow ' + (i === flottaPos[k] ? 'bg-white' : 'bg-white/50');
+            });
+        }
+
         // CARICAMENTO DINAMICO FLOTTA DAL CMS SUPABASE CON PREZZI PERSONALIZZATI O DEFAULT
         async function caricaFlottaDinamica() {
             if (typeof _supabase === 'undefined') return;
@@ -413,8 +428,13 @@
 
                 container.innerHTML = '';
 
-                flottaData.forEach(item => {
-                    const imgUrl = item.immagine_url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80';
+                flottaData.forEach((item, idx) => {
+                    const foto = [item.immagine_url, item.foto_2, item.foto_3].filter(Boolean);
+                    if (foto.length === 0) foto.push('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80');
+                    flottaFoto[idx] = foto;
+                    flottaPos[idx] = 0;
+                    const multi = foto.length > 1;
+
                     const sottotitolo = item.sottotitolo || 'Senza Patente • Max 6 Persone';
                     const msgWa = encodeURIComponent(`Ciao! Vorrei informazioni per il noleggio della barca ${item.titolo}`);
 
@@ -427,22 +447,28 @@
                     container.innerHTML += `
                         <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200">
                             <div class="relative">
-                                <img src="${imgUrl}" alt="${item.titolo}" class="w-full h-44 object-cover">
+                                <img id="fl-img-${idx}" src="${esc(foto[0])}" alt="${esc(item.titolo)}" class="w-full h-44 object-cover">
+                                ${multi ? `
+                                <button type="button" onclick="flottaSlide(${idx}, -1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-slate-900/60 hover:bg-slate-900 text-white w-7 h-7 rounded-full flex items-center justify-center text-[10px] shadow border border-white/20"><i class="fa-solid fa-chevron-left"></i></button>
+                                <button type="button" onclick="flottaSlide(${idx}, 1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-slate-900/60 hover:bg-slate-900 text-white w-7 h-7 rounded-full flex items-center justify-center text-[10px] shadow border border-white/20"><i class="fa-solid fa-chevron-right"></i></button>
+                                <div class="absolute bottom-2 right-3 flex gap-1.5">
+                                    ${foto.map((u, i) => `<span data-fd="${idx}" class="w-2.5 h-2.5 rounded-full shadow ${i === 0 ? 'bg-white' : 'bg-white/50'}"></span>`).join('')}
+                                </div>` : ''}
                             </div>
 
                             <div class="p-4 space-y-2">
-                                <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">${sottotitolo}</span>
-                                <h4 class="font-extrabold text-slate-800 text-base">${item.titolo}</h4>
-                                <p class="text-xs text-slate-600 leading-relaxed">${item.descrizione}</p>
-                                
+                                <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">${esc(sottotitolo)}</span>
+                                <h4 class="font-extrabold text-slate-800 text-base">${esc(item.titolo)}</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed whitespace-pre-line">${esc(item.descrizione)}</p>
+
                                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
                                     <div class="flex justify-between">
                                         <span class="text-slate-500" data-i18n="low_season">Bassa Stagione (Giu/Set):</span>
-                                        <span class="font-bold">Mezza €${pBassaMezza} | Intera €${pBassaIntera}</span>
+                                        <span class="font-bold">Mezza €${esc(pBassaMezza)} | Intera €${esc(pBassaIntera)}</span>
                                     </div>
                                     <div class="flex justify-between border-t pt-1">
                                         <span class="text-slate-500" data-i18n="high_season">Alta Stagione (Lug/Ago):</span>
-                                        <span class="font-bold text-emerald-600">Mezza €${pAltaMezza} | Intera €${pAltaIntera}</span>
+                                        <span class="font-bold text-emerald-600">Mezza €${esc(pAltaMezza)} | Intera €${esc(pAltaIntera)}</span>
                                     </div>
                                 </div>
 
@@ -453,6 +479,9 @@
                         </div>
                     `;
                 });
+
+                // Applica la lingua scelta anche alle schede appena create
+                setLanguage(currentLang);
             } catch (err) {
                 console.error("Errore caricamento flotta dinamica:", err);
             }
