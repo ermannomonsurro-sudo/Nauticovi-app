@@ -332,6 +332,24 @@
         </div>
     </div>
 
+    <!-- RITAGLIO FOTO 5:2 AL CARICAMENTO -->
+    <div id="crop-modal" style="display:none" class="fixed inset-0 bg-slate-900/90 z-[100] items-center justify-center p-3">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-lg space-y-3 shadow-2xl">
+            <h3 class="font-extrabold text-sm text-slate-800"><i class="fa-solid fa-crop-simple text-cyan-600"></i> Ritaglia la foto (formato 5:2)</h3>
+            <p class="text-[11px] text-slate-500">Trascina la foto per spostarla e usa il cursore per ingrandire. Il rettangolo tratteggiato è la zona che si vede <b>sempre</b> in tutte le pagine del sito: tieni lì il soggetto principale.</p>
+            <div id="crop-stage" class="relative w-full bg-slate-300 overflow-hidden select-none" style="aspect-ratio:5/2;touch-action:none;cursor:grab">
+                <img id="crop-img" class="absolute max-w-none" draggable="false" alt="">
+                <div class="absolute pointer-events-none" style="left:13%;top:13%;width:74%;height:74%;border:2px dashed #fff;box-shadow:0 0 0 1px rgba(15,23,42,.5)"></div>
+            </div>
+            <input type="range" id="crop-zoom" min="1" max="4" step="0.01" value="1" class="w-full">
+            <div class="grid grid-cols-3 gap-2 text-xs font-bold">
+                <button type="button" id="crop-cancel" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl">Annulla</button>
+                <button type="button" id="crop-full" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl">Usa foto intera</button>
+                <button type="button" id="crop-ok" class="p-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl shadow">Conferma ritaglio</button>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPT SUPABASE & CRM ADMIN LOGIC -->
     <script>
         const SUPABASE_URL = "https://cbvpixcfhmedbapnvfmw.supabase.co";
@@ -527,6 +545,51 @@
             setTxt('cms-dove', 'Compare in: ' + T.dove);
         }
 
+        // RITAGLIO 5:2: formato intermedio tra le cornici del sito (circa 1,9:1 – 3,4:1).
+        // Zona sicura = centro 74% (visibile in ogni pagina). Risolve con il Blob ritagliato, oppure null = foto intera.
+        function ritagliaFoto(file) {
+            return new Promise((resolve, reject) => {
+                const modal = E('crop-modal'), stage = E('crop-stage'), img = E('crop-img'), zoom = E('crop-zoom');
+                const url = URL.createObjectURL(file);
+                let st = null, drag = null;
+                const chiudi = () => { modal.style.display = 'none'; URL.revokeObjectURL(url); img.removeAttribute('src'); };
+                const annulla = () => { const er = new Error('operazione annullata'); er.annullato = true; return er; };
+                const clamp = () => { const sc = st.base * st.z; st.x = Math.min(0, Math.max(st.W - st.nw * sc, st.x)); st.y = Math.min(0, Math.max(st.H - st.nh * sc, st.y)); };
+                const apply = () => {
+                    clamp(); const sc = st.base * st.z;
+                    img.style.width = (st.nw * sc) + 'px'; img.style.height = (st.nh * sc) + 'px';
+                    img.style.left = st.x + 'px'; img.style.top = st.y + 'px';
+                };
+                const setZoom = z => {
+                    const old = st.base * st.z, cx = (st.W / 2 - st.x) / old, cy = (st.H / 2 - st.y) / old;
+                    st.z = z; const sc = st.base * z;
+                    st.x = st.W / 2 - cx * sc; st.y = st.H / 2 - cy * sc; apply();
+                };
+                img.onerror = () => { chiudi(); reject(new Error('formato immagine non supportato da questo browser')); };
+                img.onload = () => {
+                    modal.style.display = 'flex';
+                    const W = stage.clientWidth, H = stage.clientHeight, nw = img.naturalWidth, nh = img.naturalHeight;
+                    const base = Math.max(W / nw, H / nh);
+                    st = { W, H, nw, nh, base, z: 1, x: (W - nw * base) / 2, y: (H - nh * base) / 2 };
+                    zoom.value = 1; apply();
+                };
+                stage.onpointerdown = e => { if (!st) return; drag = { px: e.clientX, py: e.clientY, x: st.x, y: st.y }; stage.setPointerCapture(e.pointerId); stage.style.cursor = 'grabbing'; };
+                stage.onpointermove = e => { if (!drag) return; st.x = drag.x + (e.clientX - drag.px); st.y = drag.y + (e.clientY - drag.py); apply(); };
+                stage.onpointerup = stage.onpointercancel = () => { drag = null; stage.style.cursor = 'grab'; };
+                stage.onwheel = e => { e.preventDefault(); zoom.value = Math.min(4, Math.max(1, +zoom.value + (e.deltaY < 0 ? 0.1 : -0.1))); setZoom(+zoom.value); };
+                zoom.oninput = () => setZoom(+zoom.value);
+                E('crop-cancel').onclick = () => { chiudi(); reject(annulla()); };
+                E('crop-full').onclick = () => { chiudi(); resolve(null); };
+                E('crop-ok').onclick = () => {
+                    const sc = st.base * st.z, OW = 1500, OH = Math.round(OW * st.H / st.W);
+                    const c = document.createElement('canvas'); c.width = OW; c.height = OH;
+                    c.getContext('2d').drawImage(img, -st.x / sc, -st.y / sc, st.W / sc, st.H / sc, 0, 0, OW, OH);
+                    c.toBlob(b => { chiudi(); b ? resolve(b) : reject(new Error('ritaglio non riuscito')); }, 'image/jpeg', 0.85);
+                };
+                img.src = url;
+            });
+        }
+
         // Converte HEIC/HEIF in JPEG e ridimensiona le foto (max 1400px, JPEG): pagine più veloci e DB leggero.
         // Se la foto non è elaborabile lancia un errore: non viene caricato nulla di inutilizzabile.
         const isHeic = f => /hei[cf]/i.test(f.type || '') || /\.hei[cf]$/i.test(f.name || '');
@@ -539,6 +602,8 @@
                 file = new File([b], (file.name || 'foto').replace(/\.hei[cf]$/i, '') + '.jpg', { type: 'image/jpeg' });
             }
             if (file.type === 'image/svg+xml') return file;
+            const ritaglio = await ritagliaFoto(file);
+            if (ritaglio) return ritaglio;   // già ritagliata 5:2
             return new Promise((res, rej) => {
                 const img = new Image(), url = URL.createObjectURL(file);
                 img.onload = () => {
@@ -563,6 +628,7 @@
             catch (e) {
                 if (spinner) spinner.classList.add('hidden');
                 inputEl.value = '';
+                if (e && e.annullato) return;
                 alert('Foto non elaborabile: ' + (e.message || e) + '.\n\nConvertila in JPG o PNG e riprova.');
                 return;
             }
