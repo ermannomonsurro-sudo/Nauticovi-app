@@ -149,12 +149,12 @@
             </div>
 
             <!-- Promemoria Rientro Obbligatorio -->
-            <div class="bg-slate-950/60 border border-cyan-500/20 rounded-xl p-2.5 flex items-center justify-between text-xs mt-1">
+            <div id="return-box" class="hidden bg-slate-950/60 border border-cyan-500/20 rounded-xl p-2.5 flex items-center justify-between text-xs mt-1">
                 <div class="flex items-center gap-2">
                     <i class="fa-regular fa-clock text-cyan-400 text-sm"></i>
                     <span class="text-[11px] text-slate-300" data-i18n="return_notice">Rientro obbligatorio in banchina alle:</span>
                 </div>
-                <b class="text-cyan-300 font-mono text-xs bg-slate-800 px-2 py-0.5 rounded border border-cyan-500/30" data-i18n="return_time">Ore 18:00</b>
+                <b id="return-time-val" class="text-cyan-300 font-mono text-xs bg-slate-800 px-2 py-0.5 rounded border border-cyan-500/30">--:--</b>
             </div>
         </div>
 
@@ -418,7 +418,6 @@
                 btn_call: "Chiama",
                 btn_return_base: "Torna in Banchina",
                 return_notice: "Rientro obbligatorio in banchina alle:",
-                return_time: "Ore 18:00",
                 weather_title: "Meteo & Condizioni Mare Live",
                 weather_status: "Favorevole",
                 weather_sea: "Stato Mare",
@@ -492,7 +491,6 @@
                 btn_call: "Call",
                 btn_return_base: "Return to Base",
                 return_notice: "Mandatory return to base by:",
-                return_time: "6:00 PM",
                 weather_title: "Live Weather & Sea Conditions",
                 weather_status: "Favorable",
                 weather_sea: "Sea State",
@@ -566,7 +564,6 @@
                 btn_call: "Llamar",
                 btn_return_base: "Volver a la Base",
                 return_notice: "Regreso obligatorio a la base a las:",
-                return_time: "18:00 Hs",
                 weather_title: "Tiempo y Estado del Mar en Vivo",
                 weather_status: "Favorable",
                 weather_sea: "Estado Mar",
@@ -1974,6 +1971,16 @@
             if (barcaNome) {
                 const barcaEl = document.getElementById('welcome-barca');
                 if (barcaEl) barcaEl.innerText = barcaNome;
+            }
+
+            // Orario di rientro personalizzato (?rientro=HH:MM). Se manca o non è valido, l'avviso resta nascosto.
+            const rientroParam = (urlParams.get('rientro') || '').trim();
+            const mRientro = /^([01]?\d|2[0-3]):([0-5]\d)$/.exec(rientroParam);
+            if (mRientro) {
+                const rientroEl = document.getElementById('return-time-val');
+                const rientroBox = document.getElementById('return-box');
+                if (rientroEl) rientroEl.innerText = mRientro[1].padStart(2, '0') + ':' + mRientro[2];
+                if (rientroBox) rientroBox.classList.remove('hidden');
             }
 
             const oraAttuale = new Date();
