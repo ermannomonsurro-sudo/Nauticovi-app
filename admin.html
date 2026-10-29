@@ -268,7 +268,7 @@
                         <div class="grid grid-cols-2 gap-2">
                             <div>
                                 <label class="block font-bold text-slate-600 uppercase">Barca Assegnata</label>
-                                <select id="barca" class="w-full mt-1 p-2 border rounded-lg bg-white outline-none font-semibold">
+                                <select id="barca" onchange="suggerisciPrezzo()" class="w-full mt-1 p-2 border rounded-lg bg-white outline-none font-semibold">
                                     <option>Marlin 1</option>
                                     <option>Marlin 2</option>
                                     <option>Poseidon 1</option>
@@ -277,19 +277,8 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block font-bold text-slate-600 uppercase">Importo Totale (€)</label>
-                                <input type="number" id="importo" required placeholder="150" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block font-bold text-slate-600 uppercase">Caparra (€)</label>
-                                <input type="number" id="caparra" required placeholder="75" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
-                            </div>
-                            <div>
                                 <label class="block font-bold text-slate-600 uppercase">Data Noleggio</label>
-                                <input type="date" id="data_noleggio" required class="w-full mt-1 p-2 border rounded-lg outline-none">
+                                <input type="date" id="data_noleggio" required onchange="suggerisciPrezzo()" class="w-full mt-1 p-2 border rounded-lg outline-none">
                             </div>
                         </div>
 
@@ -307,6 +296,18 @@
                                 <input type="time" id="ora_rientro" value="18:00" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
                             </div>
                         </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold text-slate-600 uppercase">Importo Totale (€)</label>
+                                <input type="number" id="importo" required placeholder="150" oninput="importoModificatoManualmente()" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-600 uppercase">Caparra (€)</label>
+                                <input type="number" id="caparra" required placeholder="75" oninput="caparraModificataManualmente()" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                            </div>
+                        </div>
+                        <p id="hint-prezzo" class="hidden text-[10px] text-cyan-800 bg-cyan-50 border border-cyan-200 rounded-lg p-2 font-medium"></p>
 
                         <button type="submit" id="btn-salva-noleggio" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2.5 rounded-lg shadow transition flex justify-center items-center gap-2">
                             <i class="fa-solid fa-cloud-arrow-up"></i> Salva Noleggio in Cloud
@@ -1136,6 +1137,68 @@
         function impostaPresetRientro() {
             const tipo = document.getElementById('tipo_uscita').value;
             document.getElementById('ora_rientro').value = PRESET_RIENTRO[tipo] || '18:00';
+            suggerisciPrezzo();
+        }
+
+        // Listino delle barche fisse (come in catalogo.html). Per le barche del CMS valgono le tariffe inserite nel CMS.
+        // bm/bi = bassa mezza/intera, am/ai = alta mezza/intera. Alta stagione = Luglio e Agosto; tutti gli altri mesi = bassa.
+        const LISTINO_BASE = {
+            marlin:   { bm: 120, bi: 200, am: 150, ai: 220 },
+            poseidon: { bm: 120, bi: 200, am: 150, ai: 220 },
+            lancia:   { bm: 80,  bi: 150, am: 100, ai: 180 }
+        };
+        const MESI_ALTA = [7, 8];
+        const PERCENTUALE_CAPARRA = 0.5;
+        let caparraManuale = false;
+
+        function tariffeBarca(nome) {
+            const n = String(nome || '').trim().toLowerCase();
+            const cms = listaCMSCache.find(i => catNorm(i.categoria) === 'flotta' && String(i.titolo || '').trim().toLowerCase() === n);
+            if (cms) {
+                return {
+                    bm: Number(cms.prezzo_bassa_mezza) || 120, bi: Number(cms.prezzo_bassa_intera) || 200,
+                    am: Number(cms.prezzo_alta_mezza) || 150,  ai: Number(cms.prezzo_alta_intera) || 220
+                };
+            }
+            const chiave = Object.keys(LISTINO_BASE).find(k => n.startsWith(k));
+            return chiave ? LISTINO_BASE[chiave] : null;
+        }
+
+        const calcolaCaparra = importo => Math.round(importo * PERCENTUALE_CAPARRA * 100) / 100;
+
+        // Precompila importo e caparra in base a barca, data e tipo uscita (restano modificabili a mano)
+        function suggerisciPrezzo() {
+            const m = /^\d{4}-(\d{2})-\d{2}$/.exec(val('data_noleggio'));
+            const t = tariffeBarca(val('barca'));
+            if (!m || !t) { show('hint-prezzo', false); return; }
+
+            const mese = parseInt(m[1], 10);
+            const alta = MESI_ALTA.includes(mese);
+            const mezza = val('tipo_uscita') !== 'intera';
+            const prezzo = t[(alta ? 'a' : 'b') + (mezza ? 'm' : 'i')];
+
+            caparraManuale = false;
+            setV('importo', prezzo);
+            setV('caparra', calcolaCaparra(prezzo));
+
+            let testo = `Tariffa applicata: ${alta ? 'Alta' : 'Bassa'} stagione · ${mezza ? 'Mezza' : 'Intera'} giornata · €${prezzo}. Importo e caparra (50%) sono modificabili a mano.`;
+            if (mese < 6 || mese > 9) testo += ' ⚠ Mese fuori dal listino (Giu–Set): applicata la tariffa bassa, verifica.';
+            setTxt('hint-prezzo', testo);
+            show('hint-prezzo', true);
+        }
+
+        // Se modifichi l'importo a mano, la caparra si adegua al 50% (a meno che tu non l'abbia già cambiata a mano)
+        function importoModificatoManualmente() {
+            if (caparraManuale) return;
+            const v = parseFloat(val('importo'));
+            setV('caparra', isNaN(v) ? '' : calcolaCaparra(v));
+        }
+
+        function caparraModificataManualmente() { caparraManuale = true; }
+
+        function resetSuggerimentoPrezzo() {
+            caparraManuale = false;
+            show('hint-prezzo', false);
         }
 
         async function registraNoleggioCloud(e) {
@@ -1160,6 +1223,7 @@
                 alert("Errore nel salvataggio su Cloud: " + error.message);
             } else {
                 document.getElementById('crmForm').reset();
+                resetSuggerimentoPrezzo();
                 caricaDatiCloud();
             }
             btn.disabled = false;
