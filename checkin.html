@@ -123,9 +123,15 @@
             <p class="text-xs opacity-95 leading-relaxed" data-i18n="success_desc">
                 Grazie! I tuoi dati sono stati registrati con successo. Al tuo arrivo in banchina dovrai unicamente firmare il contratto cartaceo e prendere le chiavi dell'imbarcazione!
             </p>
-            <a href="index.html" class="inline-block bg-slate-900 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow hover:bg-slate-800 transition">
-                <i class="fa-solid fa-house"></i> <span data-i18n="btn_home">Torna alla Home</span>
-            </a>
+            <div class="flex flex-col items-center gap-2 pt-1">
+                <a id="btn-guest-portal" href="guest.html" class="inline-block bg-white text-slate-900 font-bold px-5 py-2.5 rounded-xl text-xs shadow hover:bg-cyan-50 transition">
+                    <i class="fa-solid fa-compass text-cyan-600"></i> <span data-i18n="btn_guest">Apri il tuo Guest Portal</span>
+                </a>
+                <p class="text-[11px] opacity-90 leading-relaxed" data-i18n="tip_home">Il Guest Portal si attiva il giorno del noleggio. Salvalo nella schermata Home del telefono per ritrovarlo subito in mare.</p>
+                <a href="index.html" class="inline-block bg-slate-900 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-house"></i> <span data-i18n="btn_home">Torna alla Home</span>
+                </a>
+            </div>
         </div>
 
     </main>
@@ -162,7 +168,9 @@
                 btn_submit: "CONFERMA WEB CHECK-IN",
                 success_title: "Web Check-in Completato!",
                 success_desc: "Grazie! I tuoi dati sono stati registrati con successo. Al tuo arrivo in banchina dovrai unicamente firmare il contratto cartaceo e prendere le chiavi dell'imbarcazione!",
-                btn_home: "Torna alla Home"
+                btn_home: "Torna alla Home",
+                btn_guest: "Apri il tuo Guest Portal",
+                tip_home: "Il Guest Portal si attiva il giorno del noleggio. Salvalo nella schermata Home del telefono per ritrovarlo subito in mare."
             },
             en: {
                 header_sub: "FAST WEB CHECK-IN",
@@ -181,7 +189,9 @@
                 btn_submit: "CONFIRM WEB CHECK-IN",
                 success_title: "Web Check-in Completed!",
                 success_desc: "Thank you! Your details have been successfully registered. Upon arrival at the dock, you will only need to sign the paper contract and collect your boat keys!",
-                btn_home: "Back to Home"
+                btn_home: "Back to Home",
+                btn_guest: "Open your Guest Portal",
+                tip_home: "The Guest Portal unlocks on your rental day. Add it to your phone Home Screen to find it quickly at sea."
             },
             es: {
                 header_sub: "WEB CHECK-IN RÁPIDO",
@@ -200,7 +210,9 @@
                 btn_submit: "CONFIRMAR WEB CHECK-IN",
                 success_title: "¡Web Check-in Completado!",
                 success_desc: "¡Gracias! Tus datos se han registrado correctamente. A tu llegada al muelle, únicamente tendrás que firmar el contrato en papel y recoger las llaves del barco.",
-                btn_home: "Volver al Inicio"
+                btn_home: "Volver al Inicio",
+                btn_guest: "Abre tu Guest Portal",
+                tip_home: "El Guest Portal se activa el día del alquiler. Añádelo a la pantalla de inicio del teléfono para encontrarlo enseguida en el mar."
             }
         };
 
@@ -275,7 +287,8 @@
         return;
     }
 
-    // Mostra la schermata di successo
+    // Mostra la schermata di successo e collega il Guest Portal personale del cliente
+    document.getElementById('btn-guest-portal').href = 'guest.html?id=' + encodeURIComponent(noleggioId);
     document.getElementById('checkin-form').classList.add('hidden');
     document.getElementById('checkin-success').classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
