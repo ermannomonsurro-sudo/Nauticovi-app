@@ -961,7 +961,7 @@
                 let query = _supabase.from('noleggi').select('*').order('data_noleggio', { ascending: false });
 
                 const adesso = new Date();
-                const oggi = adesso.toISOString().split('T')[0];
+                const oggi = dataLocaleISO(adesso);
 
                 if (filtro === 'oggi') {
                     query = query.eq('data_noleggio', oggi);
@@ -969,7 +969,7 @@
                     const anno = adesso.getFullYear();
                     const mese = String(adesso.getMonth() + 1).padStart(2, '0');
                     const primoGiorno = `${anno}-${mese}-01`;
-                    const ultimoGiorno = new Date(anno, adesso.getMonth() + 1, 0).toISOString().split('T')[0];
+                    const ultimoGiorno = dataLocaleISO(new Date(anno, adesso.getMonth() + 1, 0));
                     query = query.gte('data_noleggio', primoGiorno).lte('data_noleggio', ultimoGiorno);
                 }
 
@@ -1004,6 +1004,55 @@
             document.getElementById('kpiMedio').innerText = `€${mediaIncasso}`;
         }
 
+// Data locale in formato YYYY-MM-DD (evita lo sfasamento UTC di toISOString)
+        function dataLocaleISO(d = new Date()) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function formattaDataIT(iso) {
+            const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+            return m ? `${m[3]}/${m[2]}/${m[1]}` : (iso || '');
+        }
+
+        // Link personale del cliente: contiene solo l'ID, dati e orari sono letti dal database
+        function linkGuest(n) { return `${window.location.origin}/guest.html?id=${n.id}`; }
+        function linkCheckin(n) { return `${window.location.origin}/checkin.html?id=${n.id}`; }
+
+        // 1° messaggio (alla prenotazione): conferma + Web Check-in + Guest Portal
+        function messaggioPrenotazione(n) {
+            const rientro = n.ora_rientro ? `\nRientro in banchina entro le ${String(n.ora_rientro).slice(0, 5)}.` : '';
+            return `Ciao ${n.nome_cliente}! Confermiamo il noleggio della barca ${n.barca} del ${formattaDataIT(n.data_noleggio)}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).${rientro}
+
+⚡ *Velocizza il tuo imbarco!* Compila il Web Check-in qui: ${linkCheckin(n)}
+
+🧭 *Il tuo Guest Portal con navigatore GPS* (si attiva il giorno del noleggio): ${linkGuest(n)}`;
+        }
+
+        // 2° messaggio (giorno del noleggio): solo il link al Guest Portal
+        function messaggioGiornoNoleggio(n) {
+            const primo = String(n.nome_cliente || '').trim().split(' ')[0];
+            const rientro = n.ora_rientro ? `\n\n⏰ Rientro in banchina entro le ${String(n.ora_rientro).slice(0, 5)}.` : '';
+            return `Buongiorno ${primo}! Oggi si salpa ⚓ Ecco il tuo Guest Portal con navigatore GPS, meteo e audioguide: ${linkGuest(n)}${rientro}
+
+💡 Aprilo ora e aggiungilo alla schermata Home del telefono: lo ritroverai subito anche in mare.`;
+        }
+
+        async function copiaLinkGuest(id, btn) {
+            const n = listaNoleggi.find(x => String(x.id) === String(id));
+            if (!n) return;
+            const link = linkGuest(n);
+            try {
+                await navigator.clipboard.writeText(link);
+                if (btn) {
+                    const html = btn.innerHTML;
+                    btn.innerHTML = '<i class="fa-solid fa-check text-xs"></i> Copiato';
+                    setTimeout(() => { btn.innerHTML = html; }, 1500);
+                }
+            } catch (e) {
+                window.prompt('Copia il link del Guest Portal:', link);
+            }
+        }
+
         function renderTable(noleggi) {
             const tbody = document.getElementById('clientiTable');
             if (!tbody) return;
@@ -1015,15 +1064,15 @@
             }
 
             noleggi.forEach((n) => {
-                const checkinLink = `${window.location.origin}/checkin.html?id=${n.id}`;
-                const guestLink = `${window.location.origin}/guest.html?cliente=${encodeURIComponent(n.nome_cliente)}&barca=${encodeURIComponent(n.barca)}&date=${n.data_noleggio}${n.ora_rientro ? '&rientro=' + encodeURIComponent(String(n.ora_rientro).slice(0, 5)) : ''}`;
                 const telefonoWa = String(n.telefono || '').replace(/\D/g, '');
-
-                const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).
-
-⚡ *Velocizza il tuo imbarco prima di arrivare!* Compila il Web Check-in qui: ${checkinLink}
-
-🧭 *Accedi al Navigatore GPS di bordo:* ${guestLink}`);
+                const msgWhatsApp = encodeURIComponent(messaggioPrenotazione(n));
+                const msgOggi = encodeURIComponent(messaggioGiornoNoleggio(n));
+                const eOggi = n.data_noleggio === dataLocaleISO();
+                const btnOggi = eOggi
+                    ? `<a href="https://wa.me/${telefonoWa}?text=${msgOggi}" target="_blank" class="bg-cyan-600 hover:bg-cyan-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] flex items-center gap-1 shadow whitespace-nowrap" title="Secondo messaggio: link al Guest Portal per oggi">
+                           <i class="fa-solid fa-sun text-xs"></i> Link di oggi
+                       </a>`
+                    : '';
 
                 const badgeCheckin = n.stato_checkin === 'completato'
                     ? `<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">✓ Completato</span>`
@@ -1046,10 +1095,14 @@
                         <td class="p-2 font-mono text-slate-600">${esc(n.data_noleggio)}${n.ora_rientro ? `<span class="block text-[9px] text-slate-400">↩ ${esc(String(n.ora_rientro).slice(0, 5))}</span>` : ''}</td>
                         <td class="p-2 font-bold text-emerald-600">€${esc(n.importo)}</td>
                         <td class="p-2">${badgeCheckin}</td>
-                        <td class="p-2 flex gap-2 items-center">
-                            <a href="https://wa.me/${telefonoWa}?text=${msgWhatsApp}" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] flex items-center gap-1 shadow" title="Invia Link WhatsApp">
+                        <td class="p-2 flex flex-wrap gap-2 items-center">
+                            <a href="https://wa.me/${telefonoWa}?text=${msgWhatsApp}" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] flex items-center gap-1 shadow" title="Primo messaggio: conferma, Web Check-in e Guest Portal">
                                 <i class="fa-brands fa-whatsapp text-xs"></i> Invia Link
                             </a>
+                            ${btnOggi}
+                            <button onclick="copiaLinkGuest('${esc(n.id)}', this)" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2.5 py-1 rounded-lg font-bold text-[10px] flex items-center gap-1 shadow whitespace-nowrap" title="Copia il link personale del Guest Portal">
+                                <i class="fa-solid fa-link text-xs"></i> Copia link
+                            </button>
                             ${btnFattura}
                             <button onclick="eliminaNoleggio('${esc(n.id)}')" class="text-red-400 hover:text-red-600 p-1" title="Elimina">
                                 <i class="fa-solid fa-trash"></i>
