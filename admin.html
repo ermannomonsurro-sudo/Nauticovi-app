@@ -521,6 +521,22 @@
         const catNorm = c => (c === 'banchina' ? 'base' : c);
         const itemsDelTab = k => listaCMSCache.filter(i => MACRO[k].tipi.includes(catNorm(i.categoria)));
 
+        // Menu "Barca Assegnata": barche fisse + imbarcazioni inserite nel CMS (categoria 'flotta'), senza duplicati
+        const BARCHE_BASE = ['Marlin 1', 'Marlin 2', 'Poseidon 1', 'Poseidon 2', 'Lancia 30CV'];
+
+        function popolaSelectBarche() {
+            const sel = E('barca');
+            if (!sel) return;
+            const corrente = sel.value;
+            const nomi = BARCHE_BASE.slice();
+            listaCMSCache.filter(i => catNorm(i.categoria) === 'flotta' && i.titolo).forEach(i => {
+                const t = String(i.titolo).trim();
+                if (t && !nomi.some(x => x.toLowerCase() === t.toLowerCase())) nomi.push(t);
+            });
+            sel.innerHTML = nomi.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+            if (nomi.includes(corrente)) sel.value = corrente;
+        }
+
         function renderMacroTabs() {
             E('macro-tabs').innerHTML = Object.entries(MACRO).map(([k, m], i) =>
                 `<button type="button" id="macro-tab-${k}" onclick="selezionaMacroTab('${k}')" class="macro-tab-btn ${k === currentMacroTab ? 'active' : ''} p-3 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 flex items-center justify-center gap-2">
@@ -669,6 +685,7 @@
                 const { data, error } = await _supabase.from('cms_contenuti').select('*').order('created_at', { ascending: false });
                 if (error) { E('cmsListaContenuti').innerHTML = `<p class="text-xs text-red-500 py-4 text-center">Errore lettura CMS: ${esc(error.message)}</p>`; return; }
                 listaCMSCache = data || []; cmsCaricato = true;
+                popolaSelectBarche();
                 renderMacroTabs(); renderListaCMS();
             } catch (err) { console.error('Errore caricamento CMS:', err); }
         }
