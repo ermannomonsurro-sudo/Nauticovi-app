@@ -1683,9 +1683,8 @@
         }
 
                 function inviaSOSPosizioneGPS() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const barcaNome = urlParams.get('barca') || 'Barca Nauticovi';
-            const clienteNome = urlParams.get('cliente') || 'Cliente';
+            const barcaNome = datiNoleggio.barca || 'Barca Nauticovi';
+            const clienteNome = datiNoleggio.cliente || 'Cliente';
 
             function apriWhatsApp(lat, lng) {
                 let msg = `🆘 SOS Assistenza in mare! Ho bisogno di supporto a bordo della barca ${barcaNome} (${clienteNome}).`;
@@ -1953,11 +1952,132 @@
             } catch(e) {}
         }
 
+        let datiNoleggio = { cliente: '', barca: '', date: '', rientro: '' };
+
+        function escH(v) {
+            return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function formattaData(iso) {
+            const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+            return m ? `${m[3]}/${m[2]}/${m[1]}` : (iso || '');
+        }
+
+        // Risolve i dati del noleggio: da ?id=UUID (RPC get_guest_info) oppure dai vecchi parametri ?cliente=&barca=&date=&rientro=
+        // Ritorna 'ok' | 'non_trovato' | 'errore'
+        async function risolviDatiNoleggio() {
+            const p = new URLSearchParams(window.location.search);
+            datiNoleggio = {
+                cliente: p.get('cliente') || '',
+                barca: p.get('barca') || '',
+                date: p.get('date') || '',
+                rientro: p.get('rientro') || ''
+            };
+            const id = (p.get('id') || '').trim();
+            if (!id) return 'ok';
+            if (!_supabase) return 'errore';
+            try {
+                const { data, error } = await _supabase.rpc('get_guest_info', { p_id: id });
+                if (error) return 'errore';
+                if (!data) return 'non_trovato';
+                datiNoleggio = {
+                    cliente: data.nome_cliente || '',
+                    barca: data.barca || '',
+                    date: data.data_noleggio || '',
+                    rientro: data.ora_rientro || ''
+                };
+                return 'ok';
+            } catch (e) {
+                return 'errore';
+            }
+        }
+
+        const TESTI_STATO = {
+            it: {
+                ciao: 'Ciao {nome}! ',
+                attesa_t: 'Il navigatore si attiva il {data}',
+                attesa_p: 'Il tuo Guest Portal (navigatore GPS, meteo e audioguide) si sblocca il giorno del noleggio{barca}. Salva questa pagina nella schermata Home del telefono per ritrovarla subito.',
+                rientro: 'Rientro in banchina entro le {rientro}',
+                nonvalido_t: 'Link non valido',
+                nonvalido_p: 'Questo link non corrisponde a nessun noleggio. Scrivici su WhatsApp e te ne mandiamo uno nuovo.',
+                errore_t: 'Connessione non riuscita',
+                errore_p: 'Non riesco a verificare il tuo noleggio. Controlla la connessione e riprova.',
+                wa: 'Scrivi su WhatsApp', riprova: 'Riprova', home: 'Torna alla Home'
+            },
+            en: {
+                ciao: 'Hi {nome}! ',
+                attesa_t: 'Your navigator unlocks on {data}',
+                attesa_p: 'Your Guest Portal (GPS navigator, weather and audio guides) unlocks on your rental day{barca}. Add this page to your phone Home Screen to find it quickly.',
+                rientro: 'Return to the dock by {rientro}',
+                nonvalido_t: 'Invalid link',
+                nonvalido_p: 'This link does not match any rental. Message us on WhatsApp and we will send you a new one.',
+                errore_t: 'Connection failed',
+                errore_p: 'We cannot verify your rental. Check your connection and try again.',
+                wa: 'Message us on WhatsApp', riprova: 'Try again', home: 'Back to Home'
+            },
+            es: {
+                ciao: '¡Hola {nome}! ',
+                attesa_t: 'El navegador se activa el {data}',
+                attesa_p: 'Tu Guest Portal (navegador GPS, tiempo y audioguías) se desbloquea el día del alquiler{barca}. Añade esta página a la pantalla de inicio del teléfono para encontrarla enseguida.',
+                rientro: 'Regreso al muelle antes de las {rientro}',
+                nonvalido_t: 'Enlace no válido',
+                nonvalido_p: 'Este enlace no corresponde a ningún alquiler. Escríbenos por WhatsApp y te enviaremos uno nuevo.',
+                errore_t: 'Conexión fallida',
+                errore_p: 'No podemos verificar tu alquiler. Comprueba la conexión e inténtalo de nuevo.',
+                wa: 'Escríbenos por WhatsApp', riprova: 'Reintentar', home: 'Volver al Inicio'
+            }
+        };
+
+        // Schermate a tutto schermo: 'attesa' (noleggio non ancora iniziato), 'non_trovato' (ID inesistente), 'errore' (rete)
+        function mostraSchermataStato(tipo) {
+            const lang = localStorage.getItem('nauticovi_lang') || 'it';
+            const T = TESTI_STATO[lang] || TESTI_STATO.it;
+            const primoNome = (datiNoleggio.cliente || '').trim().split(' ')[0];
+            const nome = primoNome ? primoNome.charAt(0).toUpperCase() + primoNome.slice(1).toLowerCase() : '';
+            const mR = /^([01]?\d|2[0-3]):([0-5]\d)$/.exec((datiNoleggio.rientro || '').trim());
+            const rientro = mR ? mR[1].padStart(2, '0') + ':' + mR[2] : '';
+            const barcaTxt = datiNoleggio.barca ? ` (${datiNoleggio.barca})` : '';
+            const riempi = s => escH(s)
+                .replace('{data}', escH(formattaData(datiNoleggio.date)))
+                .replace('{barca}', escH(barcaTxt))
+                .replace('{rientro}', escH(rientro));
+
+            let icona = 'fa-hourglass-half', colore = 'cyan', titolo, testo, azioni = '';
+            const btnHome = `<a href="index.html" class="inline-block w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 rounded-xl transition text-xs">${escH(T.home)}</a>`;
+
+            if (tipo === 'attesa') {
+                titolo = riempi(T.attesa_t);
+                testo = (nome ? escH(T.ciao.replace('{nome}', nome)) : '') + riempi(T.attesa_p);
+                if (rientro) testo += `<br><br><b class="text-cyan-300">${riempi(T.rientro)}</b>`;
+                azioni = btnHome;
+            } else if (tipo === 'non_trovato') {
+                icona = 'fa-link-slash'; colore = 'red';
+                titolo = escH(T.nonvalido_t); testo = escH(T.nonvalido_p);
+                azioni = `<a href="https://wa.me/393484364498?text=${encodeURIComponent('Ciao! Il mio link del Guest Portal non funziona.')}" target="_blank" class="inline-block w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl transition text-xs"><i class="fa-brands fa-whatsapp"></i> ${escH(T.wa)}</a>` + btnHome;
+            } else {
+                icona = 'fa-wifi'; colore = 'red';
+                titolo = escH(T.errore_t); testo = escH(T.errore_p);
+                azioni = `<button onclick="window.location.reload()" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2.5 rounded-xl transition text-xs"><i class="fa-solid fa-rotate"></i> ${escH(T.riprova)}</button>` + btnHome;
+            }
+
+            document.body.innerHTML = `
+                <div class="min-h-screen bg-slate-900 text-white flex items-center justify-center p-4 font-sans text-center">
+                    <div class="bg-slate-800 p-6 rounded-3xl border border-${colore}-500/40 shadow-2xl max-w-sm w-full space-y-4">
+                        <div class="w-16 h-16 bg-${colore}-500/20 text-${colore}-400 rounded-full flex items-center justify-center mx-auto text-2xl border border-${colore}-500/30">
+                            <i class="fa-solid ${icona}"></i>
+                        </div>
+                        <h2 class="text-xl font-black text-white">${titolo}</h2>
+                        <p class="text-xs text-slate-300 leading-relaxed">${testo}</p>
+                        <div class="pt-1 space-y-2">${azioni}</div>
+                    </div>
+                </div>
+            `;
+        }
+
         function verificaScadenzaAccesso() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const dataNoleggio = urlParams.get('date');
-            const clienteFullName = urlParams.get('cliente') || '';
-            const barcaNome = urlParams.get('barca');
+            const dataNoleggio = datiNoleggio.date;
+            const clienteFullName = datiNoleggio.cliente || '';
+            const barcaNome = datiNoleggio.barca;
 
             if (clienteFullName) {
                 let primoNome = clienteFullName.trim().split(' ')[0];
@@ -1974,7 +2094,7 @@
             }
 
             // Orario di rientro personalizzato (?rientro=HH:MM). Se manca o non è valido, l'avviso resta nascosto.
-            const rientroParam = (urlParams.get('rientro') || '').trim();
+            const rientroParam = (datiNoleggio.rientro || '').trim();
             const mRientro = /^([01]?\d|2[0-3]):([0-5]\d)$/.exec(rientroParam);
             if (mRientro) {
                 const rientroEl = document.getElementById('return-time-val');
@@ -1990,15 +2110,20 @@
             const dataOggiStr = `${anno}-${mese}-${giorno}`;
 
             if (dataNoleggio) {
+                if (dataNoleggio > dataOggiStr) {
+                    mostraSchermataStato('attesa');
+                    return false;
+                }
+
                 if (dataNoleggio < dataOggiStr) {
-                    mostraSchermataNoleggioScaduto(dataNoleggio, "giorno_passato");
+                    mostraSchermataNoleggioScaduto(formattaData(dataNoleggio), "giorno_passato");
                     return false;
                 }
 
                 if (dataNoleggio === dataOggiStr) {
                     const oreCorrenti = oraAttuale.getHours();
                     if (oreCorrenti >= 22) {
-                        mostraSchermataNoleggioScaduto(dataNoleggio, "ore_22");
+                        mostraSchermataNoleggioScaduto(formattaData(dataNoleggio), "ore_22");
                         return false;
                     }
                 }
@@ -2041,6 +2166,8 @@
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
+            const statoAccesso = await risolviDatiNoleggio();
+            if (statoAccesso !== 'ok') { mostraSchermataStato(statoAccesso); return; }
             if(!verificaScadenzaAccesso()) return;
             const savedLang = localStorage.getItem('nauticovi_lang') || 'it';
             
