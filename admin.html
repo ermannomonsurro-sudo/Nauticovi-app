@@ -293,6 +293,21 @@
                             </div>
                         </div>
 
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold text-slate-600 uppercase">Tipo Uscita</label>
+                                <select id="tipo_uscita" onchange="impostaPresetRientro()" class="w-full mt-1 p-2 border rounded-lg bg-white outline-none font-semibold">
+                                    <option value="intera" selected>Intera giornata</option>
+                                    <option value="mezza_mattina">Mezza - mattina</option>
+                                    <option value="mezza_pomeriggio">Mezza - pomeriggio</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-600 uppercase">Ora Rientro</label>
+                                <input type="time" id="ora_rientro" value="18:00" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                            </div>
+                        </div>
+
                         <button type="submit" id="btn-salva-noleggio" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2.5 rounded-lg shadow transition flex justify-center items-center gap-2">
                             <i class="fa-solid fa-cloud-arrow-up"></i> Salva Noleggio in Cloud
                         </button>
@@ -795,7 +810,30 @@
         const VAT_ID_FORFETTARIO = 66;
         const GESTISCI_BOLLO = false;
 
-        async function generaFatturaInCloud(noleggioId) {
+        const fatturaInCorso = new Set();
+
+        // Wrapper: blocca il doppio click e chiede conferma extra se la bozza esiste già
+        async function generaFatturaInCloud(noleggioId, btn) {
+            const key = String(noleggioId);
+            if (fatturaInCorso.has(key)) return;
+
+            const n = listaNoleggi.find(x => String(x.id) === key);
+            if (n && n.stato_fattura === 'emessa') {
+                const ok = confirm("Per questo noleggio esiste già una bozza su Fatture in Cloud.\n\nRigenerala solo se l'hai eliminata dal portale, altrimenti avrai due bozze identiche.\n\nVuoi crearne una nuova?");
+                if (!ok) return;
+            }
+
+            fatturaInCorso.add(key);
+            if (btn) btn.disabled = true;
+            try {
+                await creaBozzaFatturaInCloud(noleggioId);
+            } finally {
+                fatturaInCorso.delete(key);
+                if (btn && btn.isConnected) btn.disabled = false;
+            }
+        }
+
+        async function creaBozzaFatturaInCloud(noleggioId) {
             const noleggio = listaNoleggi.find(n => String(n.id) === String(noleggioId));
             if (!noleggio) {
                 alert("Noleggio non trovato. Ricarica la pagina e riprova.");
@@ -978,7 +1016,7 @@
 
             noleggi.forEach((n) => {
                 const checkinLink = `${window.location.origin}/checkin.html?id=${n.id}`;
-                const guestLink = `${window.location.origin}/guest.html?cliente=${encodeURIComponent(n.nome_cliente)}&barca=${encodeURIComponent(n.barca)}&date=${n.data_noleggio}`;
+                const guestLink = `${window.location.origin}/guest.html?cliente=${encodeURIComponent(n.nome_cliente)}&barca=${encodeURIComponent(n.barca)}&date=${n.data_noleggio}${n.ora_rientro ? '&rientro=' + encodeURIComponent(String(n.ora_rientro).slice(0, 5)) : ''}`;
                 const telefonoWa = String(n.telefono || '').replace(/\D/g, '');
 
                 const msgWhatsApp = encodeURIComponent(`Ciao ${n.nome_cliente}! Ecco la conferma per il noleggio della barca ${n.barca} del ${n.data_noleggio}. Importo: €${n.importo} (Caparra 50%: €${n.caparra}).
@@ -991,15 +1029,21 @@
                     ? `<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">✓ Completato</span>`
                     : `<span class="bg-amber-100 text-amber-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">⌛ In Attesa</span>`;
 
-                const btnFattura = `<button onclick="generaFatturaInCloud('${esc(n.id)}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] flex items-center gap-1 shadow">
-                    <i class="fa-solid fa-file-invoice-dollar"></i> Genera FIC
-                   </button>`;
+                const fatturaEmessa = n.stato_fattura === 'emessa';
+                const btnFattura = fatturaEmessa
+                    ? `<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase whitespace-nowrap">✓ Bozza creata</span>
+                       <button onclick="generaFatturaInCloud('${esc(n.id)}', this)" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] flex items-center gap-1 shadow disabled:opacity-50 disabled:cursor-not-allowed" title="Esiste già una bozza: rigenera solo se l'hai eliminata dal portale">
+                           <i class="fa-solid fa-rotate"></i> Rigenera
+                       </button>`
+                    : `<button onclick="generaFatturaInCloud('${esc(n.id)}', this)" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] flex items-center gap-1 shadow disabled:opacity-50 disabled:cursor-not-allowed">
+                           <i class="fa-solid fa-file-invoice-dollar"></i> Genera FIC
+                       </button>`;
 
                 tbody.innerHTML += `
                     <tr>
                         <td class="p-2 font-bold text-slate-800">${esc(n.nome_cliente)}</td>
                         <td class="p-2 font-semibold text-cyan-700">${esc(n.barca)}</td>
-                        <td class="p-2 font-mono text-slate-600">${esc(n.data_noleggio)}</td>
+                        <td class="p-2 font-mono text-slate-600">${esc(n.data_noleggio)}${n.ora_rientro ? `<span class="block text-[9px] text-slate-400">↩ ${esc(String(n.ora_rientro).slice(0, 5))}</span>` : ''}</td>
                         <td class="p-2 font-bold text-emerald-600">€${esc(n.importo)}</td>
                         <td class="p-2">${badgeCheckin}</td>
                         <td class="p-2 flex gap-2 items-center">
@@ -1016,6 +1060,14 @@
             });
         }
 
+        // Preset orario di rientro (modificabile a mano nel campo "Ora Rientro")
+        const PRESET_RIENTRO = { intera: '18:00', mezza_mattina: '13:00', mezza_pomeriggio: '18:00' };
+
+        function impostaPresetRientro() {
+            const tipo = document.getElementById('tipo_uscita').value;
+            document.getElementById('ora_rientro').value = PRESET_RIENTRO[tipo] || '18:00';
+        }
+
         async function registraNoleggioCloud(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-salva-noleggio');
@@ -1028,6 +1080,7 @@
                 importo: parseFloat(document.getElementById('importo').value),
                 caparra: parseFloat(document.getElementById('caparra').value),
                 data_noleggio: document.getElementById('data_noleggio').value,
+                ora_rientro: document.getElementById('ora_rientro').value || null,
                 stato_checkin: 'in_attesa'
             };
 
