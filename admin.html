@@ -189,39 +189,29 @@
             </div>
 
             <!-- ============ SCHEDA: CALENDARIO ============ -->
-            <div id="pane-calendario" class="tab-pane hidden space-y-4">
+            <div id="pane-calendario" class="tab-pane hidden space-y-3">
                 <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-3 space-y-3">
                     <div class="flex items-center justify-between gap-2">
-                        <div id="cal-vista-switch" class="flex rounded-xl overflow-hidden border border-slate-300 text-xs font-bold"></div>
-                        <div class="flex items-center gap-2">
-                            <input type="date" id="cal_vai" onchange="calVaiA(this.value)" class="p-1.5 border rounded-lg text-xs w-[8.5rem]" title="Vai a una data">
+                        <div id="cal-vista-switch" class="flex rounded-xl overflow-x-auto border border-slate-300 text-xs font-bold"></div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <input type="date" id="cal_vai" onchange="calVaiA(this.value)" class="hidden sm:block p-1.5 border rounded-lg text-xs w-[8.5rem]" title="Vai a una data">
                             <button type="button" onclick="calOggi()" class="bg-slate-900 text-cyan-300 text-xs font-bold px-3 py-2 rounded-lg shadow">Oggi</button>
                         </div>
                     </div>
                     <div class="flex items-center justify-between">
-                        <button type="button" onclick="calSposta(-1)" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700"><i class="fa-solid fa-chevron-left"></i></button>
-                        <b id="cal-titolo" class="text-sm text-slate-800 text-center"></b>
-                        <button type="button" onclick="calSposta(1)" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700"><i class="fa-solid fa-chevron-right"></i></button>
+                        <button type="button" onclick="calSposta(-1)" class="w-11 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700" aria-label="Indietro"><i class="fa-solid fa-chevron-left"></i></button>
+                        <b id="cal-titolo" class="text-base text-slate-800 text-center"></b>
+                        <button type="button" onclick="calSposta(1)" class="w-11 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700" aria-label="Avanti"><i class="fa-solid fa-chevron-right"></i></button>
                     </div>
-                    <div id="cal-barca-box" class="hidden">
-                        <select id="cal_barca_mese" onchange="calCambiaBarca(this.value)" class="w-full p-2 border rounded-lg bg-white font-bold text-xs text-slate-700 outline-none"></select>
-                    </div>
+                    <div id="cal-filtri" class="cal-hscroll flex gap-1.5 overflow-x-auto pb-1"></div>
+                    <div id="cal-barche-modo" class="hidden flex gap-2 text-xs font-bold"></div>
                     <p id="cal-riepilogo" class="text-[11px] text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-2"></p>
                 </div>
 
                 <div id="cal-contenuto"></div>
+                <p id="cal-nota" class="text-[10px] text-amber-700 font-semibold px-1"></p>
 
-                <div class="bg-white rounded-2xl shadow border border-slate-200 p-3 text-[10px] text-slate-600 space-y-1.5">
-                    <div class="flex flex-wrap gap-x-4 gap-y-1.5 items-center">
-                        <span class="flex items-center gap-1"><i class="w-3 h-3 rounded bg-cyan-600 inline-block"></i> Intera</span>
-                        <span class="flex items-center gap-1"><i class="w-3 h-3 rounded bg-amber-400 inline-block"></i> Mezza mattina</span>
-                        <span class="flex items-center gap-1"><i class="w-3 h-3 rounded bg-indigo-500 inline-block"></i> Mezza pomeriggio</span>
-                        <span class="flex items-center gap-1"><i class="w-3 h-3 rounded bg-red-200 border border-red-300 inline-block"></i> Fuori servizio</span>
-                        <span class="flex items-center gap-1"><i class="w-3 h-3 rounded bg-emerald-50 border border-dashed border-emerald-400 inline-block"></i> Libero (tocca per prenotare)</span>
-                    </div>
-                    <p>Nelle viste settimana e mese la metà alta di ogni giorno è la mattina, quella bassa il pomeriggio.</p>
-                    <p id="cal-nota" class="text-amber-700 font-semibold"></p>
-                </div>
+                <button type="button" onclick="nuovoNoleggioDa('', calSel, null)" class="lg:hidden fixed right-4 bottom-20 z-30 w-14 h-14 rounded-full bg-cyan-600 hover:bg-cyan-700 text-white text-2xl shadow-2xl border-2 border-white" aria-label="Nuovo noleggio"><i class="fa-solid fa-plus"></i></button>
             </div>
 
             <!-- ============ SCHEDA: FLOTTA ============ -->
@@ -448,6 +438,9 @@
                                     <option value="scafo">Scafo</option>
                                     <option value="lancia">Lancia</option>
                                 </select>
+                                <label class="f-lbl">Colore nel calendario</label>
+                                <div id="cms_colori" class="flex flex-wrap gap-2"></div>
+                                <input type="hidden" id="cms_colore" value="">
                                 <label class="flex items-center gap-2 text-[11px] font-bold text-slate-700">
                                     <input type="checkbox" id="cms_ritirata" class="w-4 h-4"> Ritirata dalla flotta (venduta o dismessa: sparisce da menu e catalogo, resta nello storico)
                                 </label>
@@ -664,10 +657,34 @@
         let FLOTTA = [], INDISP = [];
         const ORDINE_TIPO = { gommone: 0, scafo: 1, lancia: 2 };
 
+        // Colori per barca (calendario, schede, filtri). Si sceglie nel CMS; altrimenti è automatico e stabile (ordine di inserimento)
+        const PALETTE_BARCHE = ['#0891b2', '#7c3aed', '#ea580c', '#16a34a', '#db2777', '#2563eb', '#ca8a04', '#0d9488', '#4f46e5', '#92400e'];
+        const _cacheColori = new Map();
+        function mixHex(hex, con, t) {
+            const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+            const x = p(hex), y = p(con);
+            return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0')).join('');
+        }
+        function coloriBarca(b) {
+            if (!b) return { solid: '#94a3b8', light: '#f1f5f9', text: '#475569' };
+            const k = String(b.id) + '|' + (b.colore || '');
+            if (_cacheColori.has(k)) return _cacheColori.get(k);
+            let solid = /^#[0-9a-fA-F]{6}$/.test(b.colore || '') ? b.colore : null;
+            if (!solid) {
+                const ordine = FLOTTA.slice().sort((x, y) => String(x.created_at).localeCompare(String(y.created_at)));
+                const i = Math.max(0, ordine.findIndex(x => String(x.id) === String(b.id)));
+                solid = PALETTE_BARCHE[i % PALETTE_BARCHE.length];
+            }
+            const c = { solid, light: mixHex(solid, '#ffffff', 0.86), text: mixHex(solid, '#000000', 0.5) };
+            _cacheColori.set(k, c);
+            return c;
+        }
+
         async function caricaFlotta() {
             if (!_supabase) return;
             const { data, error } = await _supabase.from('cms_contenuti').select('*').eq('categoria', 'flotta');
             if (error) { console.error('Errore lettura flotta:', error.message); return; }
+            _cacheColori.clear();
             FLOTTA = (data || []).sort((a, b) =>
                 (ORDINE_TIPO[a.tipo_barca] ?? 9) - (ORDINE_TIPO[b.tipo_barca] ?? 9) ||
                 String(a.titolo).localeCompare(String(b.titolo), 'it', { numeric: true }));
@@ -1211,7 +1228,7 @@
                     ? `<p class="text-[11px] text-red-700 bg-red-50 border border-red-100 rounded-lg p-2 mt-2">Motivo: <b>${esc(MOTIVI_ANNULLO[n.motivo_annullamento] || n.motivo_annullamento || '—')}</b> · Caparra ${n.caparra_rimborsata ? '<b>rimborsata</b>' : '<b>non rimborsata</b>'}${n.nota_annullamento ? ' · ' + esc(n.nota_annullamento) : ''}</p>`
                     : '';
 
-                return `<div class="bg-white rounded-2xl shadow border border-slate-200 p-3.5 ${ann ? 'opacity-75' : ''}">
+                return `<div class="bg-white rounded-2xl shadow border border-slate-200 p-3.5 ${ann ? 'opacity-75' : ''}" style="border-left:5px solid ${coloriBarca(barcaPerId(n.barca_id)).solid}">
                     <div class="flex justify-between items-start gap-2">
                         <div class="min-w-0">
                             <b class="text-slate-900 text-sm ${ann ? 'line-through' : ''}">${esc(n.nome_cliente)}</b>
@@ -1468,7 +1485,7 @@
                     const azione = b.ritirata ? '' : (p
                         ? `<button type="button" onclick="rimettiInServizio('${esc(p.id)}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-lg font-bold text-[11px] shadow"><i class="fa-solid fa-circle-check"></i> Rimetti in servizio</button>`
                         : `<button type="button" onclick="preparaFuoriServizio('${esc(b.id)}')" class="bg-white border border-red-200 text-red-600 hover:bg-red-50 px-2.5 py-1.5 rounded-lg font-bold text-[11px] shadow"><i class="fa-solid fa-ban"></i> Metti fuori servizio</button>`);
-                    return `<div class="bg-white rounded-2xl shadow border border-slate-200 p-3.5 space-y-2">
+                    return `<div class="bg-white rounded-2xl shadow border border-slate-200 p-3.5 space-y-2" style="border-left:5px solid ${coloriBarca(b).solid}">
                         <div class="flex justify-between items-start gap-2">
                             <b class="text-slate-900 text-sm">${esc(b.titolo)}</b>
                             ${b.tipo_barca ? `<span class="bg-cyan-100 text-cyan-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">${esc(MOTIVO_TIPO[b.tipo_barca] || b.tipo_barca)}</span>` : '<span class="bg-amber-100 text-amber-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">Senza categoria</span>'}
@@ -1799,24 +1816,29 @@
 
     <script>
         // =============================================================================
-        // MODULO — CALENDARIO: disponibilità per scafo (giorno, settimana, mese)
+        // MODULO — CALENDARIO v2 (stile Google): Mese + pannello giorno, Programma, Settimana, Barche
         // =============================================================================
-        let calVista = 'giorno', calData = dataLocaleISO(), calBarcaMese = '';
+        let calVista = 'mese', calData = dataLocaleISO(), calSel = dataLocaleISO();
+        let calNascoste = new Set(), calProgrammaGiorni = 14, calBarcheModo = '7';
 
         const GIORNI_BREVI = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
         const GIORNI_LUNGHI = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
         const MESI_IT = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
         const SLOT_OCCUPATI = { intera: ['M', 'P'], mezza_mattina: ['M'], mezza_pomeriggio: ['P'] };
-        const COL_TIPO = { intera: 'bg-cyan-600 text-white', mezza_mattina: 'bg-amber-400 text-slate-900', mezza_pomeriggio: 'bg-indigo-500 text-white' };
-        const BG_TIPO = { intera: 'bg-cyan-600', mezza_mattina: 'bg-amber-400', mezza_pomeriggio: 'bg-indigo-500' };
+        const ORDINE_SLOT = { intera: 0, mezza_mattina: 1, mezza_pomeriggio: 2 };
+        const FS_STILE = 'background: repeating-linear-gradient(45deg,#e2e8f0,#e2e8f0 4px,#f1f5f9 4px,#f1f5f9 8px); color:#475569;';
 
         // ---------- Date ----------
         const isoToDate = iso => { const [y, m, d] = String(iso).split('-').map(Number); return new Date(y, m - 1, d); };
         function aggiungiGiorni(iso, n) { const d = isoToDate(iso); d.setDate(d.getDate() + n); return dataLocaleISO(d); }
         function lunediDi(iso) { const d = isoToDate(iso); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return dataLocaleISO(d); }
         function giorniDelMese(iso) { const d = isoToDate(iso); return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); }
+        const primoDelMese = iso => iso.slice(0, 7) + '-01';
+        const ultimoDelMese = iso => iso.slice(0, 7) + '-' + String(giorniDelMese(iso)).padStart(2, '0');
+        const dataBreve = iso => { const d = isoToDate(iso); return `${d.getDate()} ${MESI_IT[d.getMonth()].slice(0, 3)}`; };
+        const eLargo = () => window.matchMedia('(min-width: 1024px)').matches;
 
-        // ---------- Dati: indice noleggi confermati per barca e giorno ----------
+        // ---------- Dati ----------
         function indicizzaNoleggi() {
             const idx = new Map();
             listaNoleggi.forEach(n => {
@@ -1837,42 +1859,77 @@
             };
         }
 
-        function calcolaOccupazione(barche, idx, da, a) {
+        // Sintesi di un giorno sulle barche visibili: eventi distinti, slot occupati/disponibili, barche fuori servizio
+        function statoGiorno(barcheVis, idx, iso) {
+            let disp = 0, occ = 0, fs = 0;
+            const eventi = [], visti = new Set(), fsBarche = [];
+            barcheVis.forEach(b => {
+                const st = statoCella(idx, b.id, iso);
+                if (st.fs) { fs++; fsBarche.push(b); return; }
+                disp += 2;
+                if (st.M) occ++;
+                if (st.P) occ++;
+                [st.M, st.P].forEach(n => { if (n && !visti.has(n.id)) { visti.add(n.id); eventi.push(n); } });
+            });
+            eventi.sort((a, b) => (ORDINE_SLOT[a.tipo_uscita] - ORDINE_SLOT[b.tipo_uscita]) || String(a.barca).localeCompare(String(b.barca), 'it', { numeric: true }));
+            return { disp, occ, fs, fsBarche, eventi, pieno: disp > 0 && occ === disp };
+        }
+
+        function calcolaOccupazione(barcheVis, idx, da, a) {
             let occ = 0, disp = 0;
+            const uscite = new Set();
             for (let iso = da; iso <= a; iso = aggiungiGiorni(iso, 1)) {
-                barche.forEach(b => {
-                    const st = statoCella(idx, b.id, iso);
-                    if (st.fs) return;
-                    disp += 2;
-                    if (st.M) occ++;
-                    if (st.P) occ++;
-                });
+                const g = statoGiorno(barcheVis, idx, iso);
+                occ += g.occ; disp += g.disp;
+                g.eventi.forEach(n => uscite.add(n.id));
             }
-            return { occ, disp, pct: disp ? Math.round(occ * 100 / disp) : 0 };
+            return { occ, disp, uscite: uscite.size, pct: disp ? Math.round(occ * 100 / disp) : 0 };
         }
 
         const primoNomeCal = n => String(n.nome_cliente || '').trim().split(' ')[0];
+        const nomeBarcaDi = n => { const b = barcaPerId(n.barca_id); return b ? b.titolo : (n.barca || ''); };
+        const iconaSlot = t => t === 'intera' ? '<i class="fa-solid fa-calendar-day"></i>' : (t === 'mezza_mattina' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-cloud-sun"></i>');
+        const nomeSlotBreve = t => ({ intera: 'Intera', mezza_mattina: 'Mattina', mezza_pomeriggio: 'Pomeriggio' })[t] || '';
 
         // ---------- Navigazione ----------
-        function calImpostaVista(v) { calVista = v; renderCalendario(); }
-        function calOggi() { calData = dataLocaleISO(); renderCalendario(); }
-        function calVaiA(iso) { if (!iso) return; calData = iso; renderCalendario(); }
-        function calVaiAGiorno(iso) { calData = iso; calVista = 'giorno'; renderCalendario(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function calCambiaBarca(id) { calBarcaMese = id; renderCalendario(); }
-        function calSposta(dir) {
-            if (calVista === 'giorno') calData = aggiungiGiorni(calData, dir);
-            else if (calVista === 'settimana') calData = aggiungiGiorni(calData, 7 * dir);
-            else { const d = isoToDate(calData); calData = dataLocaleISO(new Date(d.getFullYear(), d.getMonth() + dir, 1)); }
+        function calImpostaVista(v) {
+            if (calVista === 'mese' && v !== 'mese') calData = calSel;
+            if (v === 'mese') calSel = calData;
+            calVista = v; calProgrammaGiorni = 14;
             renderCalendario();
         }
+        function calOggi() { calData = calSel = dataLocaleISO(); calProgrammaGiorni = 14; renderCalendario(); }
+        function calVaiA(iso) { if (!iso) return; calData = calSel = iso; calProgrammaGiorni = 14; renderCalendario(); }
+        function calApriGiorno(iso) { calSel = calData = iso; calVista = 'mese'; renderCalendario(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function calSelezionaGiorno(iso) {
+            calSel = iso;
+            if (iso.slice(0, 7) !== calData.slice(0, 7)) calData = iso;
+            renderCalendario();
+            if (!eLargo()) { const p = E('cal-pannello-giorno'); if (p) p.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+        }
+        function calSposta(dir) {
+            if (calVista === 'mese' || (calVista === 'barche' && calBarcheModo === 'mese')) {
+                const d = isoToDate(calData);
+                calData = dataLocaleISO(new Date(d.getFullYear(), d.getMonth() + dir, 1));
+                const oggi = dataLocaleISO();
+                calSel = oggi.slice(0, 7) === calData.slice(0, 7) ? oggi : calData;
+            } else if (calVista === 'programma') { calData = aggiungiGiorni(calData, 14 * dir); calProgrammaGiorni = 14; }
+            else { calData = aggiungiGiorni(calData, 7 * dir); calSel = calData; }
+            renderCalendario();
+        }
+        function calToggleBarca(id) { const k = String(id); if (calNascoste.has(k)) calNascoste.delete(k); else calNascoste.add(k); renderCalendario(); }
+        function calTutte() { calNascoste = new Set(); renderCalendario(); }
+        function calSoloBarca(id) { calNascoste = new Set(FLOTTA.filter(b => !b.ritirata && String(b.id) !== String(id)).map(b => String(b.id))); renderCalendario(); }
+        function calBarcheImposta(m) { calBarcheModo = m; renderCalendario(); }
+        function calAltriGiorni() { calProgrammaGiorni += 14; renderCalendario(); }
 
-        // ---------- Azioni dal calendario ----------
+        // ---------- Azioni ----------
         function nuovoNoleggioDa(barcaId, iso, slot) {
             selezionaTab('noleggi');
             resetFormNoleggio();
             apriFormNoleggio();
             const tipo = slot === 'P' ? 'mezza_pomeriggio' : (slot === 'M' ? 'mezza_mattina' : 'intera');
-            setV('barca', barcaId);
+            if (barcaId) setV('barca', barcaId);
             setV('data_noleggio', iso);
             setV('tipo_uscita', tipo);
             setV('ora_rientro', PRESET_RIENTRO[tipo] || '18:00');
@@ -1886,17 +1943,18 @@
         function apriDettaglioNoleggio(id) {
             const n = listaNoleggi.find(x => String(x.id) === String(id));
             if (!n) return;
+            const b = barcaPerId(n.barca_id), c = coloriBarca(b);
             const rientro = n.ora_rientro ? String(n.ora_rientro).slice(0, 5) : '';
-            const tel = String(n.telefono || '');
-            const telWa = tel.replace(/\D/g, '');
+            const tel = String(n.telefono || ''), telWa = tel.replace(/\D/g, '');
             const riga = (k, v) => `<div class="flex justify-between gap-3 border-b border-slate-100 py-1"><span class="text-slate-500">${k}</span><b class="text-slate-800 text-right">${v}</b></div>`;
+            E('dett-body').style.borderTop = '6px solid ' + c.solid;
             E('dett-body').innerHTML = `
                 <div class="flex justify-between items-start gap-2">
-                    <h3 class="font-extrabold text-base text-slate-900">${esc(n.nome_cliente)}</h3>
+                    <div><h3 class="font-extrabold text-base text-slate-900">${esc(n.nome_cliente)}</h3>
+                    <span class="inline-block mt-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:${c.light};color:${c.text}">${esc(nomeBarcaDi(n))}</span></div>
                     <button type="button" onclick="chiudiDettaglio()" class="text-slate-400 hover:text-slate-700 p-1"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div>
-                    ${riga('Barca', esc(n.barca))}
                     ${riga('Data', esc(formattaDataIT(n.data_noleggio)))}
                     ${riga('Uscita', esc(etichettaSlot(n.tipo_uscita)) + (rientro ? ' · rientro ' + esc(rientro) : ''))}
                     ${riga('Importo / Caparra', '€' + esc(n.importo) + ' / €' + esc(n.caparra))}
@@ -1914,159 +1972,239 @@
             E('dett-modal').style.display = 'flex';
         }
 
-        // ---------- Rendering ----------
+        // ---------- Rendering principale ----------
         function renderCalendario() {
             const box = E('cal-contenuto');
             if (!box || tabCorrente !== 'calendario') return;
 
-            const barche = FLOTTA.filter(b => !b.ritirata);
+            const tutte = FLOTTA.filter(b => !b.ritirata);
+            const barche = tutte.filter(b => !calNascoste.has(String(b.id)));
             const idx = indicizzaNoleggi();
-            const largo = window.matchMedia('(min-width: 1024px)').matches;
-            const meseSingolo = calVista === 'mese' && !largo;
+            const largo = eLargo();
 
-            // selettore vista
-            E('cal-vista-switch').innerHTML = [['giorno', 'Giorno'], ['settimana', 'Settimana'], ['mese', 'Mese']].map(([k, l]) =>
-                `<button type="button" onclick="calImpostaVista('${k}')" class="px-3 py-2 ${calVista === k ? 'bg-slate-900 text-cyan-300' : 'bg-white text-slate-600 hover:bg-slate-50'}">${l}</button>`).join('');
+            E('cal-vista-switch').innerHTML = [['mese', 'Mese'], ['programma', 'Programma'], ['settimana', 'Settimana'], ['barche', 'Barche']].map(([k, l]) =>
+                `<button type="button" onclick="calImpostaVista('${k}')" class="px-3 py-2.5 whitespace-nowrap ${calVista === k ? 'bg-slate-900 text-cyan-300' : 'bg-white text-slate-600 hover:bg-slate-50'}">${l}</button>`).join('');
             setV('cal_vai', calData);
 
-            // titolo e intervallo
-            const d = isoToDate(calData);
+            // filtro barche (chip colorati, come i calendari di Google)
+            E('cal-filtri').innerHTML = tutte.length ? `<button type="button" onclick="calTutte()" class="flex-shrink-0 px-3 py-1.5 rounded-full border text-[11px] font-bold ${calNascoste.size ? 'bg-white text-slate-600 border-slate-300' : 'bg-slate-900 text-white border-slate-900'}">Tutte</button>` +
+                tutte.map(b => {
+                    const c = coloriBarca(b), on = !calNascoste.has(String(b.id));
+                    return `<button type="button" onclick="calToggleBarca('${esc(b.id)}')" ondblclick="calSoloBarca('${esc(b.id)}')" class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[11px] font-bold ${on ? '' : 'opacity-50'}" style="${on ? `background:${c.light};color:${c.text};border-color:${c.solid}` : 'background:#fff;color:#64748b;border-color:#cbd5e1'}"><i class="inline-block w-2.5 h-2.5 rounded-full" style="background:${on ? c.solid : '#fff'};border:2px solid ${c.solid}"></i>${esc(b.titolo)}</button>`;
+                }).join('') : '';
+
+            // intervallo e titolo
             let titolo, da, a;
-            if (calVista === 'giorno') {
-                titolo = `${GIORNI_LUNGHI[d.getDay()]} ${d.getDate()} ${MESI_IT[d.getMonth()]} ${d.getFullYear()}`;
-                da = a = calData;
-            } else if (calVista === 'settimana') {
+            if (calVista === 'mese' || (calVista === 'barche' && calBarcheModo === 'mese' && largo)) {
+                const d = isoToDate(calData);
+                titolo = `${MESI_IT[d.getMonth()]} ${d.getFullYear()}`; da = primoDelMese(calData); a = ultimoDelMese(calData);
+            } else if (calVista === 'programma') {
+                da = calData; a = aggiungiGiorni(da, calProgrammaGiorni - 1);
+                titolo = `${dataBreve(da)} – ${dataBreve(a)} ${isoToDate(a).getFullYear()}`;
+            } else {
                 da = lunediDi(calData); a = aggiungiGiorni(da, 6);
                 const d1 = isoToDate(da), d2 = isoToDate(a);
-                titolo = `${d1.getDate()} ${MESI_IT[d1.getMonth()].slice(0, 3)} – ${d2.getDate()} ${MESI_IT[d2.getMonth()].slice(0, 3)} ${d2.getFullYear()}`;
-            } else {
-                da = calData.slice(0, 7) + '-01';
-                a = calData.slice(0, 7) + '-' + String(giorniDelMese(da)).padStart(2, '0');
-                titolo = `${MESI_IT[d.getMonth()]} ${d.getFullYear()}`;
+                titolo = `${d1.getDate()}${d1.getMonth() !== d2.getMonth() ? ' ' + MESI_IT[d1.getMonth()].slice(0, 3) : ''} – ${d2.getDate()} ${MESI_IT[d2.getMonth()].slice(0, 3)} ${d2.getFullYear()}`;
             }
             setTxt('cal-titolo', titolo);
 
-            // selettore barca (solo mese su telefono)
-            show('cal-barca-box', meseSingolo && barche.length > 0);
-            if (!barche.some(b => String(b.id) === String(calBarcaMese))) calBarcaMese = barche[0] ? barche[0].id : '';
-            E('cal_barca_mese').innerHTML = barche.map(b => `<option value="${esc(b.id)}" ${String(b.id) === String(calBarcaMese) ? 'selected' : ''}>${esc(b.titolo)}</option>`).join('');
+            // sotto-selettore della vista Barche (solo PC)
+            const mostraModo = calVista === 'barche' && largo;
+            show('cal-barche-modo', mostraModo);
+            if (mostraModo) E('cal-barche-modo').innerHTML = [['7', '7 giorni'], ['mese', 'Mese intero']].map(([k, l]) =>
+                `<button type="button" onclick="calBarcheImposta('${k}')" class="px-3 py-1.5 rounded-lg border ${calBarcheModo === k ? 'bg-slate-900 text-cyan-300 border-slate-900' : 'bg-white text-slate-600 border-slate-300'}">${l}</button>`).join('');
 
-            if (!barche.length) {
+            if (!tutte.length) {
                 box.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-8">Nessuna barca in flotta. Caricale dal CMS › Catalogo Flotta.</p>';
-                setTxt('cal-riepilogo', '');
-                setTxt('cal-nota', '');
-                return;
+                setTxt('cal-riepilogo', ''); setTxt('cal-nota', ''); return;
+            }
+            if (!barche.length) {
+                box.innerHTML = '<p class="text-xs text-slate-500 text-center py-8">Hai nascosto tutte le barche. Tocca "Tutte" per rivederle.</p>';
+                setTxt('cal-riepilogo', ''); return;
             }
 
-            // riepilogo
-            const perOcc = meseSingolo ? barche.filter(b => String(b.id) === String(calBarcaMese)) : barche;
-            const o = calcolaOccupazione(perOcc, idx, da, a);
-            let riep = `Occupazione: <b>${o.occ}/${o.disp}</b> slot (${o.pct}%)`;
-            if (calVista === 'giorno') {
-                const uscite = new Set();
-                barche.forEach(b => { const st = statoCella(idx, b.id, calData); if (st.M) uscite.add(st.M.id); if (st.P) uscite.add(st.P.id); });
-                const fs = barche.filter(b => periodoFuoriServizio(b.id, calData)).length;
-                riep = `Uscite: <b>${uscite.size}</b> · ` + riep + (fs ? ` · Fuori servizio: <b>${fs}</b>` : '');
-            }
-            E('cal-riepilogo').innerHTML = riep;
+            const o = calcolaOccupazione(barche, idx, da, a);
+            const etic = { mese: 'nel mese', programma: 'nel periodo', settimana: 'nella settimana', barche: (calBarcheModo === 'mese' && largo) ? 'nel mese' : 'nella settimana' }[calVista];
+            E('cal-riepilogo').innerHTML = `Uscite ${etic}: <b>${o.uscite}</b> · Occupazione: <b>${o.occ}/${o.disp}</b> slot (${o.pct}%)`;
 
-            // nota sui noleggi di test senza barca
             const senza = listaNoleggi.filter(n => n.stato_noleggio !== 'annullato' && (!n.barca_id || !n.tipo_uscita)).length;
             setTxt('cal-nota', senza ? `${senza} noleggi senza barca/slot (dati di test) non compaiono nel calendario.` : '');
 
-            if (calVista === 'giorno') box.innerHTML = vistaGiorno(barche, idx);
+            if (calVista === 'mese') box.innerHTML = vistaMese(barche, idx, largo);
+            else if (calVista === 'programma') box.innerHTML = vistaProgramma(barche, idx, da);
             else if (calVista === 'settimana') box.innerHTML = vistaSettimana(barche, idx, da);
-            else box.innerHTML = largo ? vistaMeseMatrice(barche, idx, da) : vistaMeseBarca(barche, idx, da);
+            else box.innerHTML = (calBarcheModo === 'mese' && largo) ? vistaBarcheMese(barche, idx, da) : vistaBarcheSettimana(barche, idx, da);
+
+            if (calVista === 'settimana' || (calVista === 'barche')) {
+                const sc = E('cal-scroll'), oggiCol = sc ? sc.querySelector('[data-oggi]') : null;
+                if (sc && oggiCol) sc.scrollLeft = Math.max(0, oggiCol.offsetLeft - 70);
+            }
         }
 
-        function badgeCat(b) {
-            const t = { gommone: 'Gommone', scafo: 'Scafo', lancia: 'Lancia' }[b.tipo_barca];
-            return t ? `<span class="bg-cyan-100 text-cyan-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">${t}</span>` : '';
+        // ---------- Componenti ----------
+        const badgeCat = b => { const t = { gommone: 'Gommone', scafo: 'Scafo', lancia: 'Lancia' }[b.tipo_barca]; return t ? `<span class="bg-white/70 text-slate-600 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">${t}</span>` : ''; };
+
+        function chipEvento(n, extra) {
+            const c = coloriBarca(barcaPerId(n.barca_id));
+            const suff = n.tipo_uscita === 'mezza_mattina' ? ' · mat.' : (n.tipo_uscita === 'mezza_pomeriggio' ? ' · pom.' : '');
+            return `<button type="button" onclick="event.stopPropagation(); apriDettaglioNoleggio('${esc(n.id)}')" class="block w-full text-left truncate rounded px-1.5 py-0.5 text-[10px] font-bold leading-tight ${extra || ''}" style="background:${c.light};color:${c.text};border-left:3px solid ${c.solid}" title="${esc(nomeBarcaDi(n))} · ${esc(n.nome_cliente)} · ${esc(etichettaSlot(n.tipo_uscita))}">${esc(nomeBarcaDi(n))} · ${esc(primoNomeCal(n))}${suff}</button>`;
         }
 
-        function vistaGiorno(barche, idx) {
-            const iso = calData;
-            return '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">' + barche.map(b => {
-                const st = statoCella(idx, b.id, iso);
+        // ---------- MESE + pannello del giorno ----------
+        function vistaMese(barche, idx, largo) {
+            const oggi = dataLocaleISO(), primo = primoDelMese(calData), meseCorr = calData.slice(0, 7);
+            const offset = (isoToDate(primo).getDay() + 6) % 7;
+            const inizio = aggiungiGiorni(primo, -offset);
+            const totale = Math.ceil((offset + giorniDelMese(primo)) / 7) * 7;
+
+            const intest = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'].map(g => `<div class="text-center text-[10px] font-bold text-slate-500 uppercase py-1">${g}</div>`).join('');
+            let celle = '';
+            for (let i = 0; i < totale; i++) {
+                const iso = aggiungiGiorni(inizio, i), g = statoGiorno(barche, idx, iso);
+                const fuori = iso.slice(0, 7) !== meseCorr, selezionato = iso === calSel, eOggi = iso === oggi;
+                const d = isoToDate(iso).getDate();
+                const num = `<span class="inline-flex items-center justify-center min-w-[22px] h-[22px] rounded-full text-[11px] font-bold ${eOggi ? 'bg-cyan-600 text-white' : (g.pieno ? 'text-rose-600' : 'text-slate-700')}">${d}</span>`;
+                let corpo;
+                if (largo) {
+                    corpo = g.eventi.slice(0, 3).map(n => chipEvento(n, 'mt-0.5')).join('') +
+                        (g.eventi.length > 3 ? `<span class="block text-[10px] text-slate-500 font-bold mt-0.5">+${g.eventi.length - 3} altri</span>` : '') +
+                        (g.fs ? `<span class="block text-[10px] text-slate-500 mt-0.5">⛔ ${g.fs} fuori servizio</span>` : '');
+                } else {
+                    const dots = g.eventi.slice(0, 6).map(n => `<i class="inline-block w-2 h-2 rounded-full" style="background:${coloriBarca(barcaPerId(n.barca_id)).solid}"></i>`).join('') +
+                        (g.eventi.length > 6 ? '<span class="text-[8px] text-slate-500 font-bold leading-none">+</span>' : '') +
+                        g.fsBarche.slice(0, 2).map(() => '<i class="inline-block w-2 h-2 rounded-full border border-slate-400 bg-white"></i>').join('');
+                    corpo = `<div class="flex flex-wrap justify-center gap-0.5 mt-1">${dots}</div>`;
+                }
+                celle += `<div onclick="calSelezionaGiorno('${iso}')" class="cursor-pointer ${largo ? 'min-h-[92px] p-1' : 'min-h-[54px] p-0.5'} rounded-lg border ${selezionato ? 'border-cyan-500 ring-2 ring-cyan-300' : 'border-slate-200'} ${g.pieno ? 'bg-rose-50' : (fuori ? 'bg-slate-50' : 'bg-white')} ${fuori ? 'opacity-60' : ''} flex flex-col ${largo ? 'items-start' : 'items-center'}">${num}${corpo}</div>`;
+            }
+
+            const griglia = `<div class="bg-white rounded-2xl shadow border border-slate-200 p-2 lg:col-span-2"><div class="grid grid-cols-7 gap-1">${intest}</div><div class="grid grid-cols-7 gap-1">${celle}</div>
+                <p class="text-[10px] text-slate-500 mt-2 px-1">Un pallino per ogni noleggio, nel colore della barca; pallino vuoto = barca fuori servizio; giorno rosato = tutti gli slot occupati. Tocca un giorno per vederlo qui sotto.</p></div>`;
+            return `<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">${griglia}<div id="cal-pannello-giorno" class="lg:col-span-1 space-y-3">${pannelloGiorno(barche, idx, calSel)}</div></div>`;
+        }
+
+        function pannelloGiorno(barche, idx, iso) {
+            const d = isoToDate(iso), g = statoGiorno(barche, idx, iso);
+            const intesta = `<div class="bg-white rounded-2xl shadow border border-slate-200 p-3 flex items-center justify-between gap-2">
+                <div><b class="text-slate-900 text-sm">${GIORNI_LUNGHI[d.getDay()]} ${d.getDate()} ${MESI_IT[d.getMonth()]}</b>
+                <p class="text-[11px] text-slate-500">${g.eventi.length} uscite · ${g.occ}/${g.disp} slot occupati${g.fs ? ' · ' + g.fs + ' fuori servizio' : ''}</p></div>
+                <button type="button" onclick="nuovoNoleggioDa('', '${iso}', null)" class="bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold px-3 py-2 rounded-xl shadow whitespace-nowrap"><i class="fa-solid fa-plus"></i> Nuovo</button></div>`;
+
+            const cards = barche.map(b => {
+                const st = statoCella(idx, b.id, iso), c = coloriBarca(b);
                 let corpo;
                 if (st.fs) {
-                    corpo = `<div class="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold">⛔ Fuori servizio${st.fs.motivo ? ': ' + esc(st.fs.motivo) : ''}<span class="block font-normal mt-0.5">dal ${esc(formattaDataIT(st.fs.dal))}${st.fs.al ? ' al ' + esc(formattaDataIT(st.fs.al)) : ' (in corso)'}</span></div>`;
+                    corpo = `<div class="p-3 rounded-xl text-xs font-bold" style="${FS_STILE}">⛔ Fuori servizio${st.fs.motivo ? ': ' + esc(st.fs.motivo) : ''}<span class="block font-normal mt-0.5">dal ${esc(formattaDataIT(st.fs.dal))}${st.fs.al ? ' al ' + esc(formattaDataIT(st.fs.al)) : ' (in corso)'}</span></div>`;
                 } else {
                     const occ = n => {
-                        const rientro = n.ora_rientro ? ' · ↩ ' + String(n.ora_rientro).slice(0, 5) : '';
-                        return `<button type="button" onclick="apriDettaglioNoleggio('${esc(n.id)}')" class="w-full text-left rounded-xl p-3 shadow ${COL_TIPO[n.tipo_uscita]}"><b class="block text-sm truncate">${esc(n.nome_cliente)}</b><span class="text-[11px] opacity-90">${esc(etichettaSlot(n.tipo_uscita))}${esc(rientro)}</span><span class="block text-[11px] mt-0.5">${n.stato_checkin === 'completato' ? '✓' : '⌛'} check-in · €${esc(n.importo)}</span></button>`;
+                        const rientro = n.ora_rientro ? ' · rientro ' + String(n.ora_rientro).slice(0, 5) : '';
+                        const pag = (typeof statoPagamento === 'function') ? statoPagamento(n) : null;
+                        return `<button type="button" onclick="apriDettaglioNoleggio('${esc(n.id)}')" class="w-full text-left rounded-xl p-2.5 shadow text-white" style="background:${c.solid}"><b class="block text-sm truncate">${esc(n.nome_cliente)}</b><span class="text-[11px] opacity-95">${iconaSlot(n.tipo_uscita)} ${esc(etichettaSlot(n.tipo_uscita))}${esc(rientro)}</span><span class="block text-[10px] opacity-90 mt-0.5">${n.stato_checkin === 'completato' ? '✓' : '⌛'} check-in${pag ? ' · ' + esc(pag.label.replace(/^[^\wÀ-ú]+/, '')) : ''}</span></button>`;
                     };
-                    const libero = (slot, label) => `<button type="button" onclick="nuovoNoleggioDa('${esc(b.id)}','${iso}','${slot}')" class="w-full rounded-xl p-3 border border-dashed border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold text-center">＋ ${label}<span class="block font-normal">libera</span></button>`;
-                    corpo = (st.M && st.P && st.M.id === st.P.id)
-                        ? occ(st.M)
+                    const libero = (slot, label) => `<button type="button" onclick="nuovoNoleggioDa('${esc(b.id)}','${iso}','${slot}')" class="w-full rounded-xl p-2.5 border-2 border-dashed border-slate-300 hover:border-cyan-400 hover:bg-cyan-50 text-slate-500 text-xs font-bold text-center"><i class="fa-solid fa-plus"></i> ${label}<span class="block font-normal text-[10px]">libera</span></button>`;
+                    corpo = (st.M && st.P && st.M.id === st.P.id) ? occ(st.M)
                         : `<div class="grid grid-cols-2 gap-2">${st.M ? occ(st.M) : libero('M', 'Mattina')}${st.P ? occ(st.P) : libero('P', 'Pomeriggio')}</div>`;
                 }
-                return `<div class="bg-white rounded-2xl shadow border border-slate-200 p-3 space-y-2"><div class="flex justify-between items-center gap-2"><b class="text-slate-900 text-sm">${esc(b.titolo)}</b>${badgeCat(b)}</div>${corpo}</div>`;
-            }).join('') + '</div>';
+                return `<div class="bg-white rounded-2xl shadow border border-slate-200 overflow-hidden"><div class="px-3 py-1.5 flex items-center justify-between gap-2" style="background:${c.light};border-left:5px solid ${c.solid}"><b class="text-sm" style="color:${c.text}">${esc(b.titolo)}</b>${badgeCat(b)}</div><div class="p-2.5">${corpo}</div></div>`;
+            }).join('');
+            return intesta + cards;
         }
 
-        function cellaSettimana(b, iso, st) {
+        // ---------- PROGRAMMA (elenco cronologico) ----------
+        function vistaProgramma(barche, idx, da) {
+            const oggi = dataLocaleISO(), domani = aggiungiGiorni(oggi, 1);
+            let html = '', conta = 0;
+
+            // riepilogo dei fuori servizio nel periodo
+            const a = aggiungiGiorni(da, calProgrammaGiorni - 1);
+            const periodi = INDISP.filter(p => barche.some(b => String(b.id) === String(p.barca_id)) && p.dal <= a && (!p.al || p.al >= da));
+            if (periodi.length) html += `<div class="rounded-xl p-2.5 text-[11px] font-semibold" style="${FS_STILE}">⛔ Fuori servizio: ${periodi.map(p => { const b = barcaPerId(p.barca_id); return esc(b ? b.titolo : '?') + ' (' + dataBreve(p.dal) + (p.al ? '–' + dataBreve(p.al) : ' in corso') + ')'; }).join(' · ')}</div>`;
+
+            for (let i = 0; i < calProgrammaGiorni; i++) {
+                const iso = aggiungiGiorni(da, i), g = statoGiorno(barche, idx, iso);
+                if (!g.eventi.length) continue;
+                conta += g.eventi.length;
+                const d = isoToDate(iso);
+                const etichetta = iso === oggi ? 'Oggi' : (iso === domani ? 'Domani' : GIORNI_LUNGHI[d.getDay()]);
+                html += `<div class="space-y-1.5"><div class="flex items-baseline justify-between px-1 pt-2"><b class="text-sm ${iso === oggi ? 'text-cyan-700' : 'text-slate-800'}">${etichetta} <span class="font-normal text-slate-500">${d.getDate()} ${MESI_IT[d.getMonth()].slice(0, 3)}</span></b><span class="text-[10px] text-slate-400">${g.occ}/${g.disp} slot</span></div>` +
+                    g.eventi.map(n => {
+                        const c = coloriBarca(barcaPerId(n.barca_id)), pag = (typeof statoPagamento === 'function') ? statoPagamento(n) : null;
+                        const rientro = n.ora_rientro ? ' · rientro ' + String(n.ora_rientro).slice(0, 5) : '';
+                        return `<button type="button" onclick="apriDettaglioNoleggio('${esc(n.id)}')" class="w-full flex items-stretch gap-3 text-left bg-white rounded-xl border border-slate-200 shadow-sm p-2.5"><span class="w-1.5 rounded-full flex-shrink-0" style="background:${c.solid}"></span><div class="min-w-0 flex-1"><div class="flex justify-between gap-2"><b class="text-sm text-slate-900 truncate">${esc(n.nome_cliente)}</b><span class="text-[11px] font-bold flex-shrink-0" style="color:${c.text}">${esc(nomeBarcaDi(n))}</span></div><p class="text-[11px] text-slate-600">${iconaSlot(n.tipo_uscita)} ${esc(nomeSlotBreve(n.tipo_uscita))}${esc(rientro)}</p><div class="flex flex-wrap gap-1 mt-1"><span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full ${n.stato_checkin === 'completato' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${n.stato_checkin === 'completato' ? '✓ check-in' : '⌛ check-in'}</span>${pag ? `<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full ${pag.cls}">${esc(pag.label)}</span>` : ''}</div></div></button>`;
+                    }).join('') + '</div>';
+            }
+            if (!conta) html += `<div class="bg-white rounded-2xl shadow border border-slate-200 p-6 text-center text-xs text-slate-500 space-y-3"><p>Nessuna uscita in questo periodo.</p><button type="button" onclick="nuovoNoleggioDa('', '${da}', null)" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold px-4 py-2 rounded-xl shadow"><i class="fa-solid fa-plus"></i> Nuovo noleggio</button></div>`;
+            html += `<button type="button" onclick="calAltriGiorni()" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">Mostra altri 14 giorni</button>`;
+            return `<div class="space-y-2 max-w-2xl mx-auto">${html}</div>`;
+        }
+
+        // ---------- SETTIMANA (tutto il giorno / mattina / pomeriggio) ----------
+        function vistaSettimana(barche, idx, lun) {
+            const oggi = dataLocaleISO();
+            const giorni = Array.from({ length: 7 }, (_, i) => aggiungiGiorni(lun, i));
+            const dati = giorni.map(iso => ({ iso, g: statoGiorno(barche, idx, iso) }));
+
+            const cella = (contenuto, iso, extra) => `<div onclick="calApriGiorno('${iso}')" class="cursor-pointer border-t border-l border-slate-100 p-1 space-y-0.5 min-h-[44px] ${extra || ''}">${contenuto}</div>`;
+            let html = '<div class="bg-white"></div>';
+            html += dati.map(({ iso, g }) => {
+                const d = isoToDate(iso), on = iso === oggi;
+                return `<div ${on ? 'data-oggi' : ''} onclick="calApriGiorno('${iso}')" class="cursor-pointer border-l border-slate-100 text-center py-1.5 ${on ? 'bg-cyan-50' : 'bg-white'}"><span class="block text-[10px] font-bold text-slate-500 uppercase">${GIORNI_BREVI[d.getDay()]}</span><span class="inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-bold ${on ? 'bg-cyan-600 text-white' : 'text-slate-800'}">${d.getDate()}</span><span class="block text-[9px] ${g.pieno ? 'text-rose-600 font-bold' : 'text-slate-400'}">${g.pieno ? 'esaurito' : (g.disp - g.occ) + ' slot liberi'}</span></div>`;
+            }).join('');
+
+            const righe = [['Tutto il giorno', n => n.tipo_uscita === 'intera'], ['Mattina', n => n.tipo_uscita === 'mezza_mattina'], ['Pomeriggio', n => n.tipo_uscita === 'mezza_pomeriggio']];
+            righe.forEach(([label, filtro], r) => {
+                html += `<div class="sticky left-0 z-10 bg-white border-t border-slate-100 text-[10px] font-bold text-slate-500 uppercase p-1 flex items-start">${label}</div>`;
+                html += dati.map(({ iso, g }) => {
+                    let c = g.eventi.filter(filtro).map(n => chipEvento(n)).join('');
+                    if (r === 0 && g.fsBarche.length) c += g.fsBarche.map(b => `<span class="block rounded px-1.5 py-0.5 text-[10px] font-bold truncate" style="${FS_STILE}">⛔ ${esc(b.titolo)}</span>`).join('');
+                    return cella(c, iso, iso === oggi ? 'bg-cyan-50/40' : '');
+                }).join('');
+            });
+            return `<div id="cal-scroll" class="cal-hscroll relative overflow-x-auto bg-white rounded-2xl shadow border border-slate-200"><div class="grid" style="min-width:820px;grid-template-columns:72px repeat(7,minmax(108px,1fr))">${html}</div></div>
+                <p class="text-[10px] text-slate-500 px-1">Tocca un giorno per aprirlo con le barche libere; tocca un'etichetta per il dettaglio del noleggio.</p>`;
+        }
+
+        // ---------- BARCHE (barche × giorni: dove posso mettere un cliente?) ----------
+        function cellaBarca(b, iso, st, c) {
             const passato = iso < dataLocaleISO();
-            if (st.fs) return `<div class="h-[50px] rounded bg-red-100 text-red-700 border border-red-300 flex items-center justify-center text-xs" title="Fuori servizio${st.fs.motivo ? ': ' + esc(st.fs.motivo) : ''}">⛔</div>`;
-            const occ = (n, extra) => `<button type="button" onclick="apriDettaglioNoleggio('${esc(n.id)}')" class="block w-full ${extra} rounded px-1 text-left truncate font-bold text-[10px] ${COL_TIPO[n.tipo_uscita]}" title="${esc(n.nome_cliente)} · ${esc(etichettaSlot(n.tipo_uscita))}">${esc(primoNomeCal(n))}</button>`;
-            const libero = slot => `<button type="button" onclick="nuovoNoleggioDa('${esc(b.id)}','${iso}','${slot}')" class="block w-full h-6 rounded border border-dashed border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-[10px] ${passato ? 'opacity-50' : ''}">+</button>`;
+            if (st.fs) return `<div class="h-[50px] rounded flex items-center justify-center text-xs" style="${FS_STILE}" title="Fuori servizio${st.fs.motivo ? ': ' + esc(st.fs.motivo) : ''}">⛔</div>`;
+            const occ = (n, extra) => `<button type="button" onclick="apriDettaglioNoleggio('${esc(n.id)}')" class="block w-full ${extra} rounded px-1 text-left truncate font-bold text-[10px] text-white" style="background:${c.solid}" title="${esc(n.nome_cliente)} · ${esc(etichettaSlot(n.tipo_uscita))}">${esc(primoNomeCal(n))}</button>`;
+            const libero = slot => `<button type="button" onclick="nuovoNoleggioDa('${esc(b.id)}','${iso}','${slot}')" class="block w-full h-6 rounded border border-dashed border-slate-300 hover:border-cyan-400 hover:bg-cyan-50 text-slate-400 text-[10px] ${passato ? 'opacity-50' : ''}">+</button>`;
             if (st.M && st.P && st.M.id === st.P.id) return occ(st.M, 'h-[50px] pt-1');
             return `<div class="flex flex-col gap-0.5">${st.M ? occ(st.M, 'h-6 leading-6') : libero('M')}${st.P ? occ(st.P, 'h-6 leading-6') : libero('P')}</div>`;
         }
 
-        function vistaSettimana(barche, idx, lun) {
+        function tabellaBarche(barche, idx, giorni, larg) {
             const oggi = dataLocaleISO();
-            const giorni = Array.from({ length: 7 }, (_, i) => aggiungiGiorni(lun, i));
             const th = giorni.map(iso => {
                 const d = isoToDate(iso), on = iso === oggi;
-                return `<th class="px-0.5 py-1 min-w-[68px]"><button type="button" onclick="calVaiAGiorno('${iso}')" class="w-full rounded-lg py-1 font-bold text-[10px] ${on ? 'bg-cyan-600 text-white' : 'bg-slate-100 text-slate-700'}">${GIORNI_BREVI[d.getDay()]}<br>${d.getDate()}</button></th>`;
+                return `<th ${on ? 'data-oggi' : ''} class="px-0.5 py-1" style="min-width:${larg}px"><button type="button" onclick="calApriGiorno('${iso}')" class="w-full rounded-lg py-1 font-bold text-[10px] ${on ? 'bg-cyan-600 text-white' : (d.getDay() === 0 || d.getDay() === 6 ? 'bg-slate-200 text-slate-700' : 'bg-slate-100 text-slate-700')}">${GIORNI_BREVI[d.getDay()]}<br>${d.getDate()}</button></th>`;
             }).join('');
-            const righe = barche.map(b => `<tr><td class="sticky left-0 z-10 bg-white px-2 py-1 border-t border-slate-100 font-bold text-slate-800 text-[11px] align-middle min-w-[84px]">${esc(b.titolo)}</td>${giorni.map(iso => `<td class="px-0.5 py-1 border-t border-slate-100 align-top">${cellaSettimana(b, iso, statoCella(idx, b.id, iso))}</td>`).join('')}</tr>`).join('');
-            return `<div class="bg-white rounded-2xl shadow border border-slate-200 overflow-x-auto"><table class="w-full border-separate border-spacing-0 text-xs"><thead><tr><th class="sticky left-0 z-10 bg-white text-left px-2 py-1 text-[10px] text-slate-500 uppercase">Barca</th>${th}</tr></thead><tbody>${righe}</tbody></table></div>`;
-        }
-
-        // Due barrette (mattina sopra, pomeriggio sotto) per un giorno
-        function barretteGiorno(st) {
-            const cl = (n) => st.fs ? 'bg-red-300' : (n ? BG_TIPO[n.tipo_uscita] : 'bg-emerald-100');
-            return `<div class="flex flex-col gap-px"><div class="h-2.5 rounded-sm ${cl(st.M)}"></div><div class="h-2.5 rounded-sm ${cl(st.P)}"></div></div>`;
-        }
-
-        function titoloCella(b, iso, st) {
-            if (st.fs) return `${b.titolo} · ${formattaDataIT(iso)}: fuori servizio${st.fs.motivo ? ' (' + st.fs.motivo + ')' : ''}`;
-            const p = [];
-            if (st.M) p.push('mattina: ' + st.M.nome_cliente);
-            if (st.P && (!st.M || st.P.id !== st.M.id)) p.push('pomeriggio: ' + st.P.nome_cliente);
-            return `${b.titolo} · ${formattaDataIT(iso)}` + (p.length ? ' · ' + p.join(', ') : ' · libera');
-        }
-
-        function vistaMeseMatrice(barche, idx, primo) {
-            const n = giorniDelMese(primo), oggi = dataLocaleISO();
-            const giorni = Array.from({ length: n }, (_, i) => aggiungiGiorni(primo, i));
-            const th = giorni.map(iso => {
-                const d = isoToDate(iso), on = iso === oggi;
-                return `<th class="px-px py-1 min-w-[26px]"><button type="button" onclick="calVaiAGiorno('${iso}')" class="w-full rounded py-0.5 text-[9px] font-bold ${on ? 'bg-cyan-600 text-white' : (d.getDay() === 0 || d.getDay() === 6 ? 'bg-slate-200 text-slate-600' : 'bg-slate-100 text-slate-700')}">${GIORNI_BREVI[d.getDay()].charAt(0)}<br>${d.getDate()}</button></th>`;
+            const righe = barche.map(b => {
+                const c = coloriBarca(b);
+                return `<tr><td class="sticky left-0 z-10 bg-white px-2 py-1 border-t border-slate-100 font-bold text-[11px] align-middle whitespace-nowrap" style="color:${c.text};border-left:5px solid ${c.solid}">${esc(b.titolo)}</td>${giorni.map(iso => `<td class="px-0.5 py-1 border-t border-slate-100 align-top">${cellaBarca(b, iso, statoCella(idx, b.id, iso), c)}</td>`).join('')}</tr>`;
             }).join('');
-            const righe = barche.map(b => `<tr><td class="sticky left-0 z-10 bg-white px-2 py-1 border-t border-slate-100 font-bold text-slate-800 text-[11px] whitespace-nowrap">${esc(b.titolo)}</td>${giorni.map(iso => {
-                const st = statoCella(idx, b.id, iso);
-                return `<td class="px-px py-1 border-t border-slate-100"><button type="button" onclick="calVaiAGiorno('${iso}')" title="${esc(titoloCella(b, iso, st))}" class="block w-full">${barretteGiorno(st)}</button></td>`;
-            }).join('')}</tr>`).join('');
-            return `<div class="bg-white rounded-2xl shadow border border-slate-200 overflow-x-auto"><table class="w-full border-separate border-spacing-0"><thead><tr><th class="sticky left-0 z-10 bg-white text-left px-2 py-1 text-[10px] text-slate-500 uppercase">Barca</th>${th}</tr></thead><tbody>${righe}</tbody></table></div>`;
+            return `<div id="cal-scroll" class="cal-hscroll relative overflow-x-auto bg-white rounded-2xl shadow border border-slate-200"><table class="w-full border-separate border-spacing-0"><thead><tr><th class="sticky left-0 z-10 bg-white text-left px-2 py-1 text-[10px] text-slate-500 uppercase">Barca</th>${th}</tr></thead><tbody>${righe}</tbody></table></div>
+                <p class="text-[10px] text-slate-500 px-1">Metà alta di ogni giorno = mattina, metà bassa = pomeriggio. Tocca "+" per prenotare quello slot.</p>`;
         }
 
-        function vistaMeseBarca(barche, idx, primo) {
-            const b = barche.find(x => String(x.id) === String(calBarcaMese)) || barche[0];
-            const oggi = dataLocaleISO(), n = giorniDelMese(primo);
-            const vuote = (isoToDate(primo).getDay() + 6) % 7;
-            let celle = '<div></div>'.repeat(vuote);
-            for (let i = 0; i < n; i++) {
-                const iso = aggiungiGiorni(primo, i), st = statoCella(idx, b.id, iso);
-                celle += `<button type="button" onclick="calVaiAGiorno('${iso}')" title="${esc(titoloCella(b, iso, st))}" class="rounded-lg border bg-white p-1 ${iso === oggi ? 'ring-2 ring-cyan-500' : 'border-slate-200'}"><span class="block text-[11px] font-bold text-slate-700 text-left mb-0.5">${i + 1}</span>${barretteGiorno(st)}</button>`;
-            }
-            const intest = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'].map(g => `<div class="text-center text-[10px] font-bold text-slate-500 uppercase">${g}</div>`).join('');
-            return `<div class="bg-white rounded-2xl shadow border border-slate-200 p-3 space-y-2"><div class="grid grid-cols-7 gap-1">${intest}</div><div class="grid grid-cols-7 gap-1">${celle}</div><p class="text-[10px] text-slate-500">Tocca un giorno per vedere il dettaglio.</p></div>`;
-        }
+        const vistaBarcheSettimana = (barche, idx, lun) => tabellaBarche(barche, idx, Array.from({ length: 7 }, (_, i) => aggiungiGiorni(lun, i)), 70);
+        const vistaBarcheMese = (barche, idx, primo) => tabellaBarche(barche, idx, Array.from({ length: giorniDelMese(primo) }, (_, i) => aggiungiGiorni(primo, i)), 46);
 
-        window.addEventListener('resize', () => { if (tabCorrente === 'calendario' && calVista === 'mese') renderCalendario(); });
+        // ---------- Gesti e adattamento ----------
+        window.addEventListener('resize', () => { if (tabCorrente === 'calendario') renderCalendario(); });
+
+        registraInit(() => {
+            const box = E('cal-contenuto');
+            if (!box) return;
+            let sx = 0, sy = 0, inScroll = false;
+            box.addEventListener('touchstart', e => { const t = e.touches[0]; sx = t.clientX; sy = t.clientY; inScroll = !!e.target.closest('.cal-hscroll'); }, { passive: true });
+            box.addEventListener('touchend', e => {
+                if (inScroll || (calVista !== 'mese' && calVista !== 'programma')) return;
+                const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+                if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.6) calSposta(dx < 0 ? 1 : -1);
+            }, { passive: true });
+        });
     </script>
 
     <script>
@@ -2134,6 +2272,7 @@
             show('subbox-audio-cms', !!T.audio);
             show('box-prezzi-cms', !!T.prezzi);
             show('box-tipo-barca', !!T.tipoBarca);
+            if (T.tipoBarca) renderSwatchColori();
             show('box-slot', !!T.slot);
             show('box-ordine', !!T.ordine);
             setTxt('cms-dove', 'Compare in: ' + T.dove);
@@ -2311,6 +2450,7 @@
             setV('cms_alta_mezza', it.prezzo_alta_mezza); setV('cms_alta_intera', it.prezzo_alta_intera);
             setV('cms_slot', it.ordine || 1); setV('cms_ordine', it.ordine);
             setV('cms_tipo_barca', it.tipo_barca); if (E('cms_ritirata')) E('cms_ritirata').checked = !!it.ritirata;
+            setV('cms_colore', it.colore); renderSwatchColori();
             setTxt('btn-salva-cms-text', 'Aggiorna contenuto');
             show('btn-annulla-edit-cms', true);
             E('cmsForm').scrollIntoView({ behavior: 'smooth' });
@@ -2324,7 +2464,20 @@
             toggleCampiCMS();
         }
 
+        function renderSwatchColori() {
+            const box = E('cms_colori');
+            if (!box) return;
+            const sel = (val('cms_colore') || '').toLowerCase();
+            box.innerHTML = `<button type="button" onclick="scegliColoreBarca('')" class="px-2.5 py-1 rounded-full border text-[10px] font-bold ${!sel ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-600 border-slate-300'}">Auto</button>` +
+                PALETTE_BARCHE.map(c => `<button type="button" onclick="scegliColoreBarca('${c}')" class="w-7 h-7 rounded-full border-2 ${sel === c ? 'border-slate-900 ring-2 ring-offset-1 ring-slate-400' : 'border-white shadow'}" style="background:${c}" aria-label="Colore ${c}"></button>`).join('');
+        }
+        function scegliColoreBarca(c) { setV('cms_colore', c); renderSwatchColori(); }
+
         function mostraErroreCMS(err) {
+            if (/colore/.test(err.message || '') && /column/.test(err.message || '')) {
+                alert("Per salvare il colore della barca esegui in Supabase (SQL Editor):\n\nALTER TABLE public.cms_contenuti ADD COLUMN IF NOT EXISTS colore text CHECK (colore IS NULL OR colore ~ '^#[0-9a-fA-F]{6}$');\nNOTIFY pgrst, 'reload schema';\n\nPoi riprova.");
+                return;
+            }
             const m = /Could not find the '(\w+)' column/.exec(err.message || '');
             alert(m
                 ? `Nel database manca la colonna "${m[1]}".\n\nEsegui lo script "cms_migrazione.sql" nell'SQL Editor di Supabase (non cancella nessun dato) e riprova.`
@@ -2358,6 +2511,8 @@
                 if (!val('cms_tipo_barca')) { alert('Scegli la categoria della barca (gommone, scafo o lancia).'); btn.disabled = false; return; }
                 d.tipo_barca = val('cms_tipo_barca');
                 d.ritirata = E('cms_ritirata').checked;
+                const colSc = val('cms_colore');
+                if (colSc || (orig && 'colore' in orig)) d.colore = colSc || null;
             }
             if (T.slot) d.ordine = parseInt(val('cms_slot')) || 1;
             else if (T.ordine) d.ordine = parseInt(val('cms_ordine')) || 0;
