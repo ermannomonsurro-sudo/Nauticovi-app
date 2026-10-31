@@ -283,7 +283,7 @@
                             <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                                 <i class="fa-solid fa-chart-line text-cyan-600"></i> Dashboard Risultati
                             </h2>
-                            <p class="text-xs text-slate-500">I noleggi annullati non entrano nei conteggi.</p>
+                            <p class="text-xs text-slate-500">I noleggi annullati non entrano nei conteggi. "Incassato" e "Da incassare" si basano sulle tue conferme di caparra e saldo.</p>
                         </div>
                         <select id="filtroPeriodo" onchange="aggiornaDashboardKPI()" class="p-2 border rounded-lg bg-slate-50 font-bold text-xs text-slate-700 outline-none">
                             <option value="tutto">Tutti i Noleggi</option>
@@ -320,6 +320,38 @@
                                 <h3 class="text-2xl font-black text-purple-400 mt-0.5" id="kpiMedio">€0</h3>
                             </div>
                             <i class="fa-solid fa-calculator text-2xl text-slate-700"></i>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-emerald-500 flex justify-between items-center">
+                            <div>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">Incassato (noleggio)</p>
+                                <h3 class="text-2xl font-black text-emerald-400 mt-0.5" id="kpiIncassato">€0</h3>
+                            </div>
+                            <i class="fa-solid fa-hand-holding-dollar text-2xl text-slate-700"></i>
+                        </div>
+                        <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-red-500 flex justify-between items-center">
+                            <div>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">Da incassare</p>
+                                <h3 class="text-2xl font-black text-red-400 mt-0.5" id="kpiDaIncassare">€0</h3>
+                            </div>
+                            <i class="fa-solid fa-hourglass-half text-2xl text-slate-700"></i>
+                        </div>
+                        <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-sky-500 flex justify-between items-center">
+                            <div>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">Carburante incassato</p>
+                                <h3 class="text-2xl font-black text-sky-400 mt-0.5" id="kpiCarburante">€0</h3>
+                                <p class="text-[10px] text-slate-400" id="kpiLitri"></p>
+                            </div>
+                            <i class="fa-solid fa-gas-pump text-2xl text-slate-700"></i>
+                        </div>
+                        <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-amber-500 flex justify-between items-center">
+                            <div>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">Caparre trattenute</p>
+                                <h3 class="text-2xl font-black text-amber-400 mt-0.5" id="kpiTrattenute">€0</h3>
+                                <p class="text-[10px] text-slate-400">da annullamenti non rimborsati</p>
+                            </div>
+                            <i class="fa-solid fa-ban text-2xl text-slate-700"></i>
                         </div>
                     </div>
                     <p id="kpiAnnullati" class="text-xs text-slate-500"></p>
@@ -466,6 +498,40 @@
     <!-- MODALE DETTAGLIO NOLEGGIO (dal calendario) -->
     <div id="dett-modal" style="display:none" class="fixed inset-0 bg-slate-900/80 z-[90] items-end sm:items-center justify-center p-3" onclick="if (event.target === this) chiudiDettaglio()">
         <div id="dett-body" class="bg-white rounded-2xl p-5 w-full max-w-sm space-y-3 text-xs shadow-2xl"></div>
+    </div>
+
+    <!-- MODALE RIENTRO E SALDO -->
+    <div id="rientro-modal" style="display:none" class="fixed inset-0 bg-slate-900/80 z-[90] items-end sm:items-center justify-center p-3" onclick="if (event.target === this) chiudiRientro()">
+        <div class="bg-white rounded-2xl p-5 w-full max-w-sm space-y-3 text-xs shadow-2xl max-h-[92vh] overflow-y-auto">
+            <div class="flex justify-between items-start gap-2">
+                <h3 class="font-extrabold text-sm text-slate-800"><i class="fa-solid fa-anchor text-cyan-600"></i> Rientro e saldo</h3>
+                <button type="button" onclick="chiudiRientro()" class="text-slate-400 hover:text-slate-700 p-1"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p id="rientro-info" class="text-slate-600 font-semibold"></p>
+            <input type="hidden" id="rientro_id" value="">
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block font-bold text-slate-600 uppercase">Litri consumati</label>
+                    <input type="number" id="rientro_litri" step="0.1" min="0" inputmode="decimal" placeholder="es. 18" oninput="rientroLitriCambiati()" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-600 uppercase">Quota carburante (€)</label>
+                    <input type="number" id="rientro_quota" step="0.01" min="0" inputmode="decimal" placeholder="0" oninput="rientroQuotaCambiata()" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                </div>
+            </div>
+            <p class="text-[10px] text-slate-500">La quota si calcola da sola (litri × <span id="rientro-prezzo-litro"></span> €/L) e resta modificabile. Il carburante è solo tracciato: non entra nella bozza di fattura.</p>
+
+            <div id="rientro-riepilogo" class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1"></div>
+
+            <div>
+                <label class="block font-bold text-slate-600 uppercase">Importo incassato al saldo (€)</label>
+                <input type="number" id="rientro_incassato" step="0.01" min="0" inputmode="decimal" oninput="incassatoModificatoManualmente()" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none font-bold">
+            </div>
+
+            <p id="rientro-msg" class="hidden"></p>
+            <div id="rientro-azioni" class="grid grid-cols-1 gap-2 font-bold"></div>
+        </div>
     </div>
 
     <!-- MODALE ANNULLAMENTO NOLEGGIO -->
@@ -972,7 +1038,7 @@
             setV('annulla_motivo', 'meteo');
             setV('annulla_nota', '');
             E('annulla_rimborso').checked = true;
-            setTxt('annulla-info', `${n.nome_cliente} · ${n.barca || ''} · ${formattaDataIT(n.data_noleggio)}`);
+            setTxt('annulla-info', `${n.nome_cliente} · ${n.barca || ''} · ${formattaDataIT(n.data_noleggio)}` + (n.caparra_ricevuta_il ? ` · caparra già ricevuta (€${n.caparra}): spunta il rimborso solo se la restituisci` : ''));
             E('annulla-modal').style.display = 'flex';
         }
         function chiudiAnnulla() { E('annulla-modal').style.display = 'none'; }
@@ -1116,6 +1182,7 @@
                 if (ann) badges.push(badge('bg-red-100 text-red-800', 'Annullato'));
                 if (!n.tipo_uscita && !ann) badges.push(badge('bg-slate-200 text-slate-600', 'Senza slot (test)'));
                 if (!ann) badges.push(n.stato_checkin === 'completato' ? badge('bg-emerald-100 text-emerald-800', '✓ Check-in') : badge('bg-amber-100 text-amber-800', '⌛ Check-in'));
+                if (!ann && typeof statoPagamento === 'function') { const sp = statoPagamento(n); badges.push(badge(sp.cls, sp.label)); }
                 if (!ann && n.stato_fattura === 'emessa') badges.push(badge('bg-blue-100 text-blue-800', '✓ Bozza fattura'));
                 if (fuoriServ) badges.push(badge('bg-red-100 text-red-800', '⚠ Barca fuori servizio'));
 
@@ -1134,6 +1201,7 @@
                       + (emessa
                           ? btnN('bg-amber-500 hover:bg-amber-600 text-white', `generaFatturaInCloud('${id}', this)`, 'fa-rotate', 'Rigenera FIC', "Esiste già una bozza: rigenera solo se l'hai eliminata dal portale")
                           : btnN('bg-blue-600 hover:bg-blue-700 text-white', `generaFatturaInCloud('${id}', this)`, 'fa-file-invoice-dollar', 'Genera FIC'))
+                      + ((typeof bottoniPagamento === 'function') ? bottoniPagamento(n) : '')
                       + btnN('bg-white border border-cyan-200 text-cyan-700 hover:bg-cyan-50', `modificaNoleggio('${id}')`, 'fa-pen', 'Modifica')
                       + btnN('bg-white border border-amber-300 text-amber-700 hover:bg-amber-50', `apriAnnulla('${id}')`, 'fa-ban', 'Annulla')
                       + btnN('bg-white border border-red-200 text-red-500 hover:bg-red-50', `eliminaNoleggio('${id}')`, 'fa-trash', '', 'Elimina');
@@ -1155,6 +1223,7 @@
                         </div>
                     </div>
                     ${badges.length ? `<div class="flex flex-wrap gap-1.5 mt-2">${badges.join('')}</div>` : ''}
+                    ${ann ? '' : ((typeof infoPagamento === 'function') ? infoPagamento(n) : '')}
                     ${infoAnnullo}
                     <div class="flex flex-wrap gap-1.5 mt-2.5">${azioni}</div>
                 </div>`;
@@ -1163,11 +1232,13 @@
 
         function esportaCSV() {
             const c = v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
-            let csv = 'ID,NomeCliente,Telefono,Barca,Data,Slot,OraRientro,Importo,Caparra,StatoNoleggio,StatoCheckin,StatoFattura\n';
+            let csv = 'ID,NomeCliente,Telefono,Barca,Data,Slot,OraRientro,Importo,Caparra,StatoNoleggio,StatoCheckin,StatoFattura,CaparraRicevutaIl,SaldoIncassato,SaldoIncassatoIl,Litri,QuotaCarburante\n';
             listaNoleggi.forEach(n => {
                 csv += [c(n.id), c(n.nome_cliente), c(n.telefono), c(n.barca), c(n.data_noleggio), c(n.tipo_uscita),
                         c(n.ora_rientro ? String(n.ora_rientro).slice(0, 5) : ''), n.importo, n.caparra,
-                        c(n.stato_noleggio), c(n.stato_checkin), c(n.stato_fattura)].join(',') + '\n';
+                        c(n.stato_noleggio), c(n.stato_checkin), c(n.stato_fattura),
+                        c(n.caparra_ricevuta_il), n.saldo_incassato == null ? '' : n.saldo_incassato, c(n.saldo_incassato_il),
+                        n.litri_carburante == null ? '' : n.litri_carburante, n.quota_carburante == null ? '' : n.quota_carburante].join(',') + '\n';
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
@@ -1512,21 +1583,217 @@
             const f = val('filtroPeriodo') || 'tutto';
             const oggi = dataLocaleISO(), mese = oggi.slice(0, 7);
             const nelPeriodo = n => f === 'tutto' || (f === 'oggi' && n.data_noleggio === oggi) || (f === 'mese' && String(n.data_noleggio).slice(0, 7) === mese);
+            const num = v => Number(v) || 0;
 
             const periodo = listaNoleggi.filter(nelPeriodo);
             const confermati = periodo.filter(n => n.stato_noleggio !== 'annullato');
             const annullati = periodo.filter(n => n.stato_noleggio === 'annullato');
 
-            let totale = 0, checkin = 0;
-            confermati.forEach(n => { totale += parseFloat(n.importo || 0); if (n.stato_checkin === 'completato') checkin++; });
-            const media = confermati.length ? (totale / confermati.length).toFixed(0) : 0;
+            let totale = 0, checkin = 0, incassatoNol = 0, daIncassare = 0, carburante = 0, litri = 0;
+            confermati.forEach(n => {
+                totale += num(n.importo);
+                if (n.stato_checkin === 'completato') checkin++;
 
-            setTxt('kpiFatturato', `€${totale.toLocaleString('it-IT')}`);
+                const cap = n.caparra_ricevuta_il ? num(n.caparra) : 0;
+                const carbIncassato = n.saldo_incassato_il ? Math.min(num(n.quota_carburante), num(n.saldo_incassato)) : 0;
+                const saldoNol = n.saldo_incassato_il ? num(n.saldo_incassato) - carbIncassato : 0;
+                incassatoNol += cap + saldoNol;
+                carburante += carbIncassato;
+                litri += num(n.litri_carburante);
+                if (!n.saldo_incassato_il) daIncassare += Math.max(0, num(n.importo) - cap);
+            });
+            const media = confermati.length ? (totale / confermati.length).toFixed(0) : 0;
+            const fmt = v => '€' + (Math.round(v * 100) / 100).toLocaleString('it-IT');
+
+            // Caparre ricevute su noleggi poi annullati e non rimborsate: restano incassate
+            const trattenute = annullati.filter(n => n.caparra_ricevuta_il && !n.caparra_rimborsata).reduce((s, n) => s + num(n.caparra), 0);
+
+            setTxt('kpiFatturato', fmt(totale));
             setTxt('kpiNoleggi', confermati.length);
             setTxt('kpiCheckin', `${checkin} / ${confermati.length}`);
             setTxt('kpiMedio', `€${media}`);
+            setTxt('kpiIncassato', fmt(incassatoNol));
+            setTxt('kpiDaIncassare', fmt(daIncassare));
+            setTxt('kpiCarburante', fmt(carburante));
+            setTxt('kpiLitri', `${Math.round(litri * 10) / 10} litri registrati`);
+            setTxt('kpiTrattenute', fmt(trattenute));
             const rimb = annullati.filter(n => n.caparra_rimborsata).length;
             setTxt('kpiAnnullati', annullati.length ? `Annullati nel periodo: ${annullati.length} (caparra rimborsata in ${rimb})` : '');
+        }
+    </script>
+
+    <script>
+        // =============================================================================
+        // MODULO — PAGAMENTI E RIENTRO: caparra, saldo, carburante (solo tracciato)
+        // =============================================================================
+        const PREZZO_LITRO = 2.5;   // €/L usato per precompilare la quota carburante (modificabile a ogni rientro)
+
+        const arr2 = v => Math.round((Number(v) || 0) * 100) / 100;
+        const euro = v => '€' + arr2(v).toLocaleString('it-IT', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        const numOrNull = v => { const x = parseFloat(String(v == null ? '' : v).replace(',', '.')); return isNaN(x) ? null : x; };
+        const trovaNoleggio = id => listaNoleggi.find(x => String(x.id) === String(id));
+
+        function statoPagamento(n) {
+            if (n.saldo_incassato_il) return { k: 'saldato', label: '✓ Saldato', cls: 'bg-emerald-100 text-emerald-800' };
+            if (n.caparra_ricevuta_il) return { k: 'caparra', label: 'Caparra ricevuta', cls: 'bg-blue-100 text-blue-800' };
+            return { k: 'da_pagare', label: '💶 Da pagare', cls: 'bg-amber-100 text-amber-800' };
+        }
+
+        // Saldo dovuto = importo - caparra già ricevuta (se registrata) + quota carburante
+        function saldoDovuto(n, quota) {
+            const cap = n.caparra_ricevuta_il ? (Number(n.caparra) || 0) : 0;
+            return arr2(Math.max(0, (Number(n.importo) || 0) - cap) + (Number(quota) || 0));
+        }
+
+        // ---------- Elementi mostrati nelle schede dei noleggi ----------
+        function bottoniPagamento(n) {
+            const id = esc(n.id);
+            let h = '';
+            if (!n.caparra_ricevuta_il && !n.saldo_incassato_il) {
+                h += btnN('bg-emerald-600 hover:bg-emerald-700 text-white', `confermaCaparra('${id}')`, 'fa-hand-holding-dollar', 'Caparra ricevuta', 'Conferma di aver ricevuto la caparra');
+            }
+            h += n.saldo_incassato_il
+                ? btnN('bg-white border border-emerald-300 text-emerald-700 hover:bg-emerald-50', `apriRientro('${id}')`, 'fa-anchor', 'Rientro / incasso')
+                : btnN('bg-slate-800 hover:bg-slate-900 text-white', `apriRientro('${id}')`, 'fa-anchor', 'Rientro e saldo');
+            return h;
+        }
+
+        function infoPagamento(n) {
+            const p = [];
+            if (n.caparra_ricevuta_il) {
+                p.push(`Caparra ${esc(euro(n.caparra))} ricevuta il ${esc(formattaDataIT(n.caparra_ricevuta_il))}` +
+                    (n.saldo_incassato_il ? '' : ` <button type="button" onclick="annullaCaparra('${esc(n.id)}')" class="underline text-slate-400 hover:text-red-500">annulla</button>`));
+            }
+            if (n.saldo_incassato_il) p.push(`Saldo ${esc(euro(n.saldo_incassato))} incassato il ${esc(formattaDataIT(n.saldo_incassato_il))}`);
+            if (n.litri_carburante != null || n.quota_carburante != null) {
+                p.push(`⛽ ${n.litri_carburante != null ? esc(n.litri_carburante) + ' L' : ''}${n.quota_carburante != null ? ' · ' + esc(euro(n.quota_carburante)) : ''}`);
+            }
+            return p.length ? `<p class="text-[11px] text-slate-600 mt-2">${p.join(' · ')}</p>` : '';
+        }
+
+        function bottoniDettaglioPagamento(n) {
+            const id = esc(n.id);
+            let h = '';
+            if (!n.caparra_ricevuta_il && !n.saldo_incassato_il) h += `<button type="button" onclick="chiudiDettaglio(); confermaCaparra('${id}')" class="col-span-2 p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl"><i class="fa-solid fa-hand-holding-dollar"></i> Caparra ricevuta</button>`;
+            h += `<button type="button" onclick="chiudiDettaglio(); apriRientro('${id}')" class="col-span-2 p-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl"><i class="fa-solid fa-anchor"></i> ${n.saldo_incassato_il ? 'Rientro / incasso' : 'Rientro e saldo'}</button>`;
+            return h;
+        }
+
+        // ---------- Caparra ----------
+        async function confermaCaparra(id) {
+            const n = trovaNoleggio(id);
+            if (!n) return;
+            if (!confirm(`Confermi di aver ricevuto la caparra di ${euro(n.caparra)} da ${n.nome_cliente}?`)) return;
+            const { error } = await _supabase.from('noleggi').update({ caparra_ricevuta_il: dataLocaleISO() }).eq('id', id);
+            if (error) { alert('Errore: ' + error.message); return; }
+            await caricaNoleggi();
+        }
+
+        async function annullaCaparra(id) {
+            if (!confirm('Annullare la conferma di caparra ricevuta?')) return;
+            const { error } = await _supabase.from('noleggi').update({ caparra_ricevuta_il: null }).eq('id', id);
+            if (error) { alert('Errore: ' + error.message); return; }
+            await caricaNoleggi();
+        }
+
+        // ---------- Rientro e saldo ----------
+        let quotaManuale = false, incassatoManuale = false;
+
+        function setMsgRientro(tipo, testo) {
+            const box = E('rientro-msg');
+            if (!box) return;
+            if (!testo) { box.className = 'hidden'; box.innerText = ''; return; }
+            box.className = 'text-[11px] font-semibold rounded-lg p-2.5 border ' + (tipo === 'ok' ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-red-50 border-red-300 text-red-800');
+            box.innerText = testo;
+        }
+
+        function apriRientro(id) {
+            const n = trovaNoleggio(id);
+            if (!n) return;
+            setV('rientro_id', n.id);
+            setTxt('rientro-info', `${n.nome_cliente} · ${n.barca || ''} · ${formattaDataIT(n.data_noleggio)}`);
+            setTxt('rientro-prezzo-litro', PREZZO_LITRO.toFixed(2).replace('.', ','));
+            setV('rientro_litri', n.litri_carburante);
+            setV('rientro_quota', n.quota_carburante);
+            quotaManuale = n.quota_carburante != null && (n.litri_carburante == null || Math.abs(Number(n.quota_carburante) - arr2(n.litri_carburante * PREZZO_LITRO)) > 0.005);
+            incassatoManuale = !!n.saldo_incassato_il;
+            setV('rientro_incassato', n.saldo_incassato_il ? n.saldo_incassato : saldoDovuto(n, n.quota_carburante));
+            setMsgRientro(null);
+            rientroAggiorna();
+            E('rientro-modal').style.display = 'flex';
+        }
+
+        function chiudiRientro() { E('rientro-modal').style.display = 'none'; }
+
+        function rientroLitriCambiati() {
+            const l = numOrNull(val('rientro_litri'));
+            if (!quotaManuale) setV('rientro_quota', l == null ? '' : arr2(l * PREZZO_LITRO));
+            rientroAggiorna();
+        }
+        function rientroQuotaCambiata() { quotaManuale = true; rientroAggiorna(); }
+        function incassatoModificatoManualmente() { incassatoManuale = true; }
+
+        function rientroAggiorna() {
+            const n = trovaNoleggio(val('rientro_id'));
+            if (!n) return;
+            const quota = numOrNull(val('rientro_quota')) || 0;
+            const dovuto = saldoDovuto(n, quota);
+            if (!incassatoManuale) setV('rientro_incassato', dovuto);
+
+            const saldato = !!n.saldo_incassato_il;
+            const riga = (k, v, forte) => `<div class="flex justify-between gap-3 ${forte ? 'border-t border-slate-300 pt-1 mt-1 text-sm' : ''}"><span class="text-slate-500">${k}</span><b class="${forte ? 'text-emerald-700' : 'text-slate-800'} text-right">${v}</b></div>`;
+            E('rientro-riepilogo').innerHTML =
+                riga('Importo noleggio', esc(euro(n.importo))) +
+                riga('Caparra', n.caparra_ricevuta_il ? `${esc(euro(n.caparra))} <span class="font-normal text-emerald-700">(ricevuta il ${esc(formattaDataIT(n.caparra_ricevuta_il))})</span>` : `${esc(euro(n.caparra))} <span class="font-normal text-amber-600">non registrata</span>`) +
+                riga('Residuo noleggio', esc(euro(Math.max(0, (Number(n.importo) || 0) - (n.caparra_ricevuta_il ? (Number(n.caparra) || 0) : 0))))) +
+                riga('Carburante', esc(euro(quota))) +
+                riga('Saldo da incassare', esc(euro(dovuto)), true) +
+                (n.caparra_ricevuta_il || saldato ? '' : `<button type="button" onclick="caparraDaRientro('${esc(n.id)}')" class="mt-2 w-full p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold">Ho già ricevuto la caparra: registrala</button>`) +
+                (saldato ? `<p class="text-emerald-700 font-semibold pt-1">✓ Saldo incassato il ${esc(formattaDataIT(n.saldo_incassato_il))}: ${esc(euro(n.saldo_incassato))}</p>` : '');
+
+            E('rientro-azioni').innerHTML = saldato
+                ? `<button type="button" onclick="salvaRientro(true)" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow">Aggiorna carburante e incasso</button>
+                   <button type="button" onclick="annullaIncassoSaldo()" class="p-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-xl">Annulla incasso del saldo</button>`
+                : `<button type="button" onclick="salvaRientro(true)" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow"><i class="fa-solid fa-circle-check"></i> Conferma incasso saldo</button>
+                   <button type="button" onclick="salvaRientro(false)" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl">Salva solo il carburante (incasso dopo)</button>`;
+        }
+
+        async function caparraDaRientro(id) {
+            const n = trovaNoleggio(id);
+            if (!n) return;
+            if (!confirm(`Registrare la caparra di ${euro(n.caparra)} come ricevuta oggi?`)) return;
+            const { error } = await _supabase.from('noleggi').update({ caparra_ricevuta_il: dataLocaleISO() }).eq('id', id);
+            if (error) { setMsgRientro('err', error.message); return; }
+            await caricaNoleggi();
+            apriRientro(id);
+        }
+
+        async function salvaRientro(conIncasso) {
+            const id = val('rientro_id');
+            const n = trovaNoleggio(id);
+            if (!n) return;
+            const litri = numOrNull(val('rientro_litri')), quota = numOrNull(val('rientro_quota'));
+            if ((litri != null && litri < 0) || (quota != null && quota < 0)) { setMsgRientro('err', 'I valori non possono essere negativi.'); return; }
+
+            const d = { litri_carburante: litri, quota_carburante: quota == null ? null : arr2(quota) };
+            if (conIncasso) {
+                const inc = numOrNull(val('rientro_incassato'));
+                if (inc == null || inc < 0) { setMsgRientro('err', "Inserisci l'importo incassato al saldo."); return; }
+                d.saldo_incassato = arr2(inc);
+                d.saldo_incassato_il = n.saldo_incassato_il || dataLocaleISO();
+            }
+            const { error } = await _supabase.from('noleggi').update(d).eq('id', id);
+            if (error) { setMsgRientro('err', error.message); return; }
+            chiudiRientro();
+            await caricaNoleggi();
+        }
+
+        async function annullaIncassoSaldo() {
+            if (!confirm('Annullare l\'incasso del saldo? Il noleggio tornerà "da saldare" (il carburante registrato resta).')) return;
+            const { error } = await _supabase.from('noleggi').update({ saldo_incassato: null, saldo_incassato_il: null }).eq('id', val('rientro_id'));
+            if (error) { setMsgRientro('err', error.message); return; }
+            chiudiRientro();
+            await caricaNoleggi();
         }
     </script>
 
@@ -1634,6 +1901,7 @@
                     ${riga('Uscita', esc(etichettaSlot(n.tipo_uscita)) + (rientro ? ' · rientro ' + esc(rientro) : ''))}
                     ${riga('Importo / Caparra', '€' + esc(n.importo) + ' / €' + esc(n.caparra))}
                     ${riga('Web check-in', n.stato_checkin === 'completato' ? '✓ completato' : '⌛ in attesa')}
+                    ${riga('Pagamento', (typeof statoPagamento === 'function') ? esc(statoPagamento(n).label) : '—')}
                     ${riga('Telefono', esc(tel))}
                 </div>
                 <div class="grid grid-cols-2 gap-2 font-bold text-[11px]">
@@ -1641,6 +1909,7 @@
                     <a href="https://wa.me/${telWa}?text=${encodeURIComponent(messaggioPrenotazione(n))}" target="_blank" class="p-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-center"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
                     <button type="button" onclick="chiudiDettaglio(); selezionaTab('noleggi'); modificaNoleggio('${esc(n.id)}')" class="p-2.5 bg-white border border-cyan-300 text-cyan-700 hover:bg-cyan-50 rounded-xl"><i class="fa-solid fa-pen"></i> Modifica</button>
                     <button type="button" onclick="chiudiDettaglio(); apriAnnulla('${esc(n.id)}')" class="p-2.5 bg-white border border-amber-300 text-amber-700 hover:bg-amber-50 rounded-xl"><i class="fa-solid fa-ban"></i> Annulla</button>
+                    ${(typeof bottoniDettaglioPagamento === 'function') ? bottoniDettaglioPagamento(n) : ''}
                 </div>`;
             E('dett-modal').style.display = 'flex';
         }
