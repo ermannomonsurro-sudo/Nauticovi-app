@@ -188,6 +188,42 @@
                 </div>
             </div>
 
+            <!-- ============ SCHEDA: CALENDARIO ============ -->
+            <div id="pane-calendario" class="tab-pane hidden space-y-4">
+                <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-3 space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <div id="cal-vista-switch" class="flex rounded-xl overflow-hidden border border-slate-300 text-xs font-bold"></div>
+                        <div class="flex items-center gap-2">
+                            <input type="date" id="cal_vai" onchange="calVaiA(this.value)" class="p-1.5 border rounded-lg text-xs w-[8.5rem]" title="Vai a una data">
+                            <button type="button" onclick="calOggi()" class="bg-slate-900 text-cyan-300 text-xs font-bold px-3 py-2 rounded-lg shadow">Oggi</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <button type="button" onclick="calSposta(-1)" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700"><i class="fa-solid fa-chevron-left"></i></button>
+                        <b id="cal-titolo" class="text-sm text-slate-800 text-center"></b>
+                        <button type="button" onclick="calSposta(1)" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <div id="cal-barca-box" class="hidden">
+                        <select id="cal_barca_mese" onchange="calCambiaBarca(this.value)" class="w-full p-2 border rounded-lg bg-white font-bold text-xs text-slate-700 outline-none"></select>
+                    </div>
+                    <p id="cal-riepilogo" class="text-[11px] text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-2"></p>
+                </div>
+
+                <div id="cal-contenuto"></div>
+
+                <div class="bg-white rounded-2xl shadow border border-slate-200 p-3 text-[10px] text-slate-600 space-y-1.5">
+                    <div class="flex flex-wrap gap-x-4 gap-y-1.5 items-center">
+                        <span class="flex items-center gap-1"><i class="w-3 h-3 rounded bg-cyan-600 inline-block"></i> Intera</span>
+                        <span class="flex items-center gap-1"><i class="w-3 h-3 rounded bg-amber-400 inline-block"></i> Mezza mattina</span>
+                        <span class="flex items-center gap-1"><i class="w-3 h-3 rounded bg-indigo-500 inline-block"></i> Mezza pomeriggio</span>
+                        <span class="flex items-center gap-1"><i class="w-3 h-3 rounded bg-red-200 border border-red-300 inline-block"></i> Fuori servizio</span>
+                        <span class="flex items-center gap-1"><i class="w-3 h-3 rounded bg-emerald-50 border border-dashed border-emerald-400 inline-block"></i> Libero (tocca per prenotare)</span>
+                    </div>
+                    <p>Nelle viste settimana e mese la metà alta di ogni giorno è la mattina, quella bassa il pomeriggio.</p>
+                    <p id="cal-nota" class="text-amber-700 font-semibold"></p>
+                </div>
+            </div>
+
             <!-- ============ SCHEDA: FLOTTA ============ -->
             <div id="pane-flotta" class="tab-pane hidden space-y-5">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -427,6 +463,11 @@
         <div id="tabs-mobile" class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900 border-t border-cyan-500/30 flex" style="padding-bottom: env(safe-area-inset-bottom, 0px);"></div>
     </div>
 
+    <!-- MODALE DETTAGLIO NOLEGGIO (dal calendario) -->
+    <div id="dett-modal" style="display:none" class="fixed inset-0 bg-slate-900/80 z-[90] items-end sm:items-center justify-center p-3" onclick="if (event.target === this) chiudiDettaglio()">
+        <div id="dett-body" class="bg-white rounded-2xl p-5 w-full max-w-sm space-y-3 text-xs shadow-2xl"></div>
+    </div>
+
     <!-- MODALE ANNULLAMENTO NOLEGGIO -->
     <div id="annulla-modal" style="display:none" class="fixed inset-0 bg-slate-900/80 z-[90] items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-5 w-full max-w-sm space-y-3 shadow-2xl text-xs">
@@ -526,6 +567,7 @@
         // ---------- Schede (barra in basso su telefono, in alto su PC) ----------
         const TABS = [
             { k: 'noleggi',   label: 'Noleggi',   ico: 'fa-ship' },
+            { k: 'calendario', label: 'Calendario', ico: 'fa-calendar-days' },
             { k: 'flotta',    label: 'Flotta',    ico: 'fa-anchor' },
             { k: 'dashboard', label: 'Dashboard', ico: 'fa-chart-line' },
             { k: 'cms',       label: 'CMS',       ico: 'fa-layer-group' }
@@ -549,6 +591,7 @@
             tabCorrente = k;
             document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('hidden', p.id !== 'pane-' + k));
             renderTabs();
+            if (k === 'calendario' && typeof renderCalendario === 'function') renderCalendario();
         }
 
         // ---------- Dati condivisi: flotta (dal CMS) e periodi fuori servizio ----------
@@ -576,6 +619,7 @@
             if (typeof aggiornaMenuBarche === 'function') aggiornaMenuBarche();
             if (typeof renderFlotta === 'function') renderFlotta();
             if (typeof renderNoleggi === 'function') renderNoleggi();
+            if (typeof renderCalendario === 'function') renderCalendario();
         }
 
         const barcaPerId = id => FLOTTA.find(b => String(b.id) === String(id));
@@ -979,6 +1023,7 @@
                 }
                 listaNoleggi = data || [];
                 renderNoleggi();
+                if (typeof renderCalendario === 'function') renderCalendario();
                 if (typeof aggiornaDashboardKPI === 'function') aggiornaDashboardKPI();
             } catch (err) {
                 console.error('Errore di rete:', err);
@@ -1483,6 +1528,276 @@
             const rimb = annullati.filter(n => n.caparra_rimborsata).length;
             setTxt('kpiAnnullati', annullati.length ? `Annullati nel periodo: ${annullati.length} (caparra rimborsata in ${rimb})` : '');
         }
+    </script>
+
+    <script>
+        // =============================================================================
+        // MODULO — CALENDARIO: disponibilità per scafo (giorno, settimana, mese)
+        // =============================================================================
+        let calVista = 'giorno', calData = dataLocaleISO(), calBarcaMese = '';
+
+        const GIORNI_BREVI = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
+        const GIORNI_LUNGHI = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
+        const MESI_IT = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+        const SLOT_OCCUPATI = { intera: ['M', 'P'], mezza_mattina: ['M'], mezza_pomeriggio: ['P'] };
+        const COL_TIPO = { intera: 'bg-cyan-600 text-white', mezza_mattina: 'bg-amber-400 text-slate-900', mezza_pomeriggio: 'bg-indigo-500 text-white' };
+        const BG_TIPO = { intera: 'bg-cyan-600', mezza_mattina: 'bg-amber-400', mezza_pomeriggio: 'bg-indigo-500' };
+
+        // ---------- Date ----------
+        const isoToDate = iso => { const [y, m, d] = String(iso).split('-').map(Number); return new Date(y, m - 1, d); };
+        function aggiungiGiorni(iso, n) { const d = isoToDate(iso); d.setDate(d.getDate() + n); return dataLocaleISO(d); }
+        function lunediDi(iso) { const d = isoToDate(iso); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return dataLocaleISO(d); }
+        function giorniDelMese(iso) { const d = isoToDate(iso); return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); }
+
+        // ---------- Dati: indice noleggi confermati per barca e giorno ----------
+        function indicizzaNoleggi() {
+            const idx = new Map();
+            listaNoleggi.forEach(n => {
+                if (n.stato_noleggio === 'annullato' || !n.barca_id || !n.tipo_uscita) return;
+                const k = n.barca_id + '|' + n.data_noleggio;
+                if (!idx.has(k)) idx.set(k, []);
+                idx.get(k).push(n);
+            });
+            return idx;
+        }
+
+        function statoCella(idx, barcaId, iso) {
+            const lista = idx.get(barcaId + '|' + iso) || [];
+            return {
+                fs: periodoFuoriServizio(barcaId, iso),
+                M: lista.find(n => SLOT_OCCUPATI[n.tipo_uscita].includes('M')) || null,
+                P: lista.find(n => SLOT_OCCUPATI[n.tipo_uscita].includes('P')) || null
+            };
+        }
+
+        function calcolaOccupazione(barche, idx, da, a) {
+            let occ = 0, disp = 0;
+            for (let iso = da; iso <= a; iso = aggiungiGiorni(iso, 1)) {
+                barche.forEach(b => {
+                    const st = statoCella(idx, b.id, iso);
+                    if (st.fs) return;
+                    disp += 2;
+                    if (st.M) occ++;
+                    if (st.P) occ++;
+                });
+            }
+            return { occ, disp, pct: disp ? Math.round(occ * 100 / disp) : 0 };
+        }
+
+        const primoNomeCal = n => String(n.nome_cliente || '').trim().split(' ')[0];
+
+        // ---------- Navigazione ----------
+        function calImpostaVista(v) { calVista = v; renderCalendario(); }
+        function calOggi() { calData = dataLocaleISO(); renderCalendario(); }
+        function calVaiA(iso) { if (!iso) return; calData = iso; renderCalendario(); }
+        function calVaiAGiorno(iso) { calData = iso; calVista = 'giorno'; renderCalendario(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function calCambiaBarca(id) { calBarcaMese = id; renderCalendario(); }
+        function calSposta(dir) {
+            if (calVista === 'giorno') calData = aggiungiGiorni(calData, dir);
+            else if (calVista === 'settimana') calData = aggiungiGiorni(calData, 7 * dir);
+            else { const d = isoToDate(calData); calData = dataLocaleISO(new Date(d.getFullYear(), d.getMonth() + dir, 1)); }
+            renderCalendario();
+        }
+
+        // ---------- Azioni dal calendario ----------
+        function nuovoNoleggioDa(barcaId, iso, slot) {
+            selezionaTab('noleggi');
+            resetFormNoleggio();
+            apriFormNoleggio();
+            const tipo = slot === 'P' ? 'mezza_pomeriggio' : (slot === 'M' ? 'mezza_mattina' : 'intera');
+            setV('barca', barcaId);
+            setV('data_noleggio', iso);
+            setV('tipo_uscita', tipo);
+            setV('ora_rientro', PRESET_RIENTRO[tipo] || '18:00');
+            onSelezioneNoleggio();
+            E('box-form-noleggio').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (E('nome')) E('nome').focus({ preventScroll: true });
+        }
+
+        function chiudiDettaglio() { E('dett-modal').style.display = 'none'; }
+
+        function apriDettaglioNoleggio(id) {
+            const n = listaNoleggi.find(x => String(x.id) === String(id));
+            if (!n) return;
+            const rientro = n.ora_rientro ? String(n.ora_rientro).slice(0, 5) : '';
+            const tel = String(n.telefono || '');
+            const telWa = tel.replace(/\D/g, '');
+            const riga = (k, v) => `<div class="flex justify-between gap-3 border-b border-slate-100 py-1"><span class="text-slate-500">${k}</span><b class="text-slate-800 text-right">${v}</b></div>`;
+            E('dett-body').innerHTML = `
+                <div class="flex justify-between items-start gap-2">
+                    <h3 class="font-extrabold text-base text-slate-900">${esc(n.nome_cliente)}</h3>
+                    <button type="button" onclick="chiudiDettaglio()" class="text-slate-400 hover:text-slate-700 p-1"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div>
+                    ${riga('Barca', esc(n.barca))}
+                    ${riga('Data', esc(formattaDataIT(n.data_noleggio)))}
+                    ${riga('Uscita', esc(etichettaSlot(n.tipo_uscita)) + (rientro ? ' · rientro ' + esc(rientro) : ''))}
+                    ${riga('Importo / Caparra', '€' + esc(n.importo) + ' / €' + esc(n.caparra))}
+                    ${riga('Web check-in', n.stato_checkin === 'completato' ? '✓ completato' : '⌛ in attesa')}
+                    ${riga('Telefono', esc(tel))}
+                </div>
+                <div class="grid grid-cols-2 gap-2 font-bold text-[11px]">
+                    <a href="tel:${esc(tel)}" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-center"><i class="fa-solid fa-phone"></i> Chiama</a>
+                    <a href="https://wa.me/${telWa}?text=${encodeURIComponent(messaggioPrenotazione(n))}" target="_blank" class="p-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-center"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+                    <button type="button" onclick="chiudiDettaglio(); selezionaTab('noleggi'); modificaNoleggio('${esc(n.id)}')" class="p-2.5 bg-white border border-cyan-300 text-cyan-700 hover:bg-cyan-50 rounded-xl"><i class="fa-solid fa-pen"></i> Modifica</button>
+                    <button type="button" onclick="chiudiDettaglio(); apriAnnulla('${esc(n.id)}')" class="p-2.5 bg-white border border-amber-300 text-amber-700 hover:bg-amber-50 rounded-xl"><i class="fa-solid fa-ban"></i> Annulla</button>
+                </div>`;
+            E('dett-modal').style.display = 'flex';
+        }
+
+        // ---------- Rendering ----------
+        function renderCalendario() {
+            const box = E('cal-contenuto');
+            if (!box || tabCorrente !== 'calendario') return;
+
+            const barche = FLOTTA.filter(b => !b.ritirata);
+            const idx = indicizzaNoleggi();
+            const largo = window.matchMedia('(min-width: 1024px)').matches;
+            const meseSingolo = calVista === 'mese' && !largo;
+
+            // selettore vista
+            E('cal-vista-switch').innerHTML = [['giorno', 'Giorno'], ['settimana', 'Settimana'], ['mese', 'Mese']].map(([k, l]) =>
+                `<button type="button" onclick="calImpostaVista('${k}')" class="px-3 py-2 ${calVista === k ? 'bg-slate-900 text-cyan-300' : 'bg-white text-slate-600 hover:bg-slate-50'}">${l}</button>`).join('');
+            setV('cal_vai', calData);
+
+            // titolo e intervallo
+            const d = isoToDate(calData);
+            let titolo, da, a;
+            if (calVista === 'giorno') {
+                titolo = `${GIORNI_LUNGHI[d.getDay()]} ${d.getDate()} ${MESI_IT[d.getMonth()]} ${d.getFullYear()}`;
+                da = a = calData;
+            } else if (calVista === 'settimana') {
+                da = lunediDi(calData); a = aggiungiGiorni(da, 6);
+                const d1 = isoToDate(da), d2 = isoToDate(a);
+                titolo = `${d1.getDate()} ${MESI_IT[d1.getMonth()].slice(0, 3)} – ${d2.getDate()} ${MESI_IT[d2.getMonth()].slice(0, 3)} ${d2.getFullYear()}`;
+            } else {
+                da = calData.slice(0, 7) + '-01';
+                a = calData.slice(0, 7) + '-' + String(giorniDelMese(da)).padStart(2, '0');
+                titolo = `${MESI_IT[d.getMonth()]} ${d.getFullYear()}`;
+            }
+            setTxt('cal-titolo', titolo);
+
+            // selettore barca (solo mese su telefono)
+            show('cal-barca-box', meseSingolo && barche.length > 0);
+            if (!barche.some(b => String(b.id) === String(calBarcaMese))) calBarcaMese = barche[0] ? barche[0].id : '';
+            E('cal_barca_mese').innerHTML = barche.map(b => `<option value="${esc(b.id)}" ${String(b.id) === String(calBarcaMese) ? 'selected' : ''}>${esc(b.titolo)}</option>`).join('');
+
+            if (!barche.length) {
+                box.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-8">Nessuna barca in flotta. Caricale dal CMS › Catalogo Flotta.</p>';
+                setTxt('cal-riepilogo', '');
+                setTxt('cal-nota', '');
+                return;
+            }
+
+            // riepilogo
+            const perOcc = meseSingolo ? barche.filter(b => String(b.id) === String(calBarcaMese)) : barche;
+            const o = calcolaOccupazione(perOcc, idx, da, a);
+            let riep = `Occupazione: <b>${o.occ}/${o.disp}</b> slot (${o.pct}%)`;
+            if (calVista === 'giorno') {
+                const uscite = new Set();
+                barche.forEach(b => { const st = statoCella(idx, b.id, calData); if (st.M) uscite.add(st.M.id); if (st.P) uscite.add(st.P.id); });
+                const fs = barche.filter(b => periodoFuoriServizio(b.id, calData)).length;
+                riep = `Uscite: <b>${uscite.size}</b> · ` + riep + (fs ? ` · Fuori servizio: <b>${fs}</b>` : '');
+            }
+            E('cal-riepilogo').innerHTML = riep;
+
+            // nota sui noleggi di test senza barca
+            const senza = listaNoleggi.filter(n => n.stato_noleggio !== 'annullato' && (!n.barca_id || !n.tipo_uscita)).length;
+            setTxt('cal-nota', senza ? `${senza} noleggi senza barca/slot (dati di test) non compaiono nel calendario.` : '');
+
+            if (calVista === 'giorno') box.innerHTML = vistaGiorno(barche, idx);
+            else if (calVista === 'settimana') box.innerHTML = vistaSettimana(barche, idx, da);
+            else box.innerHTML = largo ? vistaMeseMatrice(barche, idx, da) : vistaMeseBarca(barche, idx, da);
+        }
+
+        function badgeCat(b) {
+            const t = { gommone: 'Gommone', scafo: 'Scafo', lancia: 'Lancia' }[b.tipo_barca];
+            return t ? `<span class="bg-cyan-100 text-cyan-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">${t}</span>` : '';
+        }
+
+        function vistaGiorno(barche, idx) {
+            const iso = calData;
+            return '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">' + barche.map(b => {
+                const st = statoCella(idx, b.id, iso);
+                let corpo;
+                if (st.fs) {
+                    corpo = `<div class="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold">⛔ Fuori servizio${st.fs.motivo ? ': ' + esc(st.fs.motivo) : ''}<span class="block font-normal mt-0.5">dal ${esc(formattaDataIT(st.fs.dal))}${st.fs.al ? ' al ' + esc(formattaDataIT(st.fs.al)) : ' (in corso)'}</span></div>`;
+                } else {
+                    const occ = n => {
+                        const rientro = n.ora_rientro ? ' · ↩ ' + String(n.ora_rientro).slice(0, 5) : '';
+                        return `<button type="button" onclick="apriDettaglioNoleggio('${esc(n.id)}')" class="w-full text-left rounded-xl p-3 shadow ${COL_TIPO[n.tipo_uscita]}"><b class="block text-sm truncate">${esc(n.nome_cliente)}</b><span class="text-[11px] opacity-90">${esc(etichettaSlot(n.tipo_uscita))}${esc(rientro)}</span><span class="block text-[11px] mt-0.5">${n.stato_checkin === 'completato' ? '✓' : '⌛'} check-in · €${esc(n.importo)}</span></button>`;
+                    };
+                    const libero = (slot, label) => `<button type="button" onclick="nuovoNoleggioDa('${esc(b.id)}','${iso}','${slot}')" class="w-full rounded-xl p-3 border border-dashed border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold text-center">＋ ${label}<span class="block font-normal">libera</span></button>`;
+                    corpo = (st.M && st.P && st.M.id === st.P.id)
+                        ? occ(st.M)
+                        : `<div class="grid grid-cols-2 gap-2">${st.M ? occ(st.M) : libero('M', 'Mattina')}${st.P ? occ(st.P) : libero('P', 'Pomeriggio')}</div>`;
+                }
+                return `<div class="bg-white rounded-2xl shadow border border-slate-200 p-3 space-y-2"><div class="flex justify-between items-center gap-2"><b class="text-slate-900 text-sm">${esc(b.titolo)}</b>${badgeCat(b)}</div>${corpo}</div>`;
+            }).join('') + '</div>';
+        }
+
+        function cellaSettimana(b, iso, st) {
+            const passato = iso < dataLocaleISO();
+            if (st.fs) return `<div class="h-[50px] rounded bg-red-100 text-red-700 border border-red-300 flex items-center justify-center text-xs" title="Fuori servizio${st.fs.motivo ? ': ' + esc(st.fs.motivo) : ''}">⛔</div>`;
+            const occ = (n, extra) => `<button type="button" onclick="apriDettaglioNoleggio('${esc(n.id)}')" class="block w-full ${extra} rounded px-1 text-left truncate font-bold text-[10px] ${COL_TIPO[n.tipo_uscita]}" title="${esc(n.nome_cliente)} · ${esc(etichettaSlot(n.tipo_uscita))}">${esc(primoNomeCal(n))}</button>`;
+            const libero = slot => `<button type="button" onclick="nuovoNoleggioDa('${esc(b.id)}','${iso}','${slot}')" class="block w-full h-6 rounded border border-dashed border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-[10px] ${passato ? 'opacity-50' : ''}">+</button>`;
+            if (st.M && st.P && st.M.id === st.P.id) return occ(st.M, 'h-[50px] pt-1');
+            return `<div class="flex flex-col gap-0.5">${st.M ? occ(st.M, 'h-6 leading-6') : libero('M')}${st.P ? occ(st.P, 'h-6 leading-6') : libero('P')}</div>`;
+        }
+
+        function vistaSettimana(barche, idx, lun) {
+            const oggi = dataLocaleISO();
+            const giorni = Array.from({ length: 7 }, (_, i) => aggiungiGiorni(lun, i));
+            const th = giorni.map(iso => {
+                const d = isoToDate(iso), on = iso === oggi;
+                return `<th class="px-0.5 py-1 min-w-[68px]"><button type="button" onclick="calVaiAGiorno('${iso}')" class="w-full rounded-lg py-1 font-bold text-[10px] ${on ? 'bg-cyan-600 text-white' : 'bg-slate-100 text-slate-700'}">${GIORNI_BREVI[d.getDay()]}<br>${d.getDate()}</button></th>`;
+            }).join('');
+            const righe = barche.map(b => `<tr><td class="sticky left-0 z-10 bg-white px-2 py-1 border-t border-slate-100 font-bold text-slate-800 text-[11px] align-middle min-w-[84px]">${esc(b.titolo)}</td>${giorni.map(iso => `<td class="px-0.5 py-1 border-t border-slate-100 align-top">${cellaSettimana(b, iso, statoCella(idx, b.id, iso))}</td>`).join('')}</tr>`).join('');
+            return `<div class="bg-white rounded-2xl shadow border border-slate-200 overflow-x-auto"><table class="w-full border-separate border-spacing-0 text-xs"><thead><tr><th class="sticky left-0 z-10 bg-white text-left px-2 py-1 text-[10px] text-slate-500 uppercase">Barca</th>${th}</tr></thead><tbody>${righe}</tbody></table></div>`;
+        }
+
+        // Due barrette (mattina sopra, pomeriggio sotto) per un giorno
+        function barretteGiorno(st) {
+            const cl = (n) => st.fs ? 'bg-red-300' : (n ? BG_TIPO[n.tipo_uscita] : 'bg-emerald-100');
+            return `<div class="flex flex-col gap-px"><div class="h-2.5 rounded-sm ${cl(st.M)}"></div><div class="h-2.5 rounded-sm ${cl(st.P)}"></div></div>`;
+        }
+
+        function titoloCella(b, iso, st) {
+            if (st.fs) return `${b.titolo} · ${formattaDataIT(iso)}: fuori servizio${st.fs.motivo ? ' (' + st.fs.motivo + ')' : ''}`;
+            const p = [];
+            if (st.M) p.push('mattina: ' + st.M.nome_cliente);
+            if (st.P && (!st.M || st.P.id !== st.M.id)) p.push('pomeriggio: ' + st.P.nome_cliente);
+            return `${b.titolo} · ${formattaDataIT(iso)}` + (p.length ? ' · ' + p.join(', ') : ' · libera');
+        }
+
+        function vistaMeseMatrice(barche, idx, primo) {
+            const n = giorniDelMese(primo), oggi = dataLocaleISO();
+            const giorni = Array.from({ length: n }, (_, i) => aggiungiGiorni(primo, i));
+            const th = giorni.map(iso => {
+                const d = isoToDate(iso), on = iso === oggi;
+                return `<th class="px-px py-1 min-w-[26px]"><button type="button" onclick="calVaiAGiorno('${iso}')" class="w-full rounded py-0.5 text-[9px] font-bold ${on ? 'bg-cyan-600 text-white' : (d.getDay() === 0 || d.getDay() === 6 ? 'bg-slate-200 text-slate-600' : 'bg-slate-100 text-slate-700')}">${GIORNI_BREVI[d.getDay()].charAt(0)}<br>${d.getDate()}</button></th>`;
+            }).join('');
+            const righe = barche.map(b => `<tr><td class="sticky left-0 z-10 bg-white px-2 py-1 border-t border-slate-100 font-bold text-slate-800 text-[11px] whitespace-nowrap">${esc(b.titolo)}</td>${giorni.map(iso => {
+                const st = statoCella(idx, b.id, iso);
+                return `<td class="px-px py-1 border-t border-slate-100"><button type="button" onclick="calVaiAGiorno('${iso}')" title="${esc(titoloCella(b, iso, st))}" class="block w-full">${barretteGiorno(st)}</button></td>`;
+            }).join('')}</tr>`).join('');
+            return `<div class="bg-white rounded-2xl shadow border border-slate-200 overflow-x-auto"><table class="w-full border-separate border-spacing-0"><thead><tr><th class="sticky left-0 z-10 bg-white text-left px-2 py-1 text-[10px] text-slate-500 uppercase">Barca</th>${th}</tr></thead><tbody>${righe}</tbody></table></div>`;
+        }
+
+        function vistaMeseBarca(barche, idx, primo) {
+            const b = barche.find(x => String(x.id) === String(calBarcaMese)) || barche[0];
+            const oggi = dataLocaleISO(), n = giorniDelMese(primo);
+            const vuote = (isoToDate(primo).getDay() + 6) % 7;
+            let celle = '<div></div>'.repeat(vuote);
+            for (let i = 0; i < n; i++) {
+                const iso = aggiungiGiorni(primo, i), st = statoCella(idx, b.id, iso);
+                celle += `<button type="button" onclick="calVaiAGiorno('${iso}')" title="${esc(titoloCella(b, iso, st))}" class="rounded-lg border bg-white p-1 ${iso === oggi ? 'ring-2 ring-cyan-500' : 'border-slate-200'}"><span class="block text-[11px] font-bold text-slate-700 text-left mb-0.5">${i + 1}</span>${barretteGiorno(st)}</button>`;
+            }
+            const intest = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'].map(g => `<div class="text-center text-[10px] font-bold text-slate-500 uppercase">${g}</div>`).join('');
+            return `<div class="bg-white rounded-2xl shadow border border-slate-200 p-3 space-y-2"><div class="grid grid-cols-7 gap-1">${intest}</div><div class="grid grid-cols-7 gap-1">${celle}</div><p class="text-[10px] text-slate-500">Tocca un giorno per vedere il dettaglio.</p></div>`;
+        }
+
+        window.addEventListener('resize', () => { if (tabCorrente === 'calendario' && calVista === 'mese') renderCalendario(); });
     </script>
 
     <script>
