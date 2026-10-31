@@ -175,6 +175,10 @@
                                     <option value="oggi">Oggi</option>
                                     <option value="mese">Mese corrente</option>
                                     <option value="annullati">Annullati</option>
+                                    <option value="checkin_mancante">Check-in mancanti</option>
+                                    <option value="caparra_da_ricevere">Caparre da ricevere</option>
+                                    <option value="saldo_da_incassare">Saldi da incassare</option>
+                                    <option value="da_fatturare">Da fatturare</option>
                                 </select>
                                 <button type="button" onclick="esportaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold shadow flex items-center gap-1.5 whitespace-nowrap">
                                     <i class="fa-solid fa-file-excel"></i> CSV
@@ -266,86 +270,30 @@
             </div>
 
             <!-- ============ SCHEDA: DASHBOARD ============ -->
-            <div id="pane-dashboard" class="tab-pane hidden space-y-5">
-                <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-3">
-                        <div>
-                            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                <i class="fa-solid fa-chart-line text-cyan-600"></i> Dashboard Risultati
-                            </h2>
-                            <p class="text-xs text-slate-500">I noleggi annullati non entrano nei conteggi. "Incassato" e "Da incassare" si basano sulle tue conferme di caparra e saldo.</p>
-                        </div>
-                        <select id="filtroPeriodo" onchange="aggiornaDashboardKPI()" class="p-2 border rounded-lg bg-slate-50 font-bold text-xs text-slate-700 outline-none">
-                            <option value="tutto">Tutti i Noleggi</option>
-                            <option value="oggi">Oggi</option>
-                            <option value="mese">Mese Corrente</option>
+            <div id="pane-dashboard" class="tab-pane hidden space-y-4">
+                <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-3 space-y-2">
+                    <div class="flex flex-wrap items-center gap-2 text-xs">
+                        <select id="dash_periodo" onchange="dashCambiaPeriodo()" class="p-2 border rounded-lg bg-slate-50 font-bold text-slate-700 outline-none">
+                            <option value="stagione">Stagione</option>
+                            <option value="anno">Anno intero</option>
+                            <option value="mese">Un mese</option>
+                            <option value="tutto">Tutto lo storico</option>
+                            <option value="custom">Periodo a scelta</option>
                         </select>
+                        <select id="dash_anno" onchange="dashCambiaPeriodo()" class="p-2 border rounded-lg bg-slate-50 font-bold text-slate-700 outline-none"></select>
+                        <select id="dash_mese" onchange="dashCambiaPeriodo()" class="hidden p-2 border rounded-lg bg-slate-50 font-bold text-slate-700 outline-none"></select>
+                        <span id="dash-stagione-box" class="flex items-center gap-1.5 font-bold text-slate-600">
+                            da <select id="dash_m1" onchange="dashCambiaPeriodo()" class="p-2 border rounded-lg bg-slate-50 outline-none"></select>
+                            a <select id="dash_m2" onchange="dashCambiaPeriodo()" class="p-2 border rounded-lg bg-slate-50 outline-none"></select>
+                        </span>
+                        <span id="dash-custom-box" class="hidden flex items-center gap-1.5 font-bold text-slate-600">
+                            dal <input type="date" id="dash_da" onchange="dashCambiaPeriodo()" class="p-1.5 border rounded-lg bg-slate-50 outline-none">
+                            al <input type="date" id="dash_a" onchange="dashCambiaPeriodo()" class="p-1.5 border rounded-lg bg-slate-50 outline-none">
+                        </span>
                     </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-cyan-500 flex justify-between items-center">
-                            <div>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase">Fatturato Previsto</p>
-                                <h3 class="text-2xl font-black text-cyan-400 mt-0.5" id="kpiFatturato">€0</h3>
-                            </div>
-                            <i class="fa-solid fa-euro-sign text-2xl text-slate-700"></i>
-                        </div>
-                        <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-emerald-500 flex justify-between items-center">
-                            <div>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase">Noleggi Confermati</p>
-                                <h3 class="text-2xl font-black text-emerald-400 mt-0.5" id="kpiNoleggi">0</h3>
-                            </div>
-                            <i class="fa-solid fa-ship text-2xl text-slate-700"></i>
-                        </div>
-                        <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-amber-500 flex justify-between items-center">
-                            <div>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase">Web Check-in</p>
-                                <h3 class="text-2xl font-black text-amber-400 mt-0.5" id="kpiCheckin">0 / 0</h3>
-                            </div>
-                            <i class="fa-solid fa-id-card text-2xl text-slate-700"></i>
-                        </div>
-                        <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-purple-500 flex justify-between items-center">
-                            <div>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase">Incasso Medio / Barca</p>
-                                <h3 class="text-2xl font-black text-purple-400 mt-0.5" id="kpiMedio">€0</h3>
-                            </div>
-                            <i class="fa-solid fa-calculator text-2xl text-slate-700"></i>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-emerald-500 flex justify-between items-center">
-                            <div>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase">Incassato (noleggio)</p>
-                                <h3 class="text-2xl font-black text-emerald-400 mt-0.5" id="kpiIncassato">€0</h3>
-                            </div>
-                            <i class="fa-solid fa-hand-holding-dollar text-2xl text-slate-700"></i>
-                        </div>
-                        <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-red-500 flex justify-between items-center">
-                            <div>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase">Da incassare</p>
-                                <h3 class="text-2xl font-black text-red-400 mt-0.5" id="kpiDaIncassare">€0</h3>
-                            </div>
-                            <i class="fa-solid fa-hourglass-half text-2xl text-slate-700"></i>
-                        </div>
-                        <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-sky-500 flex justify-between items-center">
-                            <div>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase">Carburante incassato</p>
-                                <h3 class="text-2xl font-black text-sky-400 mt-0.5" id="kpiCarburante">€0</h3>
-                                <p class="text-[10px] text-slate-400" id="kpiLitri"></p>
-                            </div>
-                            <i class="fa-solid fa-gas-pump text-2xl text-slate-700"></i>
-                        </div>
-                        <div class="bg-slate-900 text-white p-4 rounded-xl shadow border-l-4 border-amber-500 flex justify-between items-center">
-                            <div>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase">Caparre trattenute</p>
-                                <h3 class="text-2xl font-black text-amber-400 mt-0.5" id="kpiTrattenute">€0</h3>
-                                <p class="text-[10px] text-slate-400">da annullamenti non rimborsati</p>
-                            </div>
-                            <i class="fa-solid fa-ban text-2xl text-slate-700"></i>
-                        </div>
-                    </div>
-                    <p id="kpiAnnullati" class="text-xs text-slate-500"></p>
+                    <p id="dash-nota" class="text-[11px] text-slate-500"></p>
                 </div>
+                <div id="dash-contenuto" class="space-y-4"></div>
             </div>
 
             <!-- ============ SCHEDA: CMS ============ -->
@@ -651,6 +599,7 @@
             document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('hidden', p.id !== 'pane-' + k));
             renderTabs();
             if (k === 'calendario' && typeof renderCalendario === 'function') renderCalendario();
+            if (k === 'dashboard' && typeof aggiornaDashboardKPI === 'function') aggiornaDashboardKPI();
         }
 
         // ---------- Dati condivisi: flotta (dal CMS) e periodi fuori servizio ----------
@@ -703,6 +652,7 @@
             if (typeof renderFlotta === 'function') renderFlotta();
             if (typeof renderNoleggi === 'function') renderNoleggi();
             if (typeof renderCalendario === 'function') renderCalendario();
+            if (typeof aggiornaDashboardKPI === 'function') aggiornaDashboardKPI();
         }
 
         const barcaPerId = id => FLOTTA.find(b => String(b.id) === String(id));
@@ -1120,12 +1070,16 @@
                 const ann = n.stato_noleggio === 'annullato';
                 if (f === 'annullati') return ann;
                 if (ann && f !== 'tutti') return false;
+                if (f === 'checkin_mancante') return n.data_noleggio >= oggi && n.stato_checkin !== 'completato';
+                if (f === 'caparra_da_ricevere') return n.data_noleggio >= oggi && !n.caparra_ricevuta_il && !n.saldo_incassato_il;
+                if (f === 'saldo_da_incassare') return n.data_noleggio <= oggi && !n.saldo_incassato_il;
+                if (f === 'da_fatturare') return !!n.saldo_incassato_il && n.stato_fattura !== 'emessa';
                 if (f === 'oggi') return n.data_noleggio === oggi;
                 if (f === 'prossimi') return n.data_noleggio >= oggi;
                 if (f === 'mese') return String(n.data_noleggio).slice(0, 7) === mese;
                 return true;
             });
-            if (f === 'oggi' || f === 'prossimi') {
+            if (['oggi', 'prossimi', 'checkin_mancante', 'caparra_da_ricevere', 'saldo_da_incassare', 'da_fatturare'].includes(f)) {
                 righe.sort((a, b) => String(a.data_noleggio).localeCompare(String(b.data_noleggio)) ||
                     (a.tipo_uscita === 'mezza_pomeriggio' ? 1 : 0) - (b.tipo_uscita === 'mezza_pomeriggio' ? 1 : 0));
             }
@@ -1594,49 +1548,312 @@
 
     <script>
         // =============================================================================
-        // MODULO 5 — DASHBOARD (KPI di base; le statistiche per barca arrivano nella Fase 4)
+        // MODULO 5 — DASHBOARD DELLA FLOTTA: da fare, incassi, barche, tipo di uscita, stagionalità, giorni, annullamenti
         // =============================================================================
-        function aggiornaDashboardKPI() {
-            const f = val('filtroPeriodo') || 'tutto';
-            const oggi = dataLocaleISO(), mese = oggi.slice(0, 7);
-            const nelPeriodo = n => f === 'tutto' || (f === 'oggi' && n.data_noleggio === oggi) || (f === 'mese' && String(n.data_noleggio).slice(0, 7) === mese);
+        const MESI_DASH = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+        const GIORNI_DASH = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
+        let dashImpostazioni = { periodo: 'stagione', anno: new Date().getFullYear(), mese: new Date().getMonth() + 1, m1: 6, m2: 9, da: '', a: '' };
+        let dashOrdine = 'noleggi';
+
+        // ---------- Date (autonome dagli altri moduli) ----------
+        const dDate = iso => { const [y, m, d] = String(iso).split('-').map(Number); return new Date(y, m - 1, d); };
+        const dAdd = (iso, n) => { const d = dDate(iso); d.setDate(d.getDate() + n); return dataLocaleISO(d); };
+        const dUltimo = (y, m) => `${y}-${String(m).padStart(2, '0')}-${String(new Date(y, m, 0).getDate()).padStart(2, '0')}`;
+        const dMeseIn = (m, m1, m2) => m1 <= m2 ? (m >= m1 && m <= m2) : (m >= m1 || m <= m2);
+        const dUtc = iso => { const [y, m, d] = iso.split('-').map(Number); return Date.UTC(y, m - 1, d); };
+        const dGiorniTra = (a, b) => Math.round((dUtc(b) - dUtc(a)) / 86400000) + 1;
+
+        // ---------- CALCOLO (funzione pura: riceve tutti i dati) ----------
+        // ctx = { noleggi, flotta, indisp, per:{tipo,da,a}, stag:{m1,m2}, oggi, mesiAlta }
+        function statDashboard(ctx) {
+            const { noleggi, flotta, indisp, per, stag, oggi, mesiAlta } = ctx;
             const num = v => Number(v) || 0;
+            const confermati = noleggi.filter(n => n.stato_noleggio !== 'annullato');
+            const inPer = n => n.data_noleggio >= per.da && n.data_noleggio <= per.a;
+            const nel = confermati.filter(inPer);
+            const ann = noleggi.filter(n => n.stato_noleggio === 'annullato' && inPer(n));
 
-            const periodo = listaNoleggi.filter(nelPeriodo);
-            const confermati = periodo.filter(n => n.stato_noleggio !== 'annullato');
-            const annullati = periodo.filter(n => n.stato_noleggio === 'annullato');
+            // intervallo effettivo per i cicli giornalieri (per "tutto" si usa lo storico reale)
+            let da = per.da, a = per.a;
+            if (per.tipo === 'tutto') {
+                const date = confermati.map(n => n.data_noleggio).sort();
+                da = date.length ? date[0] : oggi; a = date.length && date[date.length - 1] > oggi ? date[date.length - 1] : oggi;
+            }
+            // giorni su cui calcolare l'occupazione: stagione (modificabile) ∩ periodo; per mese/periodo a scelta tutti i giorni
+            const giorni = [];
+            for (let iso = da; iso <= a; iso = dAdd(iso, 1)) {
+                const m = parseInt(iso.slice(5, 7), 10);
+                if (per.tipo === 'mese' || per.tipo === 'custom' || dMeseIn(m, stag.m1, stag.m2)) giorni.push(iso);
+            }
 
-            let totale = 0, checkin = 0, incassatoNol = 0, daIncassare = 0, carburante = 0, litri = 0;
-            confermati.forEach(n => {
-                totale += num(n.importo);
-                if (n.stato_checkin === 'completato') checkin++;
+            // indice noleggi per barca e giorno
+            const idx = new Map();
+            confermati.forEach(n => { if (!n.barca_id || !n.tipo_uscita) return; const k = n.barca_id + '|' + n.data_noleggio; if (!idx.has(k)) idx.set(k, []); idx.get(k).push(n); });
+            const slots = { intera: 2, mezza_mattina: 1, mezza_pomeriggio: 1 };
+            const fsAl = (barcaId, iso) => indisp.some(p => String(p.barca_id) === String(barcaId) && iso >= p.dal && (!p.al || iso <= p.al));
 
+            // ----- per barca -----
+            const barche = flotta.map(b => {
+                const mie = nel.filter(n => String(n.barca_id) === String(b.id));
+                let occ = 0, disp = 0;
+                giorni.forEach(iso => {
+                    if (fsAl(b.id, iso)) return;
+                    disp += 2;
+                    (idx.get(b.id + '|' + iso) || []).forEach(n => { occ += slots[n.tipo_uscita] || 0; });
+                });
+                let fsGiorni = 0;
+                indisp.filter(p => String(p.barca_id) === String(b.id)).forEach(p => {
+                    const s = p.dal > da ? p.dal : da, e0 = p.al || oggi;
+                    let e = e0 < a ? e0 : a; if (e > oggi) e = oggi;
+                    if (e >= s) fsGiorni += dGiorniTra(s, e);
+                });
+                const conLitri = mie.filter(n => n.litri_carburante != null);
+                const litri = conLitri.reduce((s, n) => s + num(n.litri_carburante), 0);
+                const ricavo = mie.reduce((s, n) => s + num(n.importo), 0);
+                return {
+                    barca: b, n: mie.length, ricavo, occ, disp, occPct: disp ? Math.round(occ * 100 / disp) : null,
+                    ricavoMedio: mie.length ? ricavo / mie.length : 0,
+                    intere: mie.filter(n => n.tipo_uscita === 'intera').length,
+                    mattina: mie.filter(n => n.tipo_uscita === 'mezza_mattina').length,
+                    pomeriggio: mie.filter(n => n.tipo_uscita === 'mezza_pomeriggio').length,
+                    litri, nCarb: conLitri.length, litriMedi: conLitri.length ? litri / conLitri.length : 0, fsGiorni
+                };
+            }).filter(r => !r.barca.ritirata || r.n > 0 || r.fsGiorni > 0);
+
+            // ----- tipo di uscita -----
+            const tipo = {};
+            ['intera', 'mezza_mattina', 'mezza_pomeriggio'].forEach(t => {
+                const l = nel.filter(n => n.tipo_uscita === t);
+                tipo[t] = { n: l.length, ricavo: l.reduce((s, n) => s + num(n.importo), 0) };
+            });
+            const senzaSlot = nel.filter(n => !n.tipo_uscita).length;
+
+            // ----- stagionalità -----
+            const stagionalita = { alta: { n: 0, ricavo: 0 }, bassa: { n: 0, ricavo: 0 } };
+            nel.forEach(n => { const k = mesiAlta.includes(parseInt(n.data_noleggio.slice(5, 7), 10)) ? 'alta' : 'bassa'; stagionalita[k].n++; stagionalita[k].ricavo += num(n.importo); });
+
+            // ----- andamento mensile (ultimi 24 mesi del periodo) -----
+            const mesi = [];
+            let cur = da.slice(0, 7) + '-01';
+            while (cur <= a) { mesi.push(cur.slice(0, 7)); const d = dDate(cur); cur = dataLocaleISO(new Date(d.getFullYear(), d.getMonth() + 1, 1)); }
+            const mesiUsati = mesi.slice(-24).map(ym => {
+                const l = nel.filter(n => n.data_noleggio.slice(0, 7) === ym);
+                return { ym, n: l.length, ricavo: l.reduce((s, n) => s + num(n.importo), 0) };
+            });
+
+            // ----- giorni della settimana e giorni vuoti -----
+            const settimana = Array.from({ length: 7 }, () => ({ n: 0, ricavo: 0 }));
+            nel.forEach(n => { const w = (dDate(n.data_noleggio).getDay() + 6) % 7; settimana[w].n++; settimana[w].ricavo += num(n.importo); });
+            const attive = flotta.filter(b => !b.ritirata);
+            const dateConUscite = new Set(nel.map(n => n.data_noleggio));
+            const vuoti = giorni.filter(iso => iso < oggi && !dateConUscite.has(iso) && attive.some(b => !fsAl(b.id, iso)));
+
+            // ----- incassi -----
+            let incassatoNol = 0, daIncassare = 0, carburante = 0, litri = 0;
+            nel.forEach(n => {
                 const cap = n.caparra_ricevuta_il ? num(n.caparra) : 0;
-                const carbIncassato = n.saldo_incassato_il ? Math.min(num(n.quota_carburante), num(n.saldo_incassato)) : 0;
-                const saldoNol = n.saldo_incassato_il ? num(n.saldo_incassato) - carbIncassato : 0;
-                incassatoNol += cap + saldoNol;
-                carburante += carbIncassato;
-                litri += num(n.litri_carburante);
+                const carb = n.saldo_incassato_il ? Math.min(num(n.quota_carburante), num(n.saldo_incassato)) : 0;
+                incassatoNol += cap + (n.saldo_incassato_il ? num(n.saldo_incassato) - carb : 0);
+                carburante += carb; litri += num(n.litri_carburante);
                 if (!n.saldo_incassato_il) daIncassare += Math.max(0, num(n.importo) - cap);
             });
-            const media = confermati.length ? (totale / confermati.length).toFixed(0) : 0;
-            const fmt = v => '€' + (Math.round(v * 100) / 100).toLocaleString('it-IT');
+            const prevista = nel.reduce((s, n) => s + num(n.importo), 0);
+            const trattenute = ann.filter(n => n.caparra_ricevuta_il && !n.caparra_rimborsata).reduce((s, n) => s + num(n.caparra), 0);
 
-            // Caparre ricevute su noleggi poi annullati e non rimborsate: restano incassate
-            const trattenute = annullati.filter(n => n.caparra_ricevuta_il && !n.caparra_rimborsata).reduce((s, n) => s + num(n.caparra), 0);
+            // ----- annullamenti -----
+            const motivi = {};
+            ann.forEach(n => { const k = n.motivo_annullamento || 'altro'; motivi[k] = (motivi[k] || 0) + 1; });
 
-            setTxt('kpiFatturato', fmt(totale));
-            setTxt('kpiNoleggi', confermati.length);
-            setTxt('kpiCheckin', `${checkin} / ${confermati.length}`);
-            setTxt('kpiMedio', `€${media}`);
-            setTxt('kpiIncassato', fmt(incassatoNol));
-            setTxt('kpiDaIncassare', fmt(daIncassare));
-            setTxt('kpiCarburante', fmt(carburante));
-            setTxt('kpiLitri', `${Math.round(litri * 10) / 10} litri registrati`);
-            setTxt('kpiTrattenute', fmt(trattenute));
-            const rimb = annullati.filter(n => n.caparra_rimborsata).length;
-            setTxt('kpiAnnullati', annullati.length ? `Annullati nel periodo: ${annullati.length} (caparra rimborsata in ${rimb})` : '');
+            return {
+                periodo: { da: per.da, a: per.a, daEff: da, aEff: a, giorniStagione: giorni.length },
+                tot: { n: nel.length, ricavo: prevista, medio: nel.length ? prevista / nel.length : 0, checkin: nel.filter(n => n.stato_checkin === 'completato').length },
+                incassi: { prevista, incassatoNol, daIncassare, carburante, litri, trattenute },
+                barche, tipo, senzaSlot, stagionalita, mesi: mesiUsati, settimana, vuoti,
+                annullati: { n: ann.length, motivi, rimborsate: ann.filter(n => n.caparra_rimborsata).length, trattenute }
+            };
         }
+
+        // Elementi "da fare": non dipendono dal periodo scelto
+        function statOperativo(noleggi, oggi) {
+            const num = v => Number(v) || 0;
+            const ok = noleggi.filter(n => n.stato_noleggio !== 'annullato');
+            const domani = dAdd(oggi, 1);
+            const futuri = ok.filter(n => n.data_noleggio >= oggi);
+            const passatiOggi = ok.filter(n => n.data_noleggio <= oggi);
+            const ordine = { intera: 0, mezza_mattina: 1, mezza_pomeriggio: 2 };
+            const lista = d => ok.filter(n => n.data_noleggio === d).sort((x, y) => (ordine[x.tipo_uscita] ?? 9) - (ordine[y.tipo_uscita] ?? 9));
+            const saldi = passatiOggi.filter(n => !n.saldo_incassato_il);
+            return {
+                oggi: lista(oggi), domani: lista(domani),
+                checkin: futuri.filter(n => n.stato_checkin !== 'completato').length,
+                caparre: futuri.filter(n => !n.caparra_ricevuta_il && !n.saldo_incassato_il),
+                saldi: { n: saldi.length, importo: saldi.reduce((s, n) => s + Math.max(0, num(n.importo) - (n.caparra_ricevuta_il ? num(n.caparra) : 0)), 0) },
+                daFatturare: ok.filter(n => n.saldo_incassato_il && n.stato_fattura !== 'emessa').length
+            };
+        }
+
+        // ---------- Impostazioni e periodo ----------
+        function dashPeriodoCorrente() {
+            const s = dashImpostazioni, y = parseInt(s.anno, 10) || new Date().getFullYear();
+            if (s.periodo === 'stagione') return { tipo: 'stagione', da: `${y}-${String(s.m1).padStart(2, '0')}-01`, a: s.m1 <= s.m2 ? dUltimo(y, s.m2) : dUltimo(y + 1, s.m2), etichetta: `Stagione ${y}: ${MESI_DASH[s.m1 - 1]} – ${MESI_DASH[s.m2 - 1]}` };
+            if (s.periodo === 'anno') return { tipo: 'anno', da: `${y}-01-01`, a: `${y}-12-31`, etichetta: `Anno ${y}` };
+            if (s.periodo === 'mese') return { tipo: 'mese', da: `${y}-${String(s.mese).padStart(2, '0')}-01`, a: dUltimo(y, s.mese), etichetta: `${MESI_DASH[s.mese - 1]} ${y}` };
+            if (s.periodo === 'custom') { const da = s.da || `${y}-01-01`, a = s.a || dataLocaleISO(); return { tipo: 'custom', da, a: a < da ? da : a, etichetta: `Dal ${formattaDataIT(da)} al ${formattaDataIT(a < da ? da : a)}` }; }
+            return { tipo: 'tutto', da: '0000-01-01', a: '9999-12-31', etichetta: 'Tutto lo storico' };
+        }
+
+        function dashSalva() { try { localStorage.setItem('nauticovi_dash', JSON.stringify(dashImpostazioni)); } catch (e) {} }
+        function dashCarica() { try { const s = JSON.parse(localStorage.getItem('nauticovi_dash') || 'null'); if (s && typeof s === 'object') dashImpostazioni = Object.assign(dashImpostazioni, s); } catch (e) {} }
+
+        function dashInitControlli() {
+            dashCarica();
+            const opt = (arr, sel) => arr.map((m, i) => `<option value="${i + 1}" ${i + 1 === sel ? 'selected' : ''}>${m}</option>`).join('');
+            E('dash_mese').innerHTML = opt(MESI_DASH, dashImpostazioni.mese);
+            E('dash_m1').innerHTML = opt(MESI_DASH, dashImpostazioni.m1);
+            E('dash_m2').innerHTML = opt(MESI_DASH, dashImpostazioni.m2);
+            setV('dash_periodo', dashImpostazioni.periodo);
+            setV('dash_da', dashImpostazioni.da); setV('dash_a', dashImpostazioni.a);
+        }
+
+        function dashAggiornaAnni() {
+            const anni = new Set([new Date().getFullYear()]);
+            listaNoleggi.forEach(n => { const y = parseInt(String(n.data_noleggio).slice(0, 4), 10); if (y) anni.add(y); });
+            const ord = [...anni].sort((x, y) => y - x);
+            if (!ord.includes(parseInt(dashImpostazioni.anno, 10))) dashImpostazioni.anno = ord[0];
+            E('dash_anno').innerHTML = ord.map(y => `<option value="${y}" ${y === parseInt(dashImpostazioni.anno, 10) ? 'selected' : ''}>${y}</option>`).join('');
+        }
+
+        function dashCambiaPeriodo() {
+            const s = dashImpostazioni;
+            s.periodo = val('dash_periodo'); s.anno = parseInt(val('dash_anno'), 10) || s.anno;
+            s.mese = parseInt(val('dash_mese'), 10) || s.mese;
+            s.m1 = parseInt(val('dash_m1'), 10) || s.m1; s.m2 = parseInt(val('dash_m2'), 10) || s.m2;
+            s.da = val('dash_da'); s.a = val('dash_a');
+            dashSalva();
+            aggiornaDashboardKPI();
+        }
+
+        // ---------- Rendering ----------
+        const dPct = (v, tot) => tot ? Math.round(v * 100 / tot) : 0;
+        const dBarra = (pct, colore) => `<div class="h-2 rounded-full bg-slate-100 overflow-hidden"><div class="h-2 rounded-full" style="width:${Math.max(0, Math.min(100, pct))}%;background:${colore}"></div></div>`;
+        const dSezione = (titolo, ico, corpo, nota) => `<section class="bg-white rounded-2xl shadow-md border border-slate-200 p-4 space-y-3"><h3 class="text-xs font-extrabold uppercase tracking-wide text-slate-700 flex items-center gap-2"><i class="fa-solid ${ico} text-cyan-600"></i> ${titolo}</h3>${corpo}${nota ? `<p class="text-[10px] text-slate-500">${nota}</p>` : ''}</section>`;
+        const dKpi = (label, valore, bordo, sub) => `<div class="bg-slate-900 text-white p-3 rounded-xl shadow border-l-4 ${bordo}"><p class="text-[10px] text-slate-400 font-bold uppercase leading-tight">${label}</p><h4 class="text-xl font-black mt-0.5">${valore}</h4>${sub ? `<p class="text-[10px] text-slate-400">${sub}</p>` : ''}</div>`;
+        const dTile = (n, label, sub, filtro, colore) => `<button type="button" onclick="dashVaiANoleggi('${filtro}')" class="text-left rounded-xl border p-3 ${colore} hover:shadow"><b class="text-2xl block leading-none">${n}</b><span class="text-[11px] font-bold block mt-1">${label}</span>${sub ? `<span class="text-[10px] opacity-80">${sub}</span>` : ''}</button>`;
+        const fmtEuro = v => '€' + (Math.round((Number(v) || 0) * 100) / 100).toLocaleString('it-IT', { maximumFractionDigits: 2 });
+
+        function dashImpostaOrdine(v) { dashOrdine = v; aggiornaDashboardKPI(); }
+
+        function dashVaiANoleggi(filtro) {
+            selezionaTab('noleggi');
+            setV('filtroNoleggi', filtro);
+            if (typeof renderNoleggi === 'function') renderNoleggi();
+        }
+
+        function aggiornaDashboardKPI() {
+            const box = E('dash-contenuto');
+            if (!box || tabCorrente !== 'dashboard') return;
+            dashAggiornaAnni();
+
+            const s = dashImpostazioni;
+            show('dash_anno', s.periodo !== 'tutto' && s.periodo !== 'custom');
+            show('dash_mese', s.periodo === 'mese');
+            show('dash-stagione-box', s.periodo === 'stagione');
+            show('dash-custom-box', s.periodo === 'custom');
+
+            const per = dashPeriodoCorrente(), oggi = dataLocaleISO();
+            const ctx = { noleggi: listaNoleggi, flotta: FLOTTA, indisp: INDISP, per, stag: { m1: s.m1, m2: s.m2 }, oggi, mesiAlta: (typeof MESI_ALTA !== 'undefined') ? MESI_ALTA : [7, 8] };
+            const d = statDashboard(ctx), op = statOperativo(listaNoleggi, oggi);
+            setTxt('dash-nota', `${per.etichetta}. ` + ((per.tipo === 'mese' || per.tipo === 'custom') ? "L'occupazione conta tutti i giorni scelti." : `L'occupazione conta solo i giorni di stagione (${MESI_DASH[s.m1 - 1]} – ${MESI_DASH[s.m2 - 1]}), modificabili qui sopra.`));
+
+            box.innerHTML = [sezDaFare(op, oggi), sezIncassi(d), sezBarche(d), sezTipo(d), sezStagione(d), sezGiorni(d), sezAnnullamenti(d)].join('');
+        }
+
+        function rigaUscita(n) {
+            const c = (typeof coloriBarca === 'function') ? coloriBarca(barcaPerId(n.barca_id)) : { solid: '#94a3b8' };
+            const pag = (typeof statoPagamento === 'function') ? statoPagamento(n) : null;
+            const click = (typeof apriDettaglioNoleggio === 'function') ? `onclick="apriDettaglioNoleggio('${esc(n.id)}')"` : '';
+            return `<button type="button" ${click} class="w-full flex items-stretch gap-3 text-left bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 p-2.5"><span class="w-1.5 rounded-full flex-shrink-0" style="background:${c.solid}"></span><div class="min-w-0 flex-1"><div class="flex justify-between gap-2"><b class="text-sm text-slate-900 truncate">${esc(n.nome_cliente)}</b><span class="text-[11px] font-bold text-slate-600 flex-shrink-0">${esc(n.barca)}</span></div><p class="text-[11px] text-slate-600">${esc(etichettaSlot(n.tipo_uscita))}${n.ora_rientro ? ' · rientro ' + esc(String(n.ora_rientro).slice(0, 5)) : ''}</p><div class="flex flex-wrap gap-1 mt-1"><span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full ${n.stato_checkin === 'completato' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${n.stato_checkin === 'completato' ? '✓ check-in' : '⌛ check-in'}</span>${pag ? `<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full ${pag.cls}">${esc(pag.label)}</span>` : ''}</div></div></button>`;
+        }
+
+        function sezDaFare(op, oggi) {
+            const tiles = `<div class="grid grid-cols-2 lg:grid-cols-4 gap-2">` +
+                dTile(op.checkin, 'Check-in mancanti', 'uscite da oggi in poi', 'checkin_mancante', 'bg-amber-50 border-amber-200 text-amber-900') +
+                dTile(op.caparre.length, 'Caparre da ricevere', 'uscite da oggi in poi', 'caparra_da_ricevere', 'bg-blue-50 border-blue-200 text-blue-900') +
+                dTile(op.saldi.n, 'Saldi da incassare', `${fmtEuro(op.saldi.importo)} · uscite passate`, 'saldo_da_incassare', 'bg-rose-50 border-rose-200 text-rose-900') +
+                dTile(op.daFatturare, 'Da fatturare', 'saldati senza bozza', 'da_fatturare', 'bg-emerald-50 border-emerald-200 text-emerald-900') + `</div>`;
+            const giorno = (titolo, lista) => `<div class="space-y-1.5"><b class="text-xs text-slate-700">${titolo} <span class="font-normal text-slate-400">(${lista.length})</span></b>${lista.length ? lista.map(rigaUscita).join('') : '<p class="text-[11px] text-slate-400 italic">Nessuna uscita.</p>'}</div>`;
+            return dSezione('Da fare e prossime uscite', 'fa-list-check', tiles + `<div class="grid grid-cols-1 lg:grid-cols-2 gap-3">${giorno('Oggi', op.oggi)}${giorno('Domani', op.domani)}</div>`, 'Questi numeri non dipendono dal periodo scelto. Tocca un riquadro per vedere i noleggi.');
+        }
+
+        function sezIncassi(d) {
+            const i = d.incassi;
+            return dSezione('Incassi', 'fa-euro-sign',
+                `<div class="grid grid-cols-2 lg:grid-cols-4 gap-2">` +
+                dKpi('Fatturato previsto', fmtEuro(i.prevista), 'border-cyan-500', `${d.tot.n} noleggi`) +
+                dKpi('Incassato (noleggio)', fmtEuro(i.incassatoNol), 'border-emerald-500') +
+                dKpi('Da incassare', fmtEuro(i.daIncassare), 'border-red-500') +
+                dKpi('Ricavo medio / uscita', fmtEuro(d.tot.medio), 'border-purple-500') +
+                dKpi('Check-in completati', `${d.tot.checkin} / ${d.tot.n}`, 'border-amber-500') +
+                dKpi('Carburante incassato', fmtEuro(i.carburante), 'border-sky-500', `${Math.round(i.litri * 10) / 10} litri registrati`) +
+                dKpi('Caparre trattenute', fmtEuro(i.trattenute), 'border-orange-500', 'da annullamenti non rimborsati') + `</div>`,
+                'Il carburante è solo tracciato: non è incluso nel fatturato previsto né nelle bozze di fattura.');
+        }
+
+        function sezBarche(d) {
+            const ord = { noleggi: (a, b) => b.n - a.n, ricavo: (a, b) => b.ricavo - a.ricavo, occupazione: (a, b) => (b.occPct ?? -1) - (a.occPct ?? -1) }[dashOrdine];
+            const righe = d.barche.slice().sort((a, b) => ord(a, b) || String(a.barca.titolo).localeCompare(String(b.barca.titolo), 'it', { numeric: true }));
+            const max = Math.max(1, ...righe.map(r => r.n));
+            const cella = (k, v) => `<div class="bg-slate-50 rounded-lg p-1.5"><span class="block text-[9px] text-slate-500 uppercase font-bold">${k}</span><b class="text-slate-800 text-xs">${v}</b></div>`;
+            const corpo = righe.length ? righe.map((r, i) => {
+                const c = (typeof coloriBarca === 'function') ? coloriBarca(r.barca) : { solid: '#94a3b8', light: '#f1f5f9', text: '#475569' };
+                return `<div class="rounded-xl border border-slate-200 p-3 space-y-2" style="border-left:5px solid ${c.solid}">
+                    <div class="flex justify-between items-center gap-2"><b class="text-sm text-slate-900">${i + 1}. ${esc(r.barca.titolo)}${r.barca.ritirata ? ' <span class="text-[9px] text-slate-400">(ritirata)</span>' : ''}</b><span class="text-sm font-black" style="color:${c.text}">${r.n} <span class="text-[10px] font-bold">noleggi</span></span></div>
+                    ${dBarra(dPct(r.n, max), c.solid)}
+                    <div class="grid grid-cols-3 gap-1.5">${cella('Ricavo', fmtEuro(r.ricavo))}${cella('Occupazione', r.occPct == null ? '—' : r.occPct + '%')}${cella('Medio/uscita', fmtEuro(r.ricavoMedio))}</div>
+                    <div class="grid grid-cols-3 gap-1.5">${cella('Intere', r.intere)}${cella('Mezze', `${r.mattina + r.pomeriggio} <span class="font-normal text-[9px] text-slate-500">(${r.mattina} mat · ${r.pomeriggio} pom)</span>`)}${cella('Fuori servizio', r.fsGiorni + ' gg')}</div>
+                    ${r.nCarb ? `<p class="text-[11px] text-slate-600">⛽ ${Math.round(r.litri * 10) / 10} L in ${r.nCarb} uscite · media ${Math.round(r.litriMedi * 10) / 10} L/uscita</p>` : ''}
+                </div>`;
+            }).join('') : '<p class="text-xs text-slate-400 italic">Nessuna barca in flotta.</p>';
+            const sel = `<select onchange="dashImpostaOrdine(this.value)" class="p-1.5 border rounded-lg bg-white text-[11px] font-bold text-slate-700 outline-none"><option value="noleggi" ${dashOrdine === 'noleggi' ? 'selected' : ''}>Per noleggi</option><option value="ricavo" ${dashOrdine === 'ricavo' ? 'selected' : ''}>Per ricavo</option><option value="occupazione" ${dashOrdine === 'occupazione' ? 'selected' : ''}>Per occupazione</option></select>`;
+            const fsTot = d.barche.reduce((s, r) => s + r.fsGiorni, 0);
+            return dSezione('Barche: le più noleggiate', 'fa-ranking-star', `<div class="flex justify-between items-center gap-2"><span class="text-[11px] text-slate-500">Giorni fuori servizio totali nel periodo: <b>${fsTot}</b></span>${sel}</div><div class="grid grid-cols-1 lg:grid-cols-2 gap-3">${corpo}</div>`,
+                `Occupazione = slot prenotati / slot disponibili (${d.periodo.giorniStagione} giorni considerati; i giorni fuori servizio non contano come disponibili).`);
+        }
+
+        function sezTipo(d) {
+            const t = d.tipo, tot = t.intera.n + t.mezza_mattina.n + t.mezza_pomeriggio.n;
+            const voce = (k, label, colore) => `<div class="flex items-center gap-2 text-xs"><i class="w-3 h-3 rounded inline-block flex-shrink-0" style="background:${colore}"></i><b class="text-slate-800 w-28">${label}</b><span class="text-slate-600">${t[k].n} (${dPct(t[k].n, tot)}%)</span><span class="ml-auto text-slate-500">${fmtEuro(t[k].ricavo)}</span></div>`;
+            const barra = tot ? `<div class="flex h-4 rounded-full overflow-hidden">${[['intera', '#0891b2'], ['mezza_mattina', '#f59e0b'], ['mezza_pomeriggio', '#6366f1']].map(([k, c]) => t[k].n ? `<div style="width:${dPct(t[k].n, tot)}%;background:${c}"></div>` : '').join('')}</div>` : '<p class="text-xs text-slate-400 italic">Nessun noleggio nel periodo.</p>';
+            const mezze = t.mezza_mattina.n + t.mezza_pomeriggio.n;
+            return dSezione('Mezza giornata o intera?', 'fa-chart-pie', barra + voce('intera', 'Intera giornata', '#0891b2') + voce('mezza_mattina', 'Mezza mattina', '#f59e0b') + voce('mezza_pomeriggio', 'Mezza pomeriggio', '#6366f1') +
+                (tot ? `<p class="text-[11px] text-slate-600">Intere <b>${dPct(t.intera.n, tot)}%</b> · mezze <b>${dPct(mezze, tot)}%</b>${mezze ? ` (mattina ${dPct(t.mezza_mattina.n, mezze)}% · pomeriggio ${dPct(t.mezza_pomeriggio.n, mezze)}% delle mezze)` : ''}</p>` : ''),
+                d.senzaSlot ? `${d.senzaSlot} noleggi senza fascia (dati di test) non sono inclusi.` : '');
+        }
+
+        function sezStagione(d) {
+            const s = d.stagionalita, tot = s.alta.n + s.bassa.n;
+            const blocco = (label, v, colore) => `<div class="rounded-xl p-3 text-white" style="background:${colore}"><span class="text-[10px] font-bold uppercase opacity-90">${label}</span><b class="block text-xl">${v.n} <span class="text-xs font-bold">noleggi</span></b><span class="text-[11px]">${fmtEuro(v.ricavo)} · medio ${fmtEuro(v.n ? v.ricavo / v.n : 0)}</span></div>`;
+            const maxM = Math.max(1, ...d.mesi.map(m => m.n));
+            const mesi = d.mesi.length ? `<div class="flex items-end gap-1 h-28">${d.mesi.map(m => `<div class="flex-1 flex flex-col items-center justify-end h-full min-w-0"><span class="text-[9px] font-bold text-slate-700">${m.n || ''}</span><div class="w-full rounded-t bg-cyan-500" style="height:${Math.max(m.n ? 4 : 1, m.n * 80 / maxM)}px"></div><span class="text-[9px] text-slate-500 mt-0.5">${MESI_DASH[parseInt(m.ym.slice(5, 7), 10) - 1].slice(0, 3)}</span></div>`).join('')}</div>` : '';
+            return dSezione('Alta e bassa stagione', 'fa-sun', `<div class="grid grid-cols-2 gap-2">${blocco('Alta (Lug–Ago)', s.alta, '#ea580c')}${blocco('Bassa (altri mesi)', s.bassa, '#0891b2')}</div>${tot ? mesi : '<p class="text-xs text-slate-400 italic">Nessun noleggio nel periodo.</p>'}`, 'Il grafico mostra i noleggi per mese (fino a 24 mesi).');
+        }
+
+        function sezGiorni(d) {
+            const maxS = Math.max(1, ...d.settimana.map(x => x.n));
+            const migliore = d.settimana.reduce((b, x, i) => x.n > d.settimana[b].n ? i : b, 0);
+            const bars = `<div class="flex items-end gap-2 h-24">${d.settimana.map((x, i) => `<div class="flex-1 flex flex-col items-center justify-end h-full"><span class="text-[10px] font-bold text-slate-700">${x.n || ''}</span><div class="w-full rounded-t ${i === migliore && x.n ? 'bg-emerald-500' : 'bg-slate-300'}" style="height:${Math.max(x.n ? 4 : 1, x.n * 64 / maxS)}px"></div><span class="text-[10px] text-slate-500 mt-0.5">${GIORNI_DASH[i]}</span></div>`).join('')}</div>`;
+            const v = d.vuoti;
+            const vuoti = `<div class="space-y-1"><b class="text-xs text-slate-700">Giorni senza uscite: ${v.length}</b>${v.length ? `<div class="flex flex-wrap gap-1">${v.slice(-12).reverse().map(iso => `<span class="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">${esc(GIORNI_DASH[(dDate(iso).getDay() + 6) % 7])} ${esc(formattaDataIT(iso).slice(0, 5))}</span>`).join('')}</div>${v.length > 12 ? '<p class="text-[10px] text-slate-400">Mostrati gli ultimi 12.</p>' : ''}` : '<p class="text-[11px] text-slate-400 italic">Nessun giorno vuoto (solo giorni già trascorsi, di stagione).</p>'}</div>`;
+            return dSezione('Giorni della settimana e giorni vuoti', 'fa-calendar-week', (d.tot.n ? bars : '<p class="text-xs text-slate-400 italic">Nessun noleggio nel periodo.</p>') + vuoti, d.tot.n ? `Il giorno più forte è il ${GIORNI_DASH[migliore]} (in verde).` : '');
+        }
+
+        function sezAnnullamenti(d) {
+            const a = d.annullati, nomi = { meteo: 'Maltempo', cliente: 'Richiesta del cliente', guasto: 'Guasto / barca non disponibile', altro: 'Altro' };
+            const voci = Object.keys(a.motivi).map(k => `<div class="flex justify-between text-xs"><span class="text-slate-600">${esc(nomi[k] || k)}</span><b class="text-slate-800">${a.motivi[k]}</b></div>`).join('');
+            return dSezione('Annullamenti', 'fa-ban', a.n ? `<p class="text-xs text-slate-700"><b>${a.n}</b> annullati · caparra rimborsata in <b>${a.rimborsate}</b> · trattenute <b>${fmtEuro(a.trattenute)}</b></p>${voci}` : '<p class="text-xs text-slate-400 italic">Nessun annullamento nel periodo.</p>');
+        }
+
+        registraInit(() => { dashInitControlli(); });
     </script>
 
     <script>
