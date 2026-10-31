@@ -1789,8 +1789,8 @@
         }
 
         async function annullaIncassoSaldo() {
-            if (!confirm('Annullare l\'incasso del saldo? Il noleggio tornerà "da saldare" (il carburante registrato resta).')) return;
-            const { error } = await _supabase.from('noleggi').update({ saldo_incassato: null, saldo_incassato_il: null }).eq('id', val('rientro_id'));
+            if (!confirm('Annullare l\'incasso del saldo? Verranno azzerati anche litri e quota carburante registrati, e il noleggio tornerà "da saldare". La caparra resta registrata.')) return;
+            const { error } = await _supabase.from('noleggi').update({ saldo_incassato: null, saldo_incassato_il: null, litri_carburante: null, quota_carburante: null }).eq('id', val('rientro_id'));
             if (error) { setMsgRientro('err', error.message); return; }
             chiudiRientro();
             await caricaNoleggi();
