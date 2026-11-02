@@ -192,7 +192,7 @@
                                 <button type="submit" id="btn-salva-noleggio" class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2.5 rounded-lg shadow transition flex justify-center items-center gap-2">
                                     <i class="fa-solid fa-cloud-arrow-up"></i> <span id="btn-salva-noleggio-text">Salva Noleggio in Cloud</span>
                                 </button>
-                                <button type="button" id="btn-annulla-edit-noleggio" onclick="resetFormNoleggio()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2.5 rounded-lg transition">Chiudi</button>
+                                <button type="button" id="btn-annulla-edit-noleggio" onclick="chiudiModificaNoleggio()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2.5 rounded-lg transition">Chiudi</button>
                             </div>
                         </form>
                     </div>
@@ -918,6 +918,7 @@
         let listaNoleggi = [];
         let caparraManuale = false;
         let ultimaTariffa = null;
+        let origineModifica = null;   // scheda da cui è partita la modifica (per tornarci dopo)
         let tokenDisponibilita = 0;
 
         const PRESET_RIENTRO = { intera: '18:00', mezza_mattina: '13:00', mezza_pomeriggio: '18:00' };
@@ -1110,16 +1111,32 @@
             resetFormNoleggio();
             if (window.matchMedia('(max-width: 1023px)').matches) E('box-form-noleggio').classList.add('hidden');
             await caricaNoleggi();
-            if (editId) toast('Noleggio aggiornato', 'ok');
+            if (editId) { toast('Noleggio aggiornato', 'ok'); tornaDaModifica(editId); }
             else if (r.data) {
                 const nuovo = r.data;
                 toast(`Noleggio salvato: ${nuovo.nome_cliente}`, 'ok', { durata: 14000, azione: { label: 'Invia WhatsApp', fn: () => window.open('https://wa.me/' + String(nuovo.telefono || '').replace(/\D/g, '') + '?text=' + encodeURIComponent(messaggioPrenotazione(nuovo)), '_blank') } });
             }
         }
 
+        // Dopo il salvataggio o la chiusura riporta alla scheda da cui è partita la modifica (es. Oggi o Calendario)
+        function tornaDaModifica(idModificato) {
+            const o = origineModifica;
+            origineModifica = null;
+            if (o && String(o.id) === String(idModificato) && tabCorrente === 'noleggi') selezionaTab(o.tab);
+        }
+
+        function chiudiModificaNoleggio() {
+            const id = val('noleggio_edit_id');
+            resetFormNoleggio();
+            if (window.matchMedia('(max-width: 1023px)').matches) E('box-form-noleggio').classList.add('hidden');
+            tornaDaModifica(id);
+        }
+
         function modificaNoleggio(id) {
             const n = listaNoleggi.find(x => String(x.id) === String(id));
             if (!n) return;
+            // Il form sta nella scheda Noleggi: se parti da un'altra scheda ci porta lì
+            if (tabCorrente !== 'noleggi') { origineModifica = { tab: tabCorrente, id: n.id }; selezionaTab('noleggi'); }
             setV('noleggio_edit_id', n.id);
             apriFormNoleggio();
             aggiornaMenuBarche();
@@ -2499,7 +2516,7 @@
                 <div class="grid grid-cols-2 gap-2 font-bold text-[11px]">
                     <a href="tel:${esc(tel)}" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-center"><i class="fa-solid fa-phone"></i> Chiama</a>
                     <a href="https://wa.me/${telWa}?text=${encodeURIComponent(messaggioPrenotazione(n))}" target="_blank" class="p-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-center"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" onclick="chiudiDettaglio(); selezionaTab('noleggi'); modificaNoleggio('${esc(n.id)}')" class="p-2.5 bg-white border border-cyan-300 text-cyan-700 hover:bg-cyan-50 rounded-xl"><i class="fa-solid fa-pen"></i> Modifica</button>
+                    <button type="button" onclick="chiudiDettaglio(); modificaNoleggio('${esc(n.id)}')" class="p-2.5 bg-white border border-cyan-300 text-cyan-700 hover:bg-cyan-50 rounded-xl"><i class="fa-solid fa-pen"></i> Modifica</button>
                     <button type="button" onclick="chiudiDettaglio(); apriAnnulla('${esc(n.id)}')" class="p-2.5 bg-white border border-amber-300 text-amber-700 hover:bg-amber-50 rounded-xl"><i class="fa-solid fa-ban"></i> Annulla</button>
                     ${(typeof bottoniDettaglioPagamento === 'function') ? bottoniDettaglioPagamento(n) : ''}
                 </div>`;
