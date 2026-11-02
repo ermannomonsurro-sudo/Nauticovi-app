@@ -75,8 +75,9 @@
 
             <div class="grid grid-cols-2 gap-2">
                 <div>
-                    <label class="block font-bold text-slate-700 uppercase" data-i18n="label_cf">Codice Fiscale / P.IVA *</label>
-                    <input type="text" id="checkin-cf" required placeholder="RSSMRA80A01H501U" class="w-full mt-1 p-2.5 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-cyan-500 outline-none">
+                    <label class="block font-bold text-slate-700 uppercase" data-i18n="label_cf">Codice Fiscale *</label>
+                    <input type="text" id="checkin-cf" required maxlength="16" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="RSSMRA80A01H501U" oninput="validaCampo('cf', false)" onblur="validaCampo('cf', true)" class="w-full mt-1 p-2.5 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-cyan-500 outline-none uppercase">
+                    <p id="err-cf" class="hidden text-[11px] text-red-600 font-semibold mt-1"></p>
                 </div>
                 <div>
                     <label class="block font-bold text-slate-700 uppercase" data-i18n="label_tel">Telefono *</label>
@@ -84,9 +85,16 @@
                 </div>
             </div>
 
+            <label class="flex items-start gap-2 text-[11px] text-slate-600 font-semibold">
+                <input type="checkbox" id="checkin-straniero" onchange="statoStraniero()" class="mt-0.5 w-4 h-4">
+                <span data-i18n="chk_straniero">Non ho un codice fiscale italiano (residente all'estero)</span>
+            </label>
+
             <div>
                 <label class="block font-bold text-slate-700 uppercase" data-i18n="label_email">Email (per Invio Fattura/Ricevuta) *</label>
-                <input type="email" id="checkin-email" required placeholder="mario.rossi@email.it" class="w-full mt-1 p-2.5 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-cyan-500 outline-none">
+                <input type="email" id="checkin-email" required autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="mario.rossi@email.it" oninput="emailModificata()" onblur="validaCampo('email', true)" class="w-full mt-1 p-2.5 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-cyan-500 outline-none">
+                <p id="err-email" class="hidden text-[11px] text-red-600 font-semibold mt-1"></p>
+                <div id="sugg-email" class="hidden mt-1.5 p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-[12px] text-amber-900 space-y-2"></div>
             </div>
 
             <div class="grid grid-cols-3 gap-2">
@@ -158,7 +166,15 @@
                 banner_desc: "Compila i dati anagrafici e fiscali prima di arrivare al punto di noleggio per risparmiare tempo ed evitare attese in banchina.",
                 form_header: "Dati Intestatario Contratto & Fattura",
                 label_nome: "Nome e Cognome / Ragione Sociale *",
-                label_cf: "Codice Fiscale / P.IVA *",
+                label_cf: "Codice Fiscale *",
+                chk_straniero: "Non ho un codice fiscale italiano (residente all'estero)",
+                err_cf_vuoto: "Inserisci il codice fiscale (o spunta la casella se non ne hai uno italiano).",
+                err_cf_invalido: "Il codice fiscale non sembra corretto: sono 16 tra lettere e cifre. Controlla di averlo scritto bene.",
+                err_email_vuoto: "Inserisci la tua email: ti serve per ricevere la ricevuta.",
+                err_email_invalido: "L'email non sembra corretta. Controlla di aver scritto @ e il dominio (es. nome@gmail.com).",
+                sugg_email: "Intendevi <b>{email}</b>?",
+                btn_correggi: "Sì, correggi",
+                btn_no_giusta: "No, è giusta così",
                 label_tel: "Telefono *",
                 label_email: "Email (per Invio Fattura/Ricevuta) *",
                 label_indirizzo: "Indirizzo di Residenza *",
@@ -179,7 +195,15 @@
                 banner_desc: "Fill in your personal and tax details before arriving at the rental point to save time and avoid waiting on the dock.",
                 form_header: "Contract Holder & Invoice Details",
                 label_nome: "Full Name / Company Name *",
-                label_cf: "Tax ID / VAT Number *",
+                label_cf: "Italian Tax Code (Codice Fiscale) *",
+                chk_straniero: "I don't have an Italian tax code (resident abroad)",
+                err_cf_vuoto: "Enter your Italian tax code (or tick the box if you don't have one).",
+                err_cf_invalido: "The tax code doesn't look right: it has 16 letters and digits. Please check it.",
+                err_email_vuoto: "Enter your email: we need it to send your receipt.",
+                err_email_invalido: "The email doesn't look right. Check the @ and the domain (e.g. name@gmail.com).",
+                sugg_email: "Did you mean <b>{email}</b>?",
+                btn_correggi: "Yes, fix it",
+                btn_no_giusta: "No, it's correct",
                 label_tel: "Phone Number *",
                 label_email: "Email (for Invoice/Receipt) *",
                 label_indirizzo: "Residential Address *",
@@ -200,7 +224,15 @@
                 banner_desc: "Rellena tus datos personales y fiscales antes de llegar al punto de alquiler para ahorrar tiempo y evitar esperas en el muelle.",
                 form_header: "Datos del Titular del Contrato y Factura",
                 label_nome: "Nombre y Apellidos / Razón Social *",
-                label_cf: "NIF / NIE / CIF *",
+                label_cf: "Código fiscal italiano (Codice Fiscale) *",
+                chk_straniero: "No tengo código fiscal italiano (resido en el extranjero)",
+                err_cf_vuoto: "Introduce tu código fiscal italiano (o marca la casilla si no tienes uno).",
+                err_cf_invalido: "El código fiscal no parece correcto: tiene 16 letras y cifras. Compruébalo.",
+                err_email_vuoto: "Introduce tu correo: lo necesitamos para enviarte el recibo.",
+                err_email_invalido: "El correo no parece correcto. Comprueba la @ y el dominio (p. ej. nombre@gmail.com).",
+                sugg_email: "¿Querías decir <b>{email}</b>?",
+                btn_correggi: "Sí, corregir",
+                btn_no_giusta: "No, es correcto",
                 label_tel: "Teléfono *",
                 label_email: "Correo Electrónico (para Factura) *",
                 label_indirizzo: "Dirección de Residencia *",
@@ -217,6 +249,110 @@
         };
 
         let currentLang = 'it';
+
+        // ---------- Verifica codice fiscale ed email ----------
+        const t = k => (translations[currentLang] && translations[currentLang][k]) || translations.it[k] || k;
+        const CF_DISPARI = [1, 0, 5, 7, 9, 13, 15, 17, 19, 21, 2, 4, 18, 20, 11, 3, 6, 8, 12, 14, 16, 10, 22, 25, 24, 23];
+
+        // Controlla formato (anche omocodia) e carattere di controllo
+        function validaCodiceFiscale(cf) {
+            cf = String(cf || '').toUpperCase().replace(/\s+/g, '');
+            if (!/^[A-Z]{6}[0-9LMNPQRSTUV]{2}[ABCDEHLMPRST][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]$/.test(cf)) return false;
+            let somma = 0;
+            for (let i = 0; i < 15; i++) {
+                const ch = cf[i], n = /[0-9]/.test(ch) ? ch.charCodeAt(0) - 48 : ch.charCodeAt(0) - 65;
+                somma += (i % 2 === 0) ? CF_DISPARI[n] : n;
+            }
+            return String.fromCharCode(65 + (somma % 26)) === cf[15];
+        }
+
+        const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+        const DOMINI_COMUNI = ['gmail.com', 'hotmail.com', 'hotmail.it', 'outlook.com', 'outlook.it', 'yahoo.com', 'yahoo.it', 'libero.it', 'icloud.com', 'live.it', 'live.com', 'tiscali.it', 'virgilio.it', 'alice.it', 'tin.it', 'fastwebnet.it', 'msn.com', 'proton.me', 'protonmail.com', 'pec.it', 'aruba.it'];
+
+        function distanza(a, b) {
+            const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+            for (let j = 1; j <= b.length; j++) d[0][j] = j;
+            for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+                d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+            return d[a.length][b.length];
+        }
+
+        // Propone una correzione solo per refusi evidenti nei domini più diffusi (es. gmial.com)
+        function suggerisciEmail(email) {
+            const p = String(email || '').trim().split('@');
+            if (p.length !== 2 || !p[0]) return null;
+            const dom = p[1].toLowerCase();
+            if (DOMINI_COMUNI.includes(dom)) return null;
+            const max = dom.length >= 9 ? 2 : 1;
+            let best = null, bd = max + 1;
+            DOMINI_COMUNI.forEach(d => { const x = distanza(dom, d); if (x < bd) { bd = x; best = d; } });
+            return best ? p[0] + '@' + best : null;
+        }
+
+        let emailConfermata = false;
+
+        function mostraErrore(id, campo, testo) {
+            const el = document.getElementById(id), inp = document.getElementById(campo);
+            if (el) { el.textContent = testo || ''; el.classList.toggle('hidden', !testo); }
+            if (inp) inp.classList.toggle('border-red-500', !!testo);
+        }
+
+        function statoStraniero() {
+            const on = document.getElementById('checkin-straniero').checked;
+            const inp = document.getElementById('checkin-cf');
+            inp.required = !on;
+            if (on) { inp.value = ''; }
+            inp.disabled = on;
+            inp.classList.toggle('opacity-50', on);
+            mostraErrore('err-cf', 'checkin-cf', '');
+        }
+
+        function emailModificata() { emailConfermata = false; document.getElementById('sugg-email').classList.add('hidden'); mostraErrore('err-email', 'checkin-email', ''); }
+
+        function correggiEmail(nuova) {
+            document.getElementById('checkin-email').value = nuova;
+            emailConfermata = true;
+            document.getElementById('sugg-email').classList.add('hidden');
+            mostraErrore('err-email', 'checkin-email', '');
+        }
+        function emailGiusta() { emailConfermata = true; document.getElementById('sugg-email').classList.add('hidden'); }
+
+        // mostra = true: segnala l'errore; false: toglie l'errore appena il campo diventa corretto
+        function validaCampo(quale, mostra) {
+            if (quale === 'cf') {
+                if (document.getElementById('checkin-straniero').checked) return true;
+                const v = document.getElementById('checkin-cf').value.trim();
+                if (!v) { if (mostra) mostraErrore('err-cf', 'checkin-cf', t('err_cf_vuoto')); return false; }
+                if (!validaCodiceFiscale(v)) { if (mostra) mostraErrore('err-cf', 'checkin-cf', t('err_cf_invalido')); return false; }
+                mostraErrore('err-cf', 'checkin-cf', '');
+                return true;
+            }
+            const v = document.getElementById('checkin-email').value.trim();
+            if (!v) { if (mostra) mostraErrore('err-email', 'checkin-email', t('err_email_vuoto')); return false; }
+            if (!EMAIL_RE.test(v)) { if (mostra) mostraErrore('err-email', 'checkin-email', t('err_email_invalido')); return false; }
+            mostraErrore('err-email', 'checkin-email', '');
+            const sugg = suggerisciEmail(v);
+            if (sugg && !emailConfermata) {
+                if (mostra) {
+                    const box = document.getElementById('sugg-email');
+                    box.innerHTML = '<p>' + t('sugg_email').replace('{email}', sugg.replace(/&/g, '&amp;').replace(/</g, '&lt;')) + '</p>' +
+                        '<div class="flex gap-2"><button type="button" class="px-3 py-1.5 rounded-lg bg-amber-500 text-white font-bold" id="btn-correggi-email">' + t('btn_correggi') + '</button>' +
+                        '<button type="button" class="px-3 py-1.5 rounded-lg bg-white border border-amber-400 font-bold" onclick="emailGiusta()">' + t('btn_no_giusta') + '</button></div>';
+                    document.getElementById('btn-correggi-email').onclick = () => correggiEmail(sugg);
+                    box.classList.remove('hidden');
+                }
+                return false;
+            }
+            return true;
+        }
+
+        function validaTutto() {
+            const okCf = validaCampo('cf', true), okMail = validaCampo('email', true);
+            if (okCf && okMail) return true;
+            const primo = !okCf ? document.getElementById('checkin-cf') : document.getElementById('checkin-email');
+            primo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        }
 
         function setLanguage(lang) {
             currentLang = lang;
@@ -235,6 +371,7 @@
 
        async function inviaCheckin(e) {
     e.preventDefault();
+    if (!validaTutto()) return;
     
     const btn = document.getElementById('btn-submit-checkin');
     btn.disabled = true;
@@ -253,7 +390,7 @@
 
     const datiCheckin = {
         nome_cognome: document.getElementById('checkin-nome').value.trim(),
-        cf_piva: document.getElementById('checkin-cf').value.trim().toUpperCase(),
+        cf_piva: document.getElementById('checkin-straniero').checked ? '' : document.getElementById('checkin-cf').value.trim().toUpperCase(),
         telefono: document.getElementById('checkin-tel').value.trim(),
         email: document.getElementById('checkin-email').value.trim(),
         indirizzo: document.getElementById('checkin-indirizzo').value.trim(),
