@@ -28,6 +28,22 @@
         @media (max-width: 767px) {
             #admin-panel input:not([type=checkbox]), #admin-panel select, #admin-panel textarea { font-size: 16px; }
         }
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        @media (max-width: 767px) {
+            #admin-panel .text-\[9px\] { font-size: 10.5px !important; }
+            #admin-panel .text-\[10px\] { font-size: 11.5px !important; }
+            #admin-panel .text-\[11px\] { font-size: 12.5px !important; }
+            #admin-panel input:not([type=checkbox]), #admin-panel select { min-height: 44px; }
+        }
+        /* Alto contrasto per l'uso in pieno sole */
+        body.contrasto { background: #fff !important; }
+        body.contrasto .text-slate-400, body.contrasto .text-slate-500 { color: #334155 !important; }
+        body.contrasto .text-slate-600 { color: #1e293b !important; }
+        body.contrasto .border-slate-200, body.contrasto .border-slate-100 { border-color: #64748b !important; }
+        body.contrasto .bg-slate-50, body.contrasto .bg-slate-100 { background-color: #eef2f7 !important; }
+        body.contrasto #admin-panel .text-\[9px\], body.contrasto #admin-panel .text-\[10px\] { font-size: 12px !important; }
+        body.contrasto #admin-panel .text-\[11px\] { font-size: 13px !important; }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans">
@@ -72,11 +88,12 @@
                     <span class="text-lg font-black tracking-widest text-cyan-400">NAUTICOVI</span>
                 </div>
                 <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-bold uppercase flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> SUPABASE CLOUD LIVE
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> <span id="nav-oggi">ONLINE</span>
                 </span>
             </div>
             <div class="flex gap-3 items-center">
                 <a href="index.html" class="text-xs text-cyan-400 hover:text-white font-bold"><i class="fa-solid fa-house"></i> Home</a>
+                <button type="button" onclick="toggleContrasto()" title="Alto contrasto (pieno sole)" aria-label="Alto contrasto" class="text-sm text-slate-300 hover:text-white"><i class="fa-solid fa-circle-half-stroke"></i></button>
                 <button onclick="logout()" class="text-xs text-slate-400 hover:text-white font-bold">Esci</button>
             </div>
         </nav>
@@ -84,6 +101,22 @@
         <div class="max-w-7xl mx-auto p-4 lg:p-6 pb-28 md:pb-12 space-y-5">
 
             <div id="tabs-desktop" class="hidden md:flex gap-2"></div>
+
+            <!-- ============ SCHEDA: OGGI ============ -->
+            <div id="pane-oggi" class="tab-pane space-y-4">
+                <div class="flex items-center justify-between gap-2">
+                    <div>
+                        <h2 id="oggi-titolo" class="text-lg font-extrabold text-slate-800"></h2>
+                        <p id="oggi-sottotitolo" class="text-xs text-slate-500"></p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="nuovoNoleggioDa('', dataLocaleISO(), null)" class="bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold px-3 py-2.5 rounded-xl shadow"><i class="fa-solid fa-plus"></i> Nuovo</button>
+                        <button type="button" onclick="aggiornaDati(true)" aria-label="Aggiorna" class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 w-11 h-11 rounded-xl shadow"><i class="fa-solid fa-arrows-rotate"></i></button>
+                    </div>
+                </div>
+                <div id="oggi-meteo"></div>
+                <div id="oggi-contenuto" class="space-y-4"></div>
+            </div>
 
             <!-- ============ SCHEDA: NOLEGGI ============ -->
             <div id="pane-noleggi" class="tab-pane space-y-4">
@@ -101,35 +134,28 @@
                         <form id="crmForm" onsubmit="salvaNoleggio(event)" class="space-y-3 text-xs">
                             <input type="hidden" id="noleggio_edit_id" value="">
 
-                            <div>
-                                <label class="block font-bold text-slate-600 uppercase">Nome e Cognome Cliente</label>
-                                <input type="text" id="nome" required placeholder="Mario Rossi" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
-                            </div>
-                            <div>
-                                <label class="block font-bold text-slate-600 uppercase">Telefono (WhatsApp)</label>
-                                <input type="tel" id="telefono" required placeholder="+39 333..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
-                            </div>
-
                             <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="block font-bold text-slate-600 uppercase">Barca</label>
-                                    <select id="barca" required onchange="onSelezioneNoleggio()" class="w-full mt-1 p-2 border rounded-lg bg-white outline-none font-semibold">
-                                        <option value="">Caricamento flotta...</option>
-                                    </select>
-                                </div>
                                 <div>
                                     <label class="block font-bold text-slate-600 uppercase">Data Noleggio</label>
                                     <input type="date" id="data_noleggio" required onchange="onSelezioneNoleggio()" class="w-full mt-1 p-2 border rounded-lg outline-none">
                                 </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="block font-bold text-slate-600 uppercase">Tipo Uscita</label>
                                     <select id="tipo_uscita" onchange="impostaPresetRientro()" class="w-full mt-1 p-2 border rounded-lg bg-white outline-none font-semibold">
                                         <option value="intera" selected>Intera giornata</option>
                                         <option value="mezza_mattina">Mezza - mattina</option>
                                         <option value="mezza_pomeriggio">Mezza - pomeriggio</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <p id="hint-disponibilita" class="hidden text-[10px] rounded-lg p-2 font-semibold border"></p>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block font-bold text-slate-600 uppercase">Barca</label>
+                                    <select id="barca" required onchange="onSelezioneNoleggio()" class="w-full mt-1 p-2 border rounded-lg bg-white outline-none font-semibold">
+                                        <option value="">Caricamento flotta...</option>
                                     </select>
                                 </div>
                                 <div>
@@ -150,7 +176,16 @@
                             </div>
 
                             <p id="hint-prezzo" class="hidden text-[10px] text-cyan-800 bg-cyan-50 border border-cyan-200 rounded-lg p-2 font-medium"></p>
-                            <p id="hint-disponibilita" class="hidden text-[10px] rounded-lg p-2 font-semibold border"></p>
+
+                            <div>
+                                <label class="block font-bold text-slate-600 uppercase">Nome e Cognome Cliente</label>
+                                <input type="text" id="nome" required placeholder="Mario Rossi" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-600 uppercase">Telefono (WhatsApp)</label>
+                                <input type="tel" id="telefono" required placeholder="+39 333..." class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+                            </div>
+
                             <p id="noleggio-msg" class="hidden"></p>
 
                             <div class="flex gap-2">
@@ -180,11 +215,13 @@
                                     <option value="saldo_da_incassare">Saldi da incassare</option>
                                     <option value="da_fatturare">Da fatturare</option>
                                 </select>
+                                <button type="button" onclick="aggiornaDati(true)" aria-label="Aggiorna" title="Aggiorna" class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-3 py-2 rounded-lg shadow"><i class="fa-solid fa-arrows-rotate"></i></button>
                                 <button type="button" onclick="esportaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold shadow flex items-center gap-1.5 whitespace-nowrap">
                                     <i class="fa-solid fa-file-excel"></i> CSV
                                 </button>
                             </div>
                         </div>
+                        <input type="search" id="cerca_noleggi" placeholder="Cerca per cliente, telefono o barca…" oninput="renderNoleggi()" class="w-full p-2.5 border rounded-xl bg-white text-sm outline-none focus:ring-2 focus:ring-cyan-500">
                         <div id="noleggiLista" class="space-y-3">
                             <p class="text-xs text-slate-400 italic">Caricamento noleggi in corso...</p>
                         </div>
@@ -475,6 +512,21 @@
         </div>
     </div>
 
+    <!-- AVVISI (TOAST) -->
+    <div id="toast-box" class="fixed left-0 right-0 bottom-20 md:bottom-5 z-[140] flex flex-col items-center gap-2 px-3 pointer-events-none"></div>
+
+    <!-- FINESTRA DI CONFERMA INTERNA -->
+    <div id="dialogo-modal" style="display:none" class="fixed inset-0 bg-slate-900/80 z-[130] items-center justify-center p-4" onclick="if (event.target === this) chiudiDialogo(false)">
+        <div class="bg-white rounded-2xl p-5 w-full max-w-sm space-y-3 shadow-2xl text-sm">
+            <h3 id="dialogo-titolo" class="font-extrabold text-base text-slate-800"></h3>
+            <p id="dialogo-testo" class="text-slate-600 whitespace-pre-line leading-relaxed"></p>
+            <div class="grid grid-cols-2 gap-2 font-bold pt-1">
+                <button type="button" id="dialogo-annulla" onclick="chiudiDialogo(false)" class="p-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl"></button>
+                <button type="button" id="dialogo-ok" onclick="chiudiDialogo(true)" class="p-3 bg-cyan-600 text-white rounded-xl"></button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODALE ANNULLAMENTO NOLEGGIO -->
     <div id="annulla-modal" style="display:none" class="fixed inset-0 bg-slate-900/80 z-[90] items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-5 w-full max-w-sm space-y-3 shadow-2xl text-xs">
@@ -573,22 +625,27 @@
 
         // ---------- Schede (barra in basso su telefono, in alto su PC) ----------
         const TABS = [
+            { k: 'oggi',      label: 'Oggi',      ico: 'fa-sun' },
             { k: 'noleggi',   label: 'Noleggi',   ico: 'fa-ship' },
             { k: 'calendario', label: 'Calendario', ico: 'fa-calendar-days' },
             { k: 'flotta',    label: 'Flotta',    ico: 'fa-anchor' },
             { k: 'dashboard', label: 'Dashboard', ico: 'fa-chart-line' },
             { k: 'cms',       label: 'CMS',       ico: 'fa-layer-group' }
         ];
-        let tabCorrente = 'noleggi';
+        let tabCorrente = 'oggi';
 
         function renderTabs() {
+            const bdg = (k, mobile) => (BADGE[k] > 0)
+                ? (mobile ? `<span class="absolute top-1 right-[18%] min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-black flex items-center justify-center">${BADGE[k]}</span>`
+                          : `<span class="ml-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-black inline-flex items-center justify-center">${BADGE[k]}</span>`)
+                : '';
             const mobile = TABS.map(t => {
                 const on = t.k === tabCorrente;
-                return `<button type="button" onclick="selezionaTab('${t.k}')" class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-bold ${on ? 'text-cyan-400' : 'text-slate-400'}"><i class="fa-solid ${t.ico} text-lg"></i>${t.label}</button>`;
+                return `<button type="button" onclick="selezionaTab('${t.k}')" class="relative flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-[10px] font-bold ${on ? 'text-cyan-400' : 'text-slate-400'}"><i class="fa-solid ${t.ico} text-lg"></i>${t.label}${bdg(t.k, true)}</button>`;
             }).join('');
             const desktop = TABS.map(t => {
                 const on = t.k === tabCorrente;
-                return `<button type="button" onclick="selezionaTab('${t.k}')" class="px-4 py-2 rounded-xl text-xs font-extrabold border ${on ? 'bg-slate-900 text-cyan-300 border-cyan-400 shadow' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}"><i class="fa-solid ${t.ico}"></i> ${t.label}</button>`;
+                return `<button type="button" onclick="selezionaTab('${t.k}')" class="px-4 py-2 rounded-xl text-xs font-extrabold border ${on ? 'bg-slate-900 text-cyan-300 border-cyan-400 shadow' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}"><i class="fa-solid ${t.ico}"></i> ${t.label}${bdg(t.k, false)}</button>`;
             }).join('');
             if (E('tabs-mobile')) E('tabs-mobile').innerHTML = mobile;
             if (E('tabs-desktop')) E('tabs-desktop').innerHTML = desktop;
@@ -598,6 +655,7 @@
             tabCorrente = k;
             document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('hidden', p.id !== 'pane-' + k));
             renderTabs();
+            if (k === 'oggi' && typeof renderOggi === 'function') { renderOggi(); if (typeof caricaMeteoOggi === 'function') caricaMeteoOggi(); }
             if (k === 'calendario' && typeof renderCalendario === 'function') renderCalendario();
             if (k === 'dashboard' && typeof aggiornaDashboardKPI === 'function') aggiornaDashboardKPI();
         }
@@ -653,6 +711,8 @@
             if (typeof renderNoleggi === 'function') renderNoleggi();
             if (typeof renderCalendario === 'function') renderCalendario();
             if (typeof aggiornaDashboardKPI === 'function') aggiornaDashboardKPI();
+            if (typeof aggiornaBadge === 'function') aggiornaBadge();
+            if (typeof renderOggi === 'function') renderOggi();
         }
 
         const barcaPerId = id => FLOTTA.find(b => String(b.id) === String(id));
@@ -661,6 +721,88 @@
         }
 
         registraInit(ricaricaFlotta);
+
+        // ---------- Avvisi (toast) e finestre di conferma interne ----------
+        function toast(msg, tipo = 'ok', opz = {}) {
+            const box = E('toast-box');
+            if (!box) return null;
+            const colori = { ok: '#10b981', err: '#ef4444', warn: '#f59e0b', info: '#06b6d4' };
+            const el = document.createElement('div');
+            el.className = 'pointer-events-auto bg-slate-900 text-white rounded-xl shadow-2xl px-4 py-3 text-sm flex items-center gap-3 w-full max-w-md';
+            el.style.borderLeft = '5px solid ' + (colori[tipo] || colori.ok);
+            const testo = document.createElement('span');
+            testo.className = 'flex-1 leading-snug whitespace-pre-line';
+            testo.textContent = msg;
+            el.appendChild(testo);
+            const chiudi = () => { if (el.parentNode) el.parentNode.removeChild(el); };
+            if (opz.azione) {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'font-extrabold text-cyan-300 hover:text-white uppercase text-xs whitespace-nowrap px-2 py-1';
+                b.textContent = opz.azione.label;
+                b.onclick = () => { chiudi(); try { opz.azione.fn(); } catch (e) { console.error(e); } };
+                el.appendChild(b);
+            }
+            const x = document.createElement('button');
+            x.type = 'button'; x.className = 'text-slate-400 hover:text-white px-1'; x.innerHTML = '<i class="fa-solid fa-xmark"></i>'; x.onclick = chiudi;
+            el.appendChild(x);
+            box.appendChild(el);
+            setTimeout(chiudi, opz.durata || (tipo === 'err' ? 9000 : (opz.azione ? 8000 : 4000)));
+            return el;
+        }
+
+        let _dialogoResolve = null;
+        function chiedi(o) {
+            return new Promise(res => {
+                _dialogoResolve = res;
+                setTxt('dialogo-titolo', o.titolo || 'Conferma');
+                setTxt('dialogo-testo', o.testo || '');
+                setTxt('dialogo-ok', o.ok || 'Conferma');
+                E('dialogo-ok').className = 'p-3 rounded-xl font-bold text-white shadow ' + (o.pericolo ? 'bg-red-600 hover:bg-red-700' : 'bg-cyan-600 hover:bg-cyan-700');
+                setTxt('dialogo-annulla', o.annulla || 'Annulla');
+                E('dialogo-modal').style.display = 'flex';
+            });
+        }
+        function chiudiDialogo(esito) {
+            E('dialogo-modal').style.display = 'none';
+            if (_dialogoResolve) { const r = _dialogoResolve; _dialogoResolve = null; r(!!esito); }
+        }
+
+        // ---------- Alto contrasto (uso in pieno sole) ----------
+        function applicaContrasto() {
+            let on = false;
+            try { on = localStorage.getItem('nauticovi_contrasto') === '1'; } catch (e) {}
+            document.body.classList.toggle('contrasto', on);
+        }
+        function toggleContrasto() {
+            let on = false;
+            try { on = localStorage.getItem('nauticovi_contrasto') !== '1'; localStorage.setItem('nauticovi_contrasto', on ? '1' : '0'); } catch (e) {}
+            document.body.classList.toggle('contrasto', on);
+            toast(on ? 'Alto contrasto attivo' : 'Alto contrasto disattivato', 'info');
+        }
+
+        // ---------- Aggiornamento dei dati (manuale e automatico) ----------
+        let ultimoAggiornamento = 0;
+        async function aggiornaDati(manuale) {
+            if (!pannelloVisibile) return;
+            if (!manuale && Date.now() - ultimoAggiornamento < 30000) return;
+            try {
+                const lavori = [];
+                if (typeof caricaNoleggi === 'function') lavori.push(caricaNoleggi());
+                lavori.push(ricaricaFlotta());
+                await Promise.all(lavori);
+                if (manuale) toast('Dati aggiornati', 'info', { durata: 1800 });
+            } catch (e) { console.error('Aggiornamento non riuscito:', e); if (manuale) toast('Aggiornamento non riuscito', 'err'); }
+        }
+        registraInit(() => {
+            applicaContrasto();
+            document.addEventListener('visibilitychange', () => { if (!document.hidden) aggiornaDati(false); });
+            window.addEventListener('focus', () => aggiornaDati(false));
+            setInterval(() => { if (!document.hidden) aggiornaDati(false); }, 300000);
+        });
+
+        // ---------- Indicatori sulle schede ----------
+        let BADGE = {};
 
         // ---------- Accesso ----------
         let pannelloVisibile = false;
@@ -876,6 +1018,8 @@
             onSelezioneNoleggio();
         }
 
+        function scegliBarcaLibera(id) { setV('barca', id); onSelezioneNoleggio(); }
+
         function onSelezioneNoleggio() {
             suggerisciPrezzo();
             aggiornaDisponibilita();
@@ -896,19 +1040,25 @@
 
             const elenco = libere ? String(libere).split(', ') : [];
             const b = barcaPerId(val('barca'));
-            let stile = 'bg-emerald-50 border-emerald-300 text-emerald-800', testo;
+            let stile = 'bg-emerald-50 border-emerald-300 text-emerald-800', testo, chips = '';
             if (!elenco.length) {
                 stile = 'bg-red-50 border-red-300 text-red-800';
                 testo = 'Nessuna barca libera in questo slot.';
             } else {
-                testo = 'Barche libere in questo slot: ' + elenco.join(', ') + '.';
+                testo = 'Barche libere in questo slot: tocca per sceglierla';
                 if (b && !elenco.includes(b.titolo)) {
                     stile = 'bg-amber-50 border-amber-300 text-amber-800';
                     testo = `⚠ ${b.titolo} non risulta libera in questo slot. ` + testo;
                 }
+                chips = elenco.map(nome => {
+                    const x = FLOTTA.find(f => f.titolo === nome);
+                    if (!x) return '';
+                    const c = coloriBarca(x), sel = String(x.id) === val('barca');
+                    return `<button type="button" onclick="scegliBarcaLibera('${esc(x.id)}')" class="px-3 py-1.5 rounded-full border-2 text-[11px] font-bold ${sel ? 'ring-2 ring-offset-1 ring-slate-500' : ''}" style="background:${c.light};color:${c.text};border-color:${c.solid}">${esc(nome)}</button>`;
+                }).join('');
             }
             box.className = 'text-[10px] rounded-lg p-2 font-semibold border ' + stile;
-            box.innerText = testo;
+            box.innerHTML = `<span class="block">${esc(testo)}</span>` + (chips ? `<div class="flex flex-wrap gap-1.5 mt-1.5">${chips}</div>` : '');
         }
 
         // ---------- Salvataggio / modifica ----------
@@ -948,7 +1098,7 @@
 
             const r = editId
                 ? await _supabase.from('noleggi').update(d).eq('id', editId)
-                : await _supabase.from('noleggi').insert([{ ...d, stato_checkin: 'in_attesa' }]);
+                : await _supabase.from('noleggi').insert([{ ...d, stato_checkin: 'in_attesa' }]).select().single();
             btn.disabled = false;
 
             if (r.error) {
@@ -960,6 +1110,11 @@
             resetFormNoleggio();
             if (window.matchMedia('(max-width: 1023px)').matches) E('box-form-noleggio').classList.add('hidden');
             await caricaNoleggi();
+            if (editId) toast('Noleggio aggiornato', 'ok');
+            else if (r.data) {
+                const nuovo = r.data;
+                toast(`Noleggio salvato: ${nuovo.nome_cliente}`, 'ok', { durata: 14000, azione: { label: 'Invia WhatsApp', fn: () => window.open('https://wa.me/' + String(nuovo.telefono || '').replace(/\D/g, '') + '?text=' + encodeURIComponent(messaggioPrenotazione(nuovo)), '_blank') } });
+            }
         }
 
         function modificaNoleggio(id) {
@@ -1022,26 +1177,29 @@
                 caparra_rimborsata: E('annulla_rimborso').checked
             }).eq('id', id);
             btn.disabled = false;
-            if (error) { alert('Errore annullamento: ' + error.message); return; }
+            if (error) { toast('Errore annullamento: ' + error.message, 'err'); return; }
             if (val('noleggio_edit_id') === String(id)) resetFormNoleggio();
             chiudiAnnulla();
             await caricaNoleggi();
+            toast('Noleggio annullato', 'warn', { azione: { label: 'Annulla', fn: () => riattivaNoleggio(id) } });
         }
 
         async function riattivaNoleggio(id) {
-            if (!confirm('Riattivare questo noleggio? Lo slot verrà occupato di nuovo (se è ancora libero).')) return;
             const { error } = await _supabase.from('noleggi').update({
                 stato_noleggio: 'confermato', motivo_annullamento: null, nota_annullamento: null,
                 data_annullamento: null, caparra_rimborsata: false
             }).eq('id', id);
-            if (error) { alert(error.message); return; }
+            if (error) { toast(error.message, 'err'); return; }
             await caricaNoleggi();
+            toast('Noleggio riattivato', 'ok');
         }
 
         async function eliminaNoleggio(id) {
-            if (!confirm('Eliminare definitivamente questo noleggio dal database? Per tenerne traccia nelle statistiche usa "Annulla".')) return;
+            const n = listaNoleggi.find(x => String(x.id) === String(id));
+            const ok = await chiedi({ titolo: 'Eliminare il noleggio?', testo: (n ? `${n.nome_cliente} · ${formattaDataIT(n.data_noleggio)}\n\n` : '') + 'Verrà eliminato definitivamente dal database. Per tenerne traccia nelle statistiche usa "Annulla noleggio".', ok: 'Elimina', pericolo: true });
+            if (!ok) return;
             const { error } = await _supabase.from('noleggi').delete().eq('id', id);
-            if (error) alert('Errore eliminazione: ' + error.message);
+            if (error) toast('Errore eliminazione: ' + error.message, 'err'); else toast('Noleggio eliminato', 'info');
             await caricaNoleggi();
         }
 
@@ -1055,9 +1213,12 @@
                     return;
                 }
                 listaNoleggi = data || [];
+                ultimoAggiornamento = Date.now();
                 renderNoleggi();
                 if (typeof renderCalendario === 'function') renderCalendario();
                 if (typeof aggiornaDashboardKPI === 'function') aggiornaDashboardKPI();
+                if (typeof aggiornaBadge === 'function') aggiornaBadge();
+                if (typeof renderOggi === 'function') renderOggi();
             } catch (err) {
                 console.error('Errore di rete:', err);
             }
@@ -1066,8 +1227,11 @@
         function noleggiFiltrati() {
             const f = val('filtroNoleggi') || 'tutti';
             const oggi = dataLocaleISO(), mese = oggi.slice(0, 7);
+            const q = (val('cerca_noleggi') || '').trim().toLowerCase();
+            const qCifre = q.replace(/\D/g, '');
             const righe = listaNoleggi.filter(n => {
                 const ann = n.stato_noleggio === 'annullato';
+                if (q) return String(n.nome_cliente || '').toLowerCase().includes(q) || String(n.barca || '').toLowerCase().includes(q) || (qCifre.length >= 3 && String(n.telefono || '').replace(/\D/g, '').includes(qCifre));
                 if (f === 'annullati') return ann;
                 if (ann && f !== 'tutti') return false;
                 if (f === 'checkin_mancante') return n.data_noleggio >= oggi && n.stato_checkin !== 'completato';
@@ -1079,7 +1243,7 @@
                 if (f === 'mese') return String(n.data_noleggio).slice(0, 7) === mese;
                 return true;
             });
-            if (['oggi', 'prossimi', 'checkin_mancante', 'caparra_da_ricevere', 'saldo_da_incassare', 'da_fatturare'].includes(f)) {
+            if (!q && ['oggi', 'prossimi', 'checkin_mancante', 'caparra_da_ricevere', 'saldo_da_incassare', 'da_fatturare'].includes(f)) {
                 righe.sort((a, b) => String(a.data_noleggio).localeCompare(String(b.data_noleggio)) ||
                     (a.tipo_uscita === 'mezza_pomeriggio' ? 1 : 0) - (b.tipo_uscita === 'mezza_pomeriggio' ? 1 : 0));
             }
@@ -1131,74 +1295,113 @@
         const btnN = (cls, onclick, ico, label, title) =>
             `<button type="button" onclick="${onclick}" title="${esc(title || label)}" class="${cls} px-2.5 py-1.5 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow whitespace-nowrap disabled:opacity-50"><i class="fa-solid ${ico} text-xs"></i> ${label}</button>`;
 
+        // ---------- Scheda del noleggio: un'azione principale + "Altre azioni" ----------
+        const btnG = (cls, onclick, ico, label) =>
+            `<button type="button" onclick="${onclick}" class="${cls} flex-1 min-h-[48px] px-3 rounded-xl font-extrabold text-sm shadow flex items-center justify-center gap-2"><i class="fa-solid ${ico}"></i> ${label}</button>`;
+        const linkG = (cls, href, ico, label) =>
+            `<a href="${href}" target="_blank" class="${cls} flex-1 min-h-[48px] px-3 rounded-xl font-extrabold text-sm shadow flex items-center justify-center gap-2"><i class="${ico}"></i> ${label}</a>`;
+        const linkP = (cls, href, ico, label, title) =>
+            `<a href="${href}" target="_blank" title="${esc(title || label)}" class="${cls} px-2.5 py-1.5 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow whitespace-nowrap"><i class="${ico} text-xs"></i> ${label}</a>`;
+
+        // Quale azione serve adesso? Dipende dalla fase: prima del noleggio, il giorno stesso, dopo l'uscita
+        function azioniNoleggio(n, oggi) {
+            const id = esc(n.id), tel = String(n.telefono || '').replace(/\D/g, '');
+            const saldato = !!n.saldo_incassato_il, emessa = n.stato_fattura === 'emessa';
+            const href1 = `https://wa.me/${tel}?text=${encodeURIComponent(messaggioPrenotazione(n))}`;
+            const href2 = `https://wa.me/${tel}?text=${encodeURIComponent(messaggioGiornoNoleggio(n))}`;
+            const A = {
+                caparra: { ok: !n.caparra_ricevuta_il && !saldato,
+                    g: () => btnG('bg-emerald-600 hover:bg-emerald-700 text-white', `confermaCaparra('${id}')`, 'fa-hand-holding-dollar', 'Caparra ricevuta'),
+                    p: () => btnN('bg-emerald-600 hover:bg-emerald-700 text-white', `confermaCaparra('${id}')`, 'fa-hand-holding-dollar', 'Caparra ricevuta') },
+                invia: { ok: true,
+                    g: () => linkG('bg-emerald-500 hover:bg-emerald-600 text-white', href1, 'fa-brands fa-whatsapp', 'Invia Link'),
+                    p: () => linkP('bg-emerald-500 hover:bg-emerald-600 text-white', href1, 'fa-brands fa-whatsapp', 'Invia Link', 'Primo messaggio: conferma, Web Check-in e Guest Portal') },
+                oggi: { ok: n.data_noleggio === oggi,
+                    g: () => linkG('bg-cyan-600 hover:bg-cyan-700 text-white', href2, 'fa-solid fa-sun', 'Link di oggi'),
+                    p: () => linkP('bg-cyan-600 hover:bg-cyan-700 text-white', href2, 'fa-solid fa-sun', 'Link di oggi', 'Secondo messaggio: link al Guest Portal per oggi') },
+                copia: { ok: true, g: () => '',
+                    p: () => btnN('bg-slate-200 hover:bg-slate-300 text-slate-700', `copiaLinkGuest('${id}', this)`, 'fa-link', 'Copia link', 'Copia il link personale del Guest Portal') },
+                rientro: { ok: true,
+                    g: () => btnG('bg-slate-800 hover:bg-slate-900 text-white', `apriRientro('${id}')`, 'fa-anchor', saldato ? 'Rientro / incasso' : 'Rientro e saldo'),
+                    p: () => btnN('bg-slate-800 hover:bg-slate-900 text-white', `apriRientro('${id}')`, 'fa-anchor', saldato ? 'Rientro / incasso' : 'Rientro e saldo') },
+                fic: { ok: true,
+                    g: () => btnG(emessa ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white', `generaFatturaInCloud('${id}', this)`, emessa ? 'fa-rotate' : 'fa-file-invoice-dollar', emessa ? 'Rigenera FIC' : 'Genera FIC'),
+                    p: () => emessa
+                        ? btnN('bg-amber-500 hover:bg-amber-600 text-white', `generaFatturaInCloud('${id}', this)`, 'fa-rotate', 'Rigenera FIC', "Esiste già una bozza: rigenera solo se l'hai eliminata dal portale")
+                        : btnN('bg-blue-600 hover:bg-blue-700 text-white', `generaFatturaInCloud('${id}', this)`, 'fa-file-invoice-dollar', 'Genera FIC') },
+                annulla: { ok: true, g: () => '', p: () => btnN('bg-white border border-amber-300 text-amber-700 hover:bg-amber-50', `apriAnnulla('${id}')`, 'fa-ban', 'Annulla noleggio') },
+                elimina: { ok: true, g: () => '', p: () => btnN('bg-white border border-red-200 text-red-500 hover:bg-red-50', `eliminaNoleggio('${id}')`, 'fa-trash', 'Elimina') }
+            };
+            let primarie;
+            if (n.data_noleggio > oggi) primarie = A.caparra.ok ? ['caparra'] : ['invia'];
+            else if (n.data_noleggio === oggi) primarie = !saldato ? ['oggi', 'rientro'] : (!emessa ? ['fic'] : []);
+            else primarie = !saldato ? ['rientro'] : (!emessa ? ['fic'] : []);
+            const ordineMenu = ['invia', 'oggi', 'copia', 'caparra', 'rientro', 'fic', 'annulla', 'elimina'];
+            return {
+                primarie: primarie.filter(k => A[k].ok).map(k => A[k].g()).join(''),
+                menu: ordineMenu.filter(k => A[k].ok && !primarie.includes(k)).map(k => A[k].p()).join('')
+            };
+        }
+
+        function schedaNoleggio(n, oggi) {
+            const ann = n.stato_noleggio === 'annullato';
+            const id = esc(n.id);
+            const rientro = n.ora_rientro ? String(n.ora_rientro).slice(0, 5) : '';
+            const fuoriServ = !ann && n.barca_id && periodoFuoriServizio(n.barca_id, n.data_noleggio);
+
+            const badge = (cls, t) => `<span class="${cls} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase whitespace-nowrap">${t}</span>`;
+            const badges = [];
+            if (ann) badges.push(badge('bg-red-100 text-red-800', 'Annullato'));
+            if (!n.tipo_uscita && !ann) badges.push(badge('bg-slate-200 text-slate-600', 'Senza slot (test)'));
+            if (!ann) badges.push(n.stato_checkin === 'completato' ? badge('bg-emerald-100 text-emerald-800', '✓ Check-in') : badge('bg-amber-100 text-amber-800', '⌛ Check-in'));
+            if (!ann && typeof statoPagamento === 'function') { const sp = statoPagamento(n); badges.push(badge(sp.cls, sp.label)); }
+            if (!ann && n.stato_fattura === 'emessa') badges.push(badge('bg-blue-100 text-blue-800', '✓ Bozza fattura'));
+            if (fuoriServ) badges.push(badge('bg-red-100 text-red-800', '⚠ Barca fuori servizio'));
+
+            let azioni;
+            if (ann) {
+                azioni = `<div class="flex gap-2 mt-3">${btnG('bg-slate-700 hover:bg-slate-800 text-white', `riattivaNoleggio('${id}')`, 'fa-rotate-left', 'Riattiva noleggio')}</div>
+                          <details class="mt-2"><summary class="text-[11px] font-bold text-slate-500 cursor-pointer py-1.5">Altre azioni ▾</summary><div class="flex flex-wrap gap-1.5 pt-2">${btnN('bg-white border border-red-200 text-red-500 hover:bg-red-50', `eliminaNoleggio('${id}')`, 'fa-trash', 'Elimina')}</div></details>`;
+            } else {
+                const a = azioniNoleggio(n, oggi);
+                const completo = `<div class="flex-1 min-h-[48px] rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-sm flex items-center justify-center gap-2"><i class="fa-solid fa-circle-check"></i> Tutto completo</div>`;
+                azioni = `<div class="flex gap-2 mt-3">${a.primarie || completo}<button type="button" onclick="modificaNoleggio('${id}')" aria-label="Modifica" title="Modifica" class="w-12 min-h-[48px] rounded-xl bg-white border border-cyan-200 text-cyan-700 hover:bg-cyan-50 flex-shrink-0"><i class="fa-solid fa-pen"></i></button></div>
+                          <details class="mt-2"><summary class="text-[11px] font-bold text-slate-500 cursor-pointer py-1.5">Altre azioni ▾</summary><div class="flex flex-wrap gap-1.5 pt-2">${a.menu}</div></details>`;
+            }
+
+            const infoAnnullo = ann
+                ? `<p class="text-[11px] text-red-700 bg-red-50 border border-red-100 rounded-lg p-2 mt-2">Motivo: <b>${esc(MOTIVI_ANNULLO[n.motivo_annullamento] || n.motivo_annullamento || '—')}</b> · Caparra ${n.caparra_rimborsata ? '<b>rimborsata</b>' : '<b>non rimborsata</b>'}${n.nota_annullamento ? ' · ' + esc(n.nota_annullamento) : ''}</p>`
+                : '';
+
+            return `<div class="bg-white rounded-2xl shadow border border-slate-200 p-3.5 ${ann ? 'opacity-75' : ''}" style="border-left:5px solid ${coloriBarca(barcaPerId(n.barca_id)).solid}">
+                <div class="flex justify-between items-start gap-2">
+                    <div class="min-w-0">
+                        <b class="text-slate-900 text-base ${ann ? 'line-through' : ''}">${esc(n.nome_cliente)}</b>
+                        <p class="text-[11px] text-slate-600 mt-0.5"><i class="fa-solid fa-ship text-cyan-600"></i> <b>${esc(n.barca)}</b> · <i class="fa-regular fa-calendar text-cyan-600"></i> ${esc(formattaDataIT(n.data_noleggio))}${n.tipo_uscita ? ' · ' + esc(etichettaSlot(n.tipo_uscita)) : ''}${rientro ? ' · ↩ ' + esc(rientro) : ''}</p>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <b class="text-emerald-600 text-sm">€${esc(n.importo)}</b>
+                        <p class="text-[10px] text-slate-400">caparra €${esc(n.caparra)}</p>
+                    </div>
+                </div>
+                ${badges.length ? `<div class="flex flex-wrap gap-1.5 mt-2">${badges.join('')}</div>` : ''}
+                ${ann ? '' : ((typeof infoPagamento === 'function') ? infoPagamento(n) : '')}
+                ${infoAnnullo}
+                ${azioni}
+            </div>`;
+        }
+
         function renderNoleggi() {
             const box = E('noleggiLista');
             if (!box) return;
             const righe = noleggiFiltrati();
+            const cerca = (val('cerca_noleggi') || '').trim();
             if (!righe.length) {
-                box.innerHTML = '<p class="text-xs text-slate-400 italic py-6 text-center">Nessun noleggio per questo filtro.</p>';
+                box.innerHTML = `<p class="text-xs text-slate-400 italic py-6 text-center">${cerca ? 'Nessun risultato per "' + esc(cerca) + '".' : 'Nessun noleggio per questo filtro.'}</p>`;
                 return;
             }
             const oggi = dataLocaleISO();
-
-            box.innerHTML = righe.map(n => {
-                const ann = n.stato_noleggio === 'annullato';
-                const id = esc(n.id);
-                const telefonoWa = String(n.telefono || '').replace(/\D/g, '');
-                const rientro = n.ora_rientro ? String(n.ora_rientro).slice(0, 5) : '';
-                const fuoriServ = !ann && n.barca_id && periodoFuoriServizio(n.barca_id, n.data_noleggio);
-
-                const badge = (cls, t) => `<span class="${cls} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase whitespace-nowrap">${t}</span>`;
-                const badges = [];
-                if (ann) badges.push(badge('bg-red-100 text-red-800', 'Annullato'));
-                if (!n.tipo_uscita && !ann) badges.push(badge('bg-slate-200 text-slate-600', 'Senza slot (test)'));
-                if (!ann) badges.push(n.stato_checkin === 'completato' ? badge('bg-emerald-100 text-emerald-800', '✓ Check-in') : badge('bg-amber-100 text-amber-800', '⌛ Check-in'));
-                if (!ann && typeof statoPagamento === 'function') { const sp = statoPagamento(n); badges.push(badge(sp.cls, sp.label)); }
-                if (!ann && n.stato_fattura === 'emessa') badges.push(badge('bg-blue-100 text-blue-800', '✓ Bozza fattura'));
-                if (fuoriServ) badges.push(badge('bg-red-100 text-red-800', '⚠ Barca fuori servizio'));
-
-                let azioni = '';
-                if (ann) {
-                    azioni = btnN('bg-slate-700 hover:bg-slate-800 text-white', `riattivaNoleggio('${id}')`, 'fa-rotate-left', 'Riattiva')
-                           + btnN('bg-white border border-red-200 text-red-500 hover:bg-red-50', `eliminaNoleggio('${id}')`, 'fa-trash', 'Elimina');
-                } else {
-                    const msg1 = encodeURIComponent(messaggioPrenotazione(n));
-                    const msg2 = encodeURIComponent(messaggioGiornoNoleggio(n));
-                    const emessa = n.stato_fattura === 'emessa';
-                    azioni =
-                        `<a href="https://wa.me/${telefonoWa}?text=${msg1}" target="_blank" title="Primo messaggio: conferma, Web Check-in e Guest Portal" class="bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1.5 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow whitespace-nowrap"><i class="fa-brands fa-whatsapp text-xs"></i> Invia Link</a>`
-                      + (n.data_noleggio === oggi ? `<a href="https://wa.me/${telefonoWa}?text=${msg2}" target="_blank" title="Secondo messaggio: link al Guest Portal per oggi" class="bg-cyan-600 hover:bg-cyan-700 text-white px-2.5 py-1.5 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow whitespace-nowrap"><i class="fa-solid fa-sun text-xs"></i> Link di oggi</a>` : '')
-                      + btnN('bg-slate-200 hover:bg-slate-300 text-slate-700', `copiaLinkGuest('${id}', this)`, 'fa-link', 'Copia link', 'Copia il link personale del Guest Portal')
-                      + (emessa
-                          ? btnN('bg-amber-500 hover:bg-amber-600 text-white', `generaFatturaInCloud('${id}', this)`, 'fa-rotate', 'Rigenera FIC', "Esiste già una bozza: rigenera solo se l'hai eliminata dal portale")
-                          : btnN('bg-blue-600 hover:bg-blue-700 text-white', `generaFatturaInCloud('${id}', this)`, 'fa-file-invoice-dollar', 'Genera FIC'))
-                      + ((typeof bottoniPagamento === 'function') ? bottoniPagamento(n) : '')
-                      + btnN('bg-white border border-cyan-200 text-cyan-700 hover:bg-cyan-50', `modificaNoleggio('${id}')`, 'fa-pen', 'Modifica')
-                      + btnN('bg-white border border-amber-300 text-amber-700 hover:bg-amber-50', `apriAnnulla('${id}')`, 'fa-ban', 'Annulla')
-                      + btnN('bg-white border border-red-200 text-red-500 hover:bg-red-50', `eliminaNoleggio('${id}')`, 'fa-trash', '', 'Elimina');
-                }
-
-                const infoAnnullo = ann
-                    ? `<p class="text-[11px] text-red-700 bg-red-50 border border-red-100 rounded-lg p-2 mt-2">Motivo: <b>${esc(MOTIVI_ANNULLO[n.motivo_annullamento] || n.motivo_annullamento || '—')}</b> · Caparra ${n.caparra_rimborsata ? '<b>rimborsata</b>' : '<b>non rimborsata</b>'}${n.nota_annullamento ? ' · ' + esc(n.nota_annullamento) : ''}</p>`
-                    : '';
-
-                return `<div class="bg-white rounded-2xl shadow border border-slate-200 p-3.5 ${ann ? 'opacity-75' : ''}" style="border-left:5px solid ${coloriBarca(barcaPerId(n.barca_id)).solid}">
-                    <div class="flex justify-between items-start gap-2">
-                        <div class="min-w-0">
-                            <b class="text-slate-900 text-sm ${ann ? 'line-through' : ''}">${esc(n.nome_cliente)}</b>
-                            <p class="text-[11px] text-slate-600 mt-0.5"><i class="fa-solid fa-ship text-cyan-600"></i> <b>${esc(n.barca)}</b> · <i class="fa-regular fa-calendar text-cyan-600"></i> ${esc(formattaDataIT(n.data_noleggio))}${n.tipo_uscita ? ' · ' + esc(etichettaSlot(n.tipo_uscita)) : ''}${rientro ? ' · ↩ ' + esc(rientro) : ''}</p>
-                        </div>
-                        <div class="text-right flex-shrink-0">
-                            <b class="text-emerald-600 text-sm">€${esc(n.importo)}</b>
-                            <p class="text-[10px] text-slate-400">caparra €${esc(n.caparra)}</p>
-                        </div>
-                    </div>
-                    ${badges.length ? `<div class="flex flex-wrap gap-1.5 mt-2">${badges.join('')}</div>` : ''}
-                    ${ann ? '' : ((typeof infoPagamento === 'function') ? infoPagamento(n) : '')}
-                    ${infoAnnullo}
-                    <div class="flex flex-wrap gap-1.5 mt-2.5">${azioni}</div>
-                </div>`;
-            }).join('');
+            box.innerHTML = righe.map(n => schedaNoleggio(n, oggi)).join('');
         }
 
         function esportaCSV() {
@@ -1241,7 +1444,7 @@
 
             const n = listaNoleggi.find(x => String(x.id) === key);
             if (n && n.stato_fattura === 'emessa') {
-                const ok = confirm("Per questo noleggio esiste già una bozza su Fatture in Cloud.\n\nRigenerala solo se l'hai eliminata dal portale, altrimenti avrai due bozze identiche.\n\nVuoi crearne una nuova?");
+                const ok = await chiedi({ titolo: 'Bozza già esistente', testo: "Per questo noleggio esiste già una bozza su Fatture in Cloud.\n\nRigenerala solo se l'hai eliminata dal portale, altrimenti avrai due bozze identiche.\n\nVuoi crearne una nuova?", ok: 'Crea una nuova bozza', pericolo: true });
                 if (!ok) return;
             }
 
@@ -1258,13 +1461,13 @@
         async function creaBozzaFatturaInCloud(noleggioId) {
             const noleggio = listaNoleggi.find(n => String(n.id) === String(noleggioId));
             if (!noleggio) {
-                alert("Noleggio non trovato. Ricarica la pagina e riprova.");
+                toast("Noleggio non trovato. Ricarica la pagina e riprova.", 'err');
                 return;
             }
 
             const { data: { session } } = await _supabase.auth.getSession();
             if (!session) {
-                alert("Sessione scaduta. Effettua di nuovo l'accesso.");
+                toast("Sessione scaduta. Effettua di nuovo l'accesso.", 'err');
                 mostraLogin();
                 return;
             }
@@ -1288,11 +1491,11 @@
 
             const importoTotale = Math.round(parseFloat(noleggio.importo) * 100) / 100;
             if (!importoTotale || importoTotale <= 0) {
-                alert("Importo non valido per questo noleggio.");
+                toast("Importo non valido per questo noleggio.", 'err');
                 return;
             }
 
-            const conferma = confirm(`Vuoi generare la BOZZA di fattura per ${clienteData.nome_cognome} (€${importoTotale}) su Fatture in Cloud?`);
+            const conferma = await chiedi({ titolo: 'Creare la bozza di fattura?', testo: `Vuoi generare la BOZZA di fattura per ${clienteData.nome_cognome} (€${importoTotale}) su Fatture in Cloud?`, ok: 'Crea bozza' });
             if (!conferma) return;
 
             const entityData = {
@@ -1359,14 +1562,14 @@
                 const data = await res.json();
 
                 if (res.ok && data.data) {
-                    alert("BOZZA CREATA SU FATTURE IN CLOUD!\n\nID Bozza: " + data.data.id + "\nIl documento è nella sezione \"Bozze\" del tuo account.");
+                    toast('Bozza creata su Fatture in Cloud (ID ' + data.data.id + '). La trovi nella sezione Bozze del portale.', 'ok', { durata: 10000 });
                     await _supabase.from('noleggi').update({ stato_fattura: 'emessa' }).eq('id', noleggioId);
                     caricaNoleggi();
                 } else {
-                    alert("Errore Fatture in Cloud:\n" + JSON.stringify(data.error || data, null, 2));
+                    toast("Errore Fatture in Cloud:\n" + JSON.stringify(data.error || data, null, 2), 'err');
                 }
             } catch (err) {
-                alert("Errore di rete: " + err.message);
+                toast("Errore di rete: " + err.message, 'err');
             }
         }
     </script>
@@ -1504,7 +1707,7 @@
             const { data: conflitti } = await q;
             if (conflitti && conflitti.length) {
                 const righe = conflitti.slice(0, 6).map(c => `• ${formattaDataIT(c.data_noleggio)} ${c.nome_cliente} (${etichettaSlot(c.tipo_uscita)})`).join('\n');
-                if (!confirm(`Attenzione: in questo periodo ci sono ${conflitti.length} noleggi già confermati su questa barca:\n${righe}${conflitti.length > 6 ? '\n…' : ''}\n\nI noleggi restano in elenco e andranno spostati su un'altra barca. Segnare comunque fuori servizio?`)) return;
+                if (!(await chiedi({ titolo: 'Noleggi già confermati nel periodo', testo: `Attenzione: in questo periodo ci sono ${conflitti.length} noleggi già confermati su questa barca:\n${righe}${conflitti.length > 6 ? '\n…' : ''}\n\nI noleggi restano in elenco e andranno spostati su un'altra barca. Segnare comunque fuori servizio?`, ok: 'Segna comunque', pericolo: true }))) return;
             }
 
             const btn = E('btn-salva-fs');
@@ -1518,6 +1721,20 @@
             setMsgFS('ok', 'Periodo fuori servizio registrato.');
         }
 
+        async function impostaFineFS(id, al) {
+            const { error } = await _supabase.from('indisponibilita').update({ al }).eq('id', id);
+            if (error) { toast(error.message, 'err'); return; }
+            await ricaricaFlotta();
+            toast('Ripristinato', 'info');
+        }
+
+        async function ripristinaPeriodo(p) {
+            const { error } = await _supabase.from('indisponibilita').insert([p]);
+            if (error) { toast(error.message, 'err'); return; }
+            await ricaricaFlotta();
+            toast('Ripristinato', 'info');
+        }
+
         async function rimettiInServizio(id) {
             const p = INDISP.find(x => String(x.id) === String(id));
             if (!p) return;
@@ -1525,25 +1742,28 @@
             const b = barcaPerId(p.barca_id);
             const nome = b ? b.titolo : 'La barca';
             if (p.dal >= oggi) {
-                if (!confirm(`${nome}: il periodo non è ancora iniziato (o inizia oggi), quindi non ha fatto perdere giorni. Eliminarlo?`)) return;
                 const { error } = await _supabase.from('indisponibilita').delete().eq('id', id);
-                if (error) { alert(error.message); return; }
+                if (error) { toast(error.message, 'err'); return; }
+                await ricaricaFlotta();
+                toast(`${nome}: il periodo non era ancora iniziato, eliminato`, 'info', { azione: { label: 'Annulla', fn: () => ripristinaPeriodo(p) } });
             } else {
                 const d = new Date(); d.setDate(d.getDate() - 1);
                 const ieri = dataLocaleISO(d);
-                if (!confirm(`Rimettere ${nome} in servizio da oggi? Il periodo fuori servizio si chiude il ${formattaDataIT(ieri)}.`)) return;
                 const { error } = await _supabase.from('indisponibilita').update({ al: ieri }).eq('id', id);
-                if (error) { alert(error.message); return; }
+                if (error) { toast(error.message, 'err'); return; }
+                await ricaricaFlotta();
+                toast(`${nome} è in servizio da oggi (periodo chiuso il ${formattaDataIT(ieri)})`, 'ok', { azione: { label: 'Annulla', fn: () => impostaFineFS(id, p.al || null) } });
             }
-            await ricaricaFlotta();
         }
 
         async function eliminaPeriodoFS(id) {
-            if (!confirm('Eliminare questo periodo? I giorni non verranno più conteggiati come persi.')) return;
+            const p = INDISP.find(x => String(x.id) === String(id));
             const { error } = await _supabase.from('indisponibilita').delete().eq('id', id);
-            if (error) { alert(error.message); return; }
+            if (error) { toast(error.message, 'err'); return; }
             await ricaricaFlotta();
+            toast('Periodo eliminato: i giorni non contano più come persi', 'info', p ? { azione: { label: 'Annulla', fn: () => ripristinaPeriodo(p) } } : {});
         }
+
     </script>
 
     <script>
@@ -1858,6 +2078,92 @@
 
     <script>
         // =============================================================================
+        // MODULO — OGGI: schermata iniziale per l'uso in banchina
+        // =============================================================================
+        const NOMI_GIORNI = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
+        const NOMI_MESI = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+        let _meteoCache = { t: 0, html: '' };
+
+        function aggiornaBadge() {
+            if (typeof statOperativo !== 'function') return;
+            const op = statOperativo(listaNoleggi, dataLocaleISO());
+            BADGE = { oggi: op.oggi.length, noleggi: op.saldi.n + op.caparre.length + op.daFatturare };
+            setTxt('nav-oggi', op.oggi.length ? `Oggi: ${op.oggi.length} uscit${op.oggi.length === 1 ? 'a' : 'e'}` : 'Oggi: nessuna uscita');
+            renderTabs();
+        }
+
+        function renderOggi() {
+            const box = E('oggi-contenuto');
+            if (!box || tabCorrente !== 'oggi') return;
+            const adesso = new Date(), oggi = dataLocaleISO();
+            setTxt('oggi-titolo', `${NOMI_GIORNI[adesso.getDay()]} ${adesso.getDate()} ${NOMI_MESI[adesso.getMonth()]}`);
+            if (typeof statOperativo !== 'function' || typeof schedaNoleggio !== 'function') {
+                box.innerHTML = '<p class="text-xs text-slate-500 text-center py-6">Schermata non disponibile: ricarica la pagina.</p>';
+                return;
+            }
+            const op = statOperativo(listaNoleggi, oggi);
+            const fsOggi = FLOTTA.filter(b => !b.ritirata && periodoFuoriServizio(b.id, oggi));
+            setTxt('oggi-sottotitolo', `${op.oggi.length} uscit${op.oggi.length === 1 ? 'a' : 'e'} oggi` + (fsOggi.length ? ` · fuori servizio: ${fsOggi.map(b => b.titolo).join(', ')}` : ''));
+
+            const tiles = (typeof dTile === 'function') ? `<div class="grid grid-cols-2 lg:grid-cols-4 gap-2">` +
+                dTile(op.checkin, 'Check-in mancanti', 'uscite da oggi in poi', 'checkin_mancante', 'bg-amber-50 border-amber-200 text-amber-900') +
+                dTile(op.caparre.length, 'Caparre da ricevere', 'uscite da oggi in poi', 'caparra_da_ricevere', 'bg-blue-50 border-blue-200 text-blue-900') +
+                dTile(op.saldi.n, 'Saldi da incassare', `€${Math.round(op.saldi.importo)} · uscite passate`, 'saldo_da_incassare', 'bg-rose-50 border-rose-200 text-rose-900') +
+                dTile(op.daFatturare, 'Da fatturare', 'saldati senza bozza', 'da_fatturare', 'bg-emerald-50 border-emerald-200 text-emerald-900') + `</div>` : '';
+
+            const vuoto = `<div class="bg-white rounded-2xl shadow border border-slate-200 p-5 text-center text-xs text-slate-500 space-y-3"><p>Nessuna uscita.</p>${typeof nuovoNoleggioDa === 'function' ? `<button type="button" onclick="nuovoNoleggioDa('', '${oggi}', null)" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold px-4 py-2.5 rounded-xl shadow"><i class="fa-solid fa-plus"></i> Nuovo noleggio</button>` : ''}</div>`;
+            const blocco = (titolo, lista) => `<section class="space-y-2"><h3 class="text-xs font-extrabold uppercase tracking-wide text-slate-600 px-1">${titolo} <span class="font-normal text-slate-400">(${lista.length})</span></h3>${lista.length ? `<div class="grid grid-cols-1 lg:grid-cols-2 gap-3">${lista.map(n => schedaNoleggio(n, oggi)).join('')}</div>` : vuoto}</section>`;
+
+            // Stato della flotta oggi (solo se il calendario è disponibile)
+            let flotta = '';
+            if (typeof indicizzaNoleggi === 'function' && typeof statoCella === 'function') {
+                const idx = indicizzaNoleggi();
+                const chip = b => {
+                    const c = coloriBarca(b), st = statoCella(idx, b.id, oggi);
+                    let stato, extra = '';
+                    if (st.fs) { stato = '⛔ fuori servizio'; extra = 'opacity-70'; }
+                    else if (st.M && st.P && st.M.id === st.P.id) stato = 'intera: ' + (st.M.nome_cliente || '').split(' ')[0];
+                    else if (st.M && st.P) stato = 'mattina e pomeriggio';
+                    else if (st.M) stato = 'mattina occupata · pomeriggio libero';
+                    else if (st.P) stato = 'mattina libera · pomeriggio occupato';
+                    else stato = '✓ libera tutto il giorno';
+                    return `<div class="rounded-xl px-3 py-2 text-[11px] ${extra}" style="background:${c.light};color:${c.text};border-left:4px solid ${c.solid}"><b class="block text-xs">${esc(b.titolo)}</b>${esc(stato)}</div>`;
+                };
+                const attive = FLOTTA.filter(b => !b.ritirata);
+                if (attive.length) flotta = `<section class="space-y-2"><h3 class="text-xs font-extrabold uppercase tracking-wide text-slate-600 px-1">Flotta oggi</h3><div class="grid grid-cols-2 lg:grid-cols-4 gap-2">${attive.map(chip).join('')}</div></section>`;
+            }
+
+            box.innerHTML = tiles + blocco('Uscite di oggi', op.oggi) + blocco('Domani', op.domani) + flotta;
+        }
+
+        // Meteo e mare di oggi (Open-Meteo, gratuito) per decidere in fretta su uscite e annullamenti
+        async function caricaMeteoOggi() {
+            const box = E('oggi-meteo');
+            if (!box) return;
+            if (_meteoCache.html && Date.now() - _meteoCache.t < 600000) { box.innerHTML = _meteoCache.html; return; }
+            try {
+                const LAT = 39.8981, LON = 15.7772;
+                const [m, mar] = await Promise.all([
+                    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,wind_speed_10m&wind_speed_unit=kn`).then(r => r.json()),
+                    fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wave_height`).then(r => r.json())
+                ]);
+                const vento = Math.round(m.current && m.current.wind_speed_10m != null ? m.current.wind_speed_10m : NaN);
+                const temp = Math.round(m.current && m.current.temperature_2m != null ? m.current.temperature_2m : NaN);
+                const onde = mar.current && mar.current.wave_height != null ? Number(mar.current.wave_height) : NaN;
+                if (isNaN(vento) && isNaN(onde)) { box.innerHTML = ''; return; }
+                const mosso = onde > 1.25 || vento >= 20, pocoMosso = onde > 0.5 || vento >= 15;
+                const stato = mosso ? ['Mare mosso', 'bg-red-100 text-red-800'] : (pocoMosso ? ['Poco mosso', 'bg-amber-100 text-amber-800'] : ['Condizioni buone', 'bg-emerald-100 text-emerald-800']);
+                const html = `<div class="bg-white rounded-2xl shadow border border-slate-200 p-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm"><b class="text-slate-700"><i class="fa-solid fa-water text-cyan-600"></i> Mare adesso</b><span>🌊 ${isNaN(onde) ? '—' : onde.toFixed(1) + ' m'}</span><span>💨 ${isNaN(vento) ? '—' : vento + ' nodi'}</span><span>🌡️ ${isNaN(temp) ? '—' : temp + '°C'}</span><span class="${stato[1]} text-[11px] font-bold px-2 py-0.5 rounded-full">${stato[0]}</span>${mosso ? '<span class="text-[11px] text-red-700 font-semibold">Valuta le uscite di oggi (annullamento per meteo).</span>' : ''}</div>`;
+                _meteoCache = { t: Date.now(), html };
+                box.innerHTML = html;
+            } catch (e) { box.innerHTML = ''; }
+        }
+
+        registraInit(() => { renderOggi(); caricaMeteoOggi(); });
+    </script>
+
+    <script>
+        // =============================================================================
         // MODULO — PAGAMENTI E RIENTRO: caparra, saldo, carburante (solo tracciato)
         // =============================================================================
         const PREZZO_LITRO = 2.5;   // €/L usato per precompilare la quota carburante (modificabile a ogni rientro)
@@ -1914,20 +2220,24 @@
         }
 
         // ---------- Caparra ----------
+        async function impostaCaparra(id, data) {
+            const { error } = await _supabase.from('noleggi').update({ caparra_ricevuta_il: data }).eq('id', id);
+            if (error) { toast('Errore: ' + error.message, 'err'); return false; }
+            await caricaNoleggi();
+            return true;
+        }
+
         async function confermaCaparra(id) {
             const n = trovaNoleggio(id);
             if (!n) return;
-            if (!confirm(`Confermi di aver ricevuto la caparra di ${euro(n.caparra)} da ${n.nome_cliente}?`)) return;
-            const { error } = await _supabase.from('noleggi').update({ caparra_ricevuta_il: dataLocaleISO() }).eq('id', id);
-            if (error) { alert('Errore: ' + error.message); return; }
-            await caricaNoleggi();
+            const prec = n.caparra_ricevuta_il || null;
+            if (await impostaCaparra(id, dataLocaleISO())) toast(`Caparra di ${euro(n.caparra)} registrata`, 'ok', { azione: { label: 'Annulla', fn: () => impostaCaparra(id, prec) } });
         }
 
         async function annullaCaparra(id) {
-            if (!confirm('Annullare la conferma di caparra ricevuta?')) return;
-            const { error } = await _supabase.from('noleggi').update({ caparra_ricevuta_il: null }).eq('id', id);
-            if (error) { alert('Errore: ' + error.message); return; }
-            await caricaNoleggi();
+            const n = trovaNoleggio(id);
+            const prec = n ? n.caparra_ricevuta_il : null;
+            if (await impostaCaparra(id, null)) toast('Conferma della caparra annullata', 'info', { azione: { label: 'Ripristina', fn: () => impostaCaparra(id, prec) } });
         }
 
         // ---------- Rientro e saldo ----------
@@ -1993,13 +2303,7 @@
         }
 
         async function caparraDaRientro(id) {
-            const n = trovaNoleggio(id);
-            if (!n) return;
-            if (!confirm(`Registrare la caparra di ${euro(n.caparra)} come ricevuta oggi?`)) return;
-            const { error } = await _supabase.from('noleggi').update({ caparra_ricevuta_il: dataLocaleISO() }).eq('id', id);
-            if (error) { setMsgRientro('err', error.message); return; }
-            await caricaNoleggi();
-            apriRientro(id);
+            if (await impostaCaparra(id, dataLocaleISO())) apriRientro(id);
         }
 
         async function salvaRientro(conIncasso) {
@@ -2016,19 +2320,32 @@
                 d.saldo_incassato = arr2(inc);
                 d.saldo_incassato_il = n.saldo_incassato_il || dataLocaleISO();
             }
+            const prev = { litri_carburante: n.litri_carburante ?? null, quota_carburante: n.quota_carburante ?? null, saldo_incassato: n.saldo_incassato ?? null, saldo_incassato_il: n.saldo_incassato_il || null };
             const { error } = await _supabase.from('noleggi').update(d).eq('id', id);
             if (error) { setMsgRientro('err', error.message); return; }
             chiudiRientro();
             await caricaNoleggi();
+            toast(conIncasso ? `Saldo di ${euro(d.saldo_incassato)} incassato` : 'Carburante registrato (incasso da fare)', 'ok', { azione: { label: 'Annulla', fn: () => ripristinaRientro(id, prev) } });
+        }
+
+        async function ripristinaRientro(id, prev) {
+            const { error } = await _supabase.from('noleggi').update(prev).eq('id', id);
+            if (error) { toast(error.message, 'err'); return; }
+            await caricaNoleggi();
+            toast('Ripristinato', 'info');
         }
 
         async function annullaIncassoSaldo() {
-            if (!confirm('Annullare l\'incasso del saldo? Verranno azzerati anche litri e quota carburante registrati, e il noleggio tornerà "da saldare". La caparra resta registrata.')) return;
-            const { error } = await _supabase.from('noleggi').update({ saldo_incassato: null, saldo_incassato_il: null, litri_carburante: null, quota_carburante: null }).eq('id', val('rientro_id'));
+            const id = val('rientro_id'), n = trovaNoleggio(id);
+            if (!n) return;
+            const prev = { litri_carburante: n.litri_carburante ?? null, quota_carburante: n.quota_carburante ?? null, saldo_incassato: n.saldo_incassato ?? null, saldo_incassato_il: n.saldo_incassato_il || null };
+            const { error } = await _supabase.from('noleggi').update({ saldo_incassato: null, saldo_incassato_il: null, litri_carburante: null, quota_carburante: null }).eq('id', id);
             if (error) { setMsgRientro('err', error.message); return; }
             chiudiRientro();
             await caricaNoleggi();
+            toast('Incasso annullato: saldo, litri e quota azzerati', 'warn', { azione: { label: 'Ripristina', fn: () => ripristinaRientro(id, prev) } });
         }
+
     </script>
 
     <script>
@@ -2579,7 +2896,7 @@
                 if (spinner) spinner.classList.add('hidden');
                 inputEl.value = '';
                 if (e && e.annullato) return;
-                alert('Foto non elaborabile: ' + (e.message || e) + '.\n\nConvertila in JPG o PNG e riprova.');
+                toast('Foto non elaborabile: ' + (e.message || e) + '. Convertila in JPG o PNG e riprova.', 'err');
                 return;
             }
             const ext = blob.type === 'image/jpeg' ? 'jpg' : (inputEl.files[0].name.split('.').pop() || 'img');
@@ -2725,7 +3042,7 @@
                 d.prezzo_alta_mezza = num('cms_alta_mezza') || 150; d.prezzo_alta_intera = num('cms_alta_intera') || 220;
             }
             if (T.tipoBarca) {
-                if (!val('cms_tipo_barca')) { alert('Scegli la categoria della barca (gommone, scafo o lancia).'); btn.disabled = false; return; }
+                if (!val('cms_tipo_barca')) { toast('Scegli la categoria della barca (gommone, scafo o lancia).', 'warn'); btn.disabled = false; return; }
                 d.tipo_barca = val('cms_tipo_barca');
                 d.ritirata = E('cms_ritirata').checked;
                 const colSc = val('cms_colore');
@@ -2743,7 +3060,7 @@
             if (cat === 'index_slot' && !editId) {
                 const dup = listaCMSCache.find(i => i.categoria === 'index_slot' && Number(i.ordine) === d.ordine);
                 if (dup) {
-                    if (!confirm(`Lo slot ${d.ordine} contiene già "${dup.titolo}". Vuoi sostituirlo?`)) { btn.disabled = false; return; }
+                    if (!(await chiedi({ titolo: 'Slot già occupato', testo: `Lo slot ${d.ordine} contiene già "${dup.titolo}". Vuoi sostituirlo?`, ok: 'Sostituisci' }))) { btn.disabled = false; return; }
                     editId = dup.id;
                 }
             }
@@ -2757,12 +3074,12 @@
         }
 
         async function eliminaContenutoCMS(id) {
-            if (!confirm('Sei sicuro di voler eliminare questo contenuto dal CMS?')) return;
+            if (!(await chiedi({ titolo: 'Eliminare il contenuto?', testo: 'Verrà eliminato dal CMS e dal sito.', ok: 'Elimina', pericolo: true }))) return;
             const { error } = await _supabase.from('cms_contenuti').delete().eq('id', id);
             if (error) {
-                alert(error.code === '23503'
+                toast(error.code === '23503'
                     ? 'Questa barca ha noleggi o periodi di fuori servizio collegati e non può essere eliminata.\n\nSpunta "Ritirata dalla flotta" nella sua scheda: sparirà da menu e catalogo ma resterà nello storico.'
-                    : 'Errore eliminazione: ' + error.message);
+                    : 'Errore eliminazione: ' + error.message, 'err', { durata: 14000 });
             }
             await caricaContenutiCMS();
         }
