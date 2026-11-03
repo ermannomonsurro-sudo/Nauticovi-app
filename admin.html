@@ -225,6 +225,13 @@
                         <div id="noleggiLista" class="space-y-3">
                             <p class="text-xs text-slate-400 italic">Caricamento noleggi in corso...</p>
                         </div>
+
+                        <details id="box-orfani" class="hidden bg-white rounded-2xl shadow border border-amber-200 p-3.5">
+                            <summary class="cursor-pointer font-bold text-sm text-slate-700"><i class="fa-solid fa-user-slash text-amber-500"></i> Check-in senza noleggio (<span id="n-orfani">0</span>)</summary>
+                            <p class="text-[11px] text-slate-500 mt-2">Sono i dati compilati dai clienti i cui noleggi sono stati eliminati. Restano nel database finché non li elimini qui.</p>
+                            <div id="lista-orfani" class="space-y-2 mt-2"></div>
+                            <button type="button" onclick="eliminaTuttiCheckinOrfani()" class="mt-3 w-full min-h-[44px] rounded-xl bg-white border border-red-300 text-red-600 hover:bg-red-50 font-bold text-sm"><i class="fa-solid fa-trash"></i> Elimina tutti</button>
+                        </details>
                     </div>
                 </div>
             </div>
@@ -1211,13 +1218,92 @@
             toast('Noleggio riattivato', 'ok');
         }
 
+        // Eliminazione reversibile: si ricorda il noleggio e i check-in collegati, così "Annulla" ripristina tutto
+        // Eliminazione reversibile per 12 secondi. La conferma elenca cosa si perde davvero.
         async function eliminaNoleggio(id) {
             const n = listaNoleggi.find(x => String(x.id) === String(id));
-            const ok = await chiedi({ titolo: 'Eliminare il noleggio?', testo: (n ? `${n.nome_cliente} · ${formattaDataIT(n.data_noleggio)}\n\n` : '') + 'Verrà eliminato definitivamente dal database. Per tenerne traccia nelle statistiche usa "Annulla noleggio".', ok: 'Elimina', pericolo: true });
+            if (!n) return;
+
+            // Check-in collegati: l'eliminazione li scollega, quindi li ricordiamo (per il ripristino) e li segnaliamo
+            const { data: coll, error: e1 } = await _supabase.from('checkin').select('id').eq('noleggio_id', id);
+            if (e1) { toast('Impossibile verificare i dati collegati: ' + e1.message, 'err'); return; }
+            const checkinIds = (coll || []).map(c => c.id);
+
+            const perdi = [];
+            if (checkinIds.length) perdi.push('• il check-in compilato dal cliente: i suoi dati restano nel database in "Check-in senza noleggio" finché non li elimini tu');
+            if (n.caparra_ricevuta_il) perdi.push(`• la registrazione della caparra ricevuta (${euroTesto(n.caparra)})`);
+            if (n.saldo_incassato_il) perdi.push(`• l'incasso del saldo (${euroTesto(n.saldo_incassato)}) e il carburante registrato`);
+            if (n.stato_fattura === 'emessa') perdi.push('• la bozza su Fatture in Cloud NON viene toccata: va eliminata a mano dal portale');
+            perdi.push('• i link del cliente (check-in e Guest Portal) smetteranno di funzionare');
+            const testo = `${n.nome_cliente} · ${formattaDataIT(n.data_noleggio)}\n\nCosa succede:\n${perdi.join('\n')}\n\nPer qualche secondo potrai ripristinarlo con "Annulla". Se vuoi solo liberare lo slot e tenerne traccia usa "Annulla noleggio".`;
+            const ok = await chiedi({ titolo: 'Eliminare il noleggio?', testo, ok: 'Elimina', pericolo: true });
             if (!ok) return;
+
+            const copia = { ...n };
             const { error } = await _supabase.from('noleggi').delete().eq('id', id);
-            if (error) toast('Errore eliminazione: ' + error.message, 'err'); else toast('Noleggio eliminato', 'info');
+            if (error) { toast('Errore eliminazione: ' + error.message, 'err'); return; }
             await caricaNoleggi();
+            toast(`Noleggio eliminato: ${n.nome_cliente}`, 'info', { durata: 12000, azione: { label: 'Annulla', fn: () => ripristinaNoleggio(copia, checkinIds) } });
+        }
+
+        async function ripristinaNoleggio(copia, checkinIds) {
+            // Il database ricontrolla le doppie prenotazioni: se nel frattempo lo slot è stato preso, il ripristino viene rifiutato
+            const { error } = await _supabase.from('noleggi').insert([copia]);
+            if (error) { toast('Non posso ripristinare il noleggio: ' + error.message, 'err'); return; }
+            if (checkinIds && checkinIds.length) {
+                const { error: e2 } = await _supabase.from('checkin').update({ noleggio_id: copia.id }).in('id', checkinIds);
+                if (e2) { await caricaNoleggi(); toast('Noleggio ripristinato, ma non riesco a ricollegare il check-in: ' + e2.message, 'warn', { durata: 12000 }); return; }
+            }
+            await caricaNoleggi();
+            toast('Noleggio ripristinato' + (checkinIds && checkinIds.length ? ' con il suo check-in' : ''), 'ok');
+        }
+
+        const euroTesto = v => '€' + (Math.round((Number(v) || 0) * 100) / 100).toLocaleString('it-IT', { maximumFractionDigits: 2 });
+
+        // ---------- Check-in rimasti senza noleggio (dati personali da eliminare a mano) ----------
+        let checkinOrfani = [];
+
+        async function caricaCheckinOrfani() {
+            if (!_supabase || !E('box-orfani')) return;
+            try {
+                const { data, error } = await _supabase.from('checkin').select('id,created_at,nome_cognome,email,telefono').is('noleggio_id', null).order('created_at', { ascending: false });
+                if (error) { console.error('Lettura check-in senza noleggio non riuscita:', error.message); return; }
+                checkinOrfani = data || [];
+                renderCheckinOrfani();
+            } catch (e) { console.error('Lettura check-in senza noleggio non riuscita:', e); }
+        }
+
+        function renderCheckinOrfani() {
+            const n = checkinOrfani.length;
+            show('box-orfani', n > 0);
+            setTxt('n-orfani', String(n));
+            const box = E('lista-orfani');
+            if (!box) return;
+            box.innerHTML = checkinOrfani.map(c => `<div class="flex justify-between items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-xs">
+                <div class="min-w-0"><b class="text-slate-800 block truncate">${esc(c.nome_cognome)}</b><span class="text-slate-500 block truncate">${esc(c.email || '')}${c.telefono ? ' · ' + esc(c.telefono) : ''}</span><span class="text-[10px] text-slate-400">compilato il ${esc(formattaDataIT(String(c.created_at).slice(0, 10)))}</span></div>
+                <button type="button" onclick="eliminaCheckinOrfano('${esc(c.id)}')" class="text-red-500 hover:text-red-700 p-2 flex-shrink-0" title="Elimina questo check-in" aria-label="Elimina"><i class="fa-solid fa-trash"></i></button></div>`).join('');
+        }
+
+        async function eliminaCheckinOrfano(id) {
+            const c = checkinOrfani.find(x => String(x.id) === String(id));
+            const ok = await chiedi({ titolo: 'Eliminare il check-in?', testo: `${c ? c.nome_cognome + '\n\n' : ''}Verranno eliminati definitivamente i dati personali di questo cliente. Non si può annullare.`, ok: 'Elimina definitivamente', pericolo: true });
+            if (!ok) return;
+            const { error } = await _supabase.from('checkin').delete().eq('id', id).is('noleggio_id', null);
+            if (error) { toast('Errore eliminazione: ' + error.message, 'err'); return; }
+            toast('Check-in eliminato', 'info');
+            await caricaCheckinOrfani();
+        }
+
+        async function eliminaTuttiCheckinOrfani() {
+            const n = checkinOrfani.length;
+            if (!n) return;
+            const ok = await chiedi({ titolo: `Eliminare ${n} check-in?`, testo: 'Verranno eliminati definitivamente i dati personali di tutti i clienti elencati: nome, codice fiscale, email, indirizzo e documento. Non si può annullare.', ok: 'Elimina tutti', pericolo: true });
+            if (!ok) return;
+            const ids = checkinOrfani.map(c => c.id);
+            const { error } = await _supabase.from('checkin').delete().in('id', ids).is('noleggio_id', null);
+            if (error) { toast('Errore eliminazione: ' + error.message, 'err'); return; }
+            toast(`${n} check-in eliminati`, 'info');
+            await caricaCheckinOrfani();
         }
 
         // ---------- Caricamento ed elenco ----------
@@ -1236,6 +1322,7 @@
                 if (typeof aggiornaDashboardKPI === 'function') aggiornaDashboardKPI();
                 if (typeof aggiornaBadge === 'function') aggiornaBadge();
                 if (typeof renderOggi === 'function') renderOggi();
+                caricaCheckinOrfani();
             } catch (err) {
                 console.error('Errore di rete:', err);
             }
