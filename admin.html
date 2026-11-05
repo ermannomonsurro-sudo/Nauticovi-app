@@ -277,14 +277,22 @@
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="block font-bold text-slate-600 uppercase">Dal</label>
-                                    <input type="date" id="fs_dal" required class="w-full mt-1 p-2 border rounded-lg outline-none">
+                                    <input type="date" id="fs_dal" required onchange="fsDalCambiato()" class="w-full mt-1 p-2 border rounded-lg outline-none">
                                 </div>
                                 <div>
                                     <label class="block font-bold text-slate-600 uppercase">Al (opzionale)</label>
                                     <input type="date" id="fs_al" class="w-full mt-1 p-2 border rounded-lg outline-none">
                                 </div>
                             </div>
-                            <p class="text-[10px] text-slate-500">Lascia "Al" vuoto se non sai quando tornerà in servizio: il periodo resta aperto finché non premi "Rimetti in servizio".</p>
+                            <div class="flex flex-wrap gap-1.5 text-[11px] font-bold">
+                                <button type="button" onclick="fsFine(0)" class="px-2.5 py-1.5 rounded-full border border-slate-300 bg-white hover:bg-slate-50">Solo quel giorno</button>
+                                <button type="button" onclick="fsFine(2)" class="px-2.5 py-1.5 rounded-full border border-slate-300 bg-white hover:bg-slate-50">3 giorni</button>
+                                <button type="button" onclick="fsFine(6)" class="px-2.5 py-1.5 rounded-full border border-slate-300 bg-white hover:bg-slate-50">1 settimana</button>
+                                <button type="button" onclick="fsFine(13)" class="px-2.5 py-1.5 rounded-full border border-slate-300 bg-white hover:bg-slate-50">2 settimane</button>
+                                <button type="button" onclick="fsFine(29)" class="px-2.5 py-1.5 rounded-full border border-slate-300 bg-white hover:bg-slate-50">30 giorni</button>
+                                <button type="button" onclick="fsFine(null)" class="px-2.5 py-1.5 rounded-full border border-slate-300 bg-white hover:bg-slate-50">Senza fine</button>
+                            </div>
+                            <p class="text-[10px] text-slate-500">"Al" è l'ultimo giorno fuori servizio. Se non sai quando tornerà, scegli "Senza fine": il periodo resta aperto finché non premi "Rimetti in servizio".</p>
                             <div>
                                 <label class="block font-bold text-slate-600 uppercase">Motivo</label>
                                 <input type="text" id="fs_motivo" placeholder="es. guasto motore, tagliando, rimessaggio" class="w-full mt-1 p-2 border rounded-lg outline-none">
@@ -925,6 +933,7 @@
         let listaNoleggi = [];
         let caparraManuale = false;
         let ultimaTariffa = null;
+        let prezzoAutoInModifica = false;   // in modifica: l'importo salvato era quello di listino, quindi lo seguiamo
         let origineModifica = null;   // scheda da cui è partita la modifica (per tornarci dopo)
         let tokenDisponibilita = 0;
 
@@ -993,33 +1002,37 @@
                 show('hint-prezzo', true);
                 return;
             }
-            if (!editing) {
+            const applica = !editing || prezzoAutoInModifica;
+            if (applica) {
                 caparraManuale = false;
                 setV('importo', t.prezzo);
                 setV('caparra', calcolaCaparra(t.prezzo));
             }
             let testo = `Tariffa ${t.alta ? 'alta' : 'bassa'} stagione · ${t.mezza ? 'mezza' : 'intera'} giornata · €${t.prezzo}.`;
             if (t.fuoriListino) testo += ' ⚠ Mese fuori dal listino (Giu–Set): applicata la tariffa bassa, verifica.';
-            hint.innerHTML = esc(testo) + (editing
+            hint.innerHTML = esc(testo) + (editing && !prezzoAutoInModifica
                 ? ` <button type="button" onclick="applicaTariffaSuggerita()" class="ml-1 underline font-bold">Applica €${esc(t.prezzo)} e caparra</button>`
-                : ' Importo e caparra (50%) sono modificabili.');
+                : (editing ? ' Aggiornati in automatico: puoi modificarli a mano.' : ' Importo e caparra (50%) sono modificabili.'));
             show('hint-prezzo', true);
         }
 
         function applicaTariffaSuggerita() {
             if (!ultimaTariffa || !ultimaTariffa.prezzo) return;
             caparraManuale = false;
+            prezzoAutoInModifica = true;
             setV('importo', ultimaTariffa.prezzo);
             setV('caparra', calcolaCaparra(ultimaTariffa.prezzo));
+            suggerisciPrezzo();
         }
 
         // Se modifichi l'importo a mano, la caparra si riallinea al 50% (a meno che tu non l'abbia già cambiata)
         function importoModificatoManualmente() {
+            prezzoAutoInModifica = false;
             if (caparraManuale) return;
             const v = parseFloat(val('importo'));
             setV('caparra', isNaN(v) ? '' : calcolaCaparra(v));
         }
-        function caparraModificataManualmente() { caparraManuale = true; }
+        function caparraModificataManualmente() { caparraManuale = true; prezzoAutoInModifica = false; }
 
         function impostaPresetRientro() {
             setV('ora_rientro', PRESET_RIENTRO[val('tipo_uscita')] || '18:00');
@@ -1074,6 +1087,7 @@
             E('crmForm').reset();
             setV('noleggio_edit_id', '');
             caparraManuale = false;
+            prezzoAutoInModifica = false;
             ultimaTariffa = null;
             show('hint-prezzo', false);
             show('hint-disponibilita', false);
@@ -1166,6 +1180,10 @@
             setV('importo', n.importo);
             setV('caparra', n.caparra);
             caparraManuale = true;
+            // Se importo e caparra salvati sono quelli di listino, cambiando data/barca/fascia si aggiornano da soli
+            const t0 = tariffaSuggerita();
+            prezzoAutoInModifica = !!(t0 && t0.prezzo !== null && Number(n.importo) === t0.prezzo && Number(n.caparra) === calcolaCaparra(t0.prezzo));
+            if (prezzoAutoInModifica) caparraManuale = false;
 
             setTxt('titolo-form-noleggio', 'Modifica Noleggio');
             setTxt('btn-salva-noleggio-text', 'Aggiorna Noleggio');
@@ -1732,6 +1750,7 @@
             selFs.innerHTML = '<option value="">— Scegli la barca —</option>' + FLOTTA.filter(b => !b.ritirata).map(b => `<option value="${esc(b.id)}">${esc(b.titolo)}</option>`).join('');
             if (sceltaFs) selFs.value = sceltaFs;
             if (!val('fs_dal')) setV('fs_dal', oggi);
+            fsDalCambiato();
 
             if (!FLOTTA.length) {
                 lista.innerHTML = '<p class="text-xs text-slate-400 italic col-span-full">Nessuna barca in flotta. Caricale dal CMS › Catalogo Flotta.</p>';
@@ -1783,10 +1802,29 @@
                 }).join('') : '<p class="text-xs text-slate-400 italic">Nessun periodo registrato.</p>');
         }
 
+        // "Al" non può precedere "Dal" e il selettore si apre sul mese giusto
+        function fsDalCambiato() {
+            const dal = val('fs_dal'), al = E('fs_al');
+            if (!al) return;
+            al.min = dal || '';
+            if (dal && al.value && al.value < dal) al.value = '';
+        }
+
+        // Fine del periodo a partire da "Dal": 0 = solo quel giorno, 2 = 3 giorni in tutto, null = senza fine
+        function fsFine(n) {
+            const dal = val('fs_dal');
+            if (n === null) { setV('fs_al', ''); return; }
+            if (!dal) { setMsgFS('err', 'Scegli prima la data di inizio.'); return; }
+            const [y, m, d] = dal.split('-').map(Number);
+            setV('fs_al', dataLocaleISO(new Date(y, m - 1, d + n)));
+            setMsgFS(null);
+        }
+
         function preparaFuoriServizio(barcaId) {
             setV('fs_barca', barcaId);
             setV('fs_dal', dataLocaleISO());
             setV('fs_al', '');
+            fsDalCambiato();
             E('fsForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -1821,6 +1859,7 @@
             if (error) { setMsgFS('err', error.message); return; }
             E('fsForm').reset();
             setV('fs_dal', dataLocaleISO());
+            fsDalCambiato();
             await ricaricaFlotta();
             setMsgFS('ok', 'Periodo fuori servizio registrato.');
         }
@@ -2053,6 +2092,7 @@
             s.mese = parseInt(val('dash_mese'), 10) || s.mese;
             s.m1 = parseInt(val('dash_m1'), 10) || s.m1; s.m2 = parseInt(val('dash_m2'), 10) || s.m2;
             s.da = val('dash_da'); s.a = val('dash_a');
+            if (E('dash_a')) E('dash_a').min = s.da || '';
             dashSalva();
             aggiornaDashboardKPI();
         }
